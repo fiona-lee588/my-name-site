@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>联系我们 | Contact Us - My Chinese Name</title>
+<style>
+*{margin:0;padding:20px;box-sizing:border-box;font-family:"Noto Serif SC",serif}
+body{background:#f7f2e9;color:#443322;line-height:1.8}
+h2{color:#8c2318;margin-bottom:15px}
+.en{color:#776655;margin-bottom:20px}
+.form-item{margin:15px 0;}
+input,textarea{width:100%;padding:12px;border:1px solid #d8c6b0;border-radius:6px;font-size:15px;background:#fffef9}
+button{padding:12px 24px;background:#8c2318;color:white;border:none;border-radius:6px;cursor:pointer;font-size:16px}
+</style>
+</head>
+<body>
+<h2>联系我们 | Contact Us</h2>
+<p>如有起名咨询、商务合作、意见反馈，可直接留言，我们会尽快回复。</p>
+<p class="en">For naming consultation, business cooperation or feedback, please leave a message and we will reply soon.</p>
+
+<form id="msgForm">
+    <div class="form-item">
+        <label>姓名 | Name</label>
+        <input type="text" id="name" required placeholder="请输入你的姓名">
+    </div>
+    <div class="form-item">
+        <label>邮箱 | Email</label>
+        <input type="email" id="email" required placeholder="请输入你的邮箱">
+    </div>
+    <div class="form-item">
+        <label>留言内容 | Message</label>
+        <textarea id="message" rows="6" required placeholder="请输入留言内容"></textarea>
+    </div>
+    <button type="submit">提交留言 | Send Message</button>
+    <div id="tip" style="margin-top:15px;color:#8c2318"></div>
+</form>
+
+<script>
+document.getElementById('msgForm').addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const data={
+        name:document.getElementById('name').value,
+        email:document.getElementById('email').value,
+        message:document.getElementById('message').value
+    };
+    const res=await fetch('/api/submit-message',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+    });
+    const text=await res.text();
+    document.getElementById('tip').innerText=text;
+    document.getElementById('msgForm').reset();
+})
+</script>
+</body>
+</html>

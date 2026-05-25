@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="My Chinese Name - Custom elegant Chinese names based on Book of Songs & Hundred Family Surnames for global users.">
+<meta name="keywords" content="my chinese name, custom chinese name, Book of Songs, chinese name creator">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Chinese Name | Creator Studio - Elegant Chinese Name Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Noto Serif SC",serif}
+body{
+    background: #f7f2e9;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4af37' fill-opacity='0.06' fill-rule='evenodd'/%3E%3C/svg%3E");
+    padding:40px 20px;
+}
+.wrap{
+    max-width:1100px;
+    margin:0 auto;
+}
+.header{
+    text-align:center;
+    padding:30px 20px;
+    border:2px solid #c8a467;
+    border-radius:10px;
+    background:#fffbf5;
+    margin-bottom:30px;
+    box-shadow:0 4px 12px rgba(139,90,43,0.1);
+}
+.header h1{
+    font-size:34px;
+    color:#8c2318;
+    letter-spacing:6px;
+    margin-bottom:8px;
+}
+.header .en-title{
+    font-size:20px;
+    color:#775533;
+    margin-bottom:12px;
+    font-weight:bold;
+}
+.header .domain{
+    font-size:16px;
+    color:#b88646;
+    margin-bottom:10px;
+}
+.header .tip{
+    color:#775533;
+    font-size:15px;
+    letter-spacing:2px;
+}
+.header .en-tip{
+    font-size:13px;
+    color:#997755;
+    margin-top:4px;
+}
+.culture-desc{
+    background:#fffbf5;
+    border-left:4px solid #c8a467;
+    padding:16px 20px;
+    border-radius:0 8px 8px 0;
+    margin-bottom:30px;
+    color:#554433;
+    line-height:1.8;
+}
+.culture-desc .en{
+    margin-top:10px;
+    font-size:14px;
+    color:#776655;
+}
+.form-box{
+    background:#fffbf5;
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:30px;
+    margin-bottom:30px;
+}
+.form-title{
+    font-size:20px;
+    color:#8c2318;
+    margin-bottom:6px;
+    padding-bottom:10px;
+    border-bottom:1px solid #e2d0b8;
+}
+.form-title-en{
+    font-size:14px;
+    color:#997755;
+    margin-bottom:20px;
+}
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+}
+.form-item{
+    margin-bottom:16px;
+}
+label{
+    display:block;
+    margin-bottom:4px;
+    color:#664433;
+    font-weight:500;
+}
+label .en{
+    font-size:13px;
+    color:#886655;
+    margin-left:6px;
+}
+input,select{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid #d8c6b0;
+    border-radius:6px;
+    font-size:15px;
+    background:#fffef9;
+}
+input:focus,select:focus{
+    outline:none;
+    border-color:#c8a467;
+}
+.full{
+    grid-column:1/-1;
+}
+.birth-row{
+    display:flex;
+    gap:12px;
+}
+.birth-col{
+    flex:1;
+}
+#generateBtn{
+    width:100%;
+    padding:14px;
+    background:#8c2318;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:17px;
+    letter-spacing:2px;
+    cursor:pointer;
+    margin-top:10px;
+}
+#generateBtn:hover{
+    background:#701c13;
+}
+#result{
+    background:#fffbf5;
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:30px;
+    white-space:pre-wrap;
+    line-height:1.8;
+    color:#443322;
+    margin-bottom:30px;
+}
+.share-box{
+    margin-top:20px;
+    padding:20px;
+    background:#f7efe4;
+    border-radius:8px;
+    text-align:center;
+}
+.share-box h4{
+    color:#8c2318;
+    margin-bottom:10px;
+}
+.share-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin:15px 0;
+}
+.share-btn{
+    padding:8px 16px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    color:white;
+}
+.fb{background:#1877f2;}
+.ig{background:#e4405f;}
+.x{background:#000;}
+.wa{background:#25d366;}
+.download-btn{
+    padding:10px 22px;
+    background:#d4af37;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:16px;
+    margin-top:10px;
+}
+.extra-box{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:30px;
+}
+.extra-card{
+    background:#fffbf5;
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:25px;
+}
+.extra-card h3{
+    color:#8c2318;
+    margin-bottom:15px;
+    border-bottom:1px solid #e2d0b8;
+    padding-bottom:8px;
+}
+/* 付费套餐优化：缩小、卡片等大、尊享版只加深边框 */
+.price-box{
+    background:#fffbf5;
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:30px;
+}
+.price-title{
+    font-size:18px;
+    color:#8c2318;
+    margin-bottom:15px;
+    text-align:center;
+}
+.price-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+.price-card{
+    border:1px solid #d8c6b0;
+    border-radius:10px;
+    padding:15px;
+    text-align:center;
+    background:#fffef9;
+}
+.price-card.hot{
+    border:2px solid #8c2318;
+}
+.price-card h3{
+    color:#8c2318;
+    margin-bottom:8px;
+    font-size:16px;
+}
+.price-card .price{
+    font-size:22px;
+    font-weight:bold;
+    color:#b8422a;
+    margin-bottom:12px;
+}
+.price-card ul{
+    list-style:none;
+    margin-bottom:15px;
+    text-align:left;
+    font-size:13px;
+    line-height:1.6;
+}
+.price-card .buy-btn{
+    padding:8px 18px;
+    background:#8c2318;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+}
+.footer{
+    background:#fffbf5;
+    border-top:1px solid #e2d0b8;
+    padding:30px 20px;
+    margin-top:40px;
+}
+.footer-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:20px;
+}
+.footer-col h4{
+    color:#8c2318;
+    margin-bottom:10px;
+}
+.footer-col a{
+    display:block;
+    color:#664433;
+    text-decoration:none;
+    margin:5px 0;
+    font-size:14px;
+}
+.copyright{
+    text-align:center;
+    color:#997755;
+    font-size:14px;
+}
+.help-float{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#8c2318;
+    color:white;
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:20px;
+}
+.loading{
+    display:none;
+    text-align:center;
+    padding:20px;
+    color:#8c2318;
+}
+/* 喇叭发音按钮样式 */
+.speaker-btn{
+    display:inline-block;
+    margin-left:8px;
+    cursor:pointer;
+    font-size:18px;
+    color:#8c2318;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="header">
+        <h1>雅韵中华 · 赐你佳名</h1>
+        <div class="en-title">My Chinese Name | Creator Studio</div>
+        <div class="domain">🌐 mychinesename.co</div>
+        <div class="tip">八字定五行｜诗经取雅意｜百家姓溯源｜国风起名馆</div>
+        <div class="en-tip">Eight‑Character & Five‑Elements · Book of Songs · Hundred Family Surnames</div>
+    </div>
+    <div class="culture-desc">
+        名者，命也。中华起名承千年文脉，融生辰八字五行、《诗经》风雅、《楚辞》浪漫、《易经》吉卦，结合姓氏源流，取字温润雅致、寓意绵长，为海外友人定制专属中式姓名。
+        <div class="en">A name shapes one’s destiny. We create exclusive Chinese‑style names with traditional fortune culture for global friends.</div>
+    </div>
+    <div class="form-box">
+        <div class="form-title">📜 定制你的专属国风姓名</div>
+        <div class="form-title-en">Custom Your Exclusive Chinese‑Style Name</div>
+        <div class="form-row">
+            <div class="form-item">
+                <label>性别 <span class="en">/ Gender</span></label>
+                <select id="gender">
+                    <option>男 Male</option>
+                    <option>女 Female</option>
+                    <option>中性 Neutral</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>名字风格 <span class="en">/ Style</span></label>
+                <select id="style">
+                    <option>温婉诗意 Gentle & Poetic</option>
+                    <option>大气豪迈 Grand & Bold</option>
+                    <option>清雅书香 Elegant & Scholarly</option>
+                    <option>温润简约 Mild & Simple</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-item">
+                <label>你的名字 <span class="en">/ Given Name</span></label>
+                <input type="text" id="englishName" placeholder="输入你的英文名 / Enter your given name">
+            </div>
+            <div class="form-item">
+                <label>你的姓氏 <span class="en">/ Surname</span></label>
+                <input type="text" id="englishSurname" placeholder="输入你的英文姓氏 / Enter your surname">
+            </div>
+        </div>
+
+        <div class="form-item full">
+            <label>出生年月日时 <span class="en">/ Birth Date & Time</span></label>
+            <div class="birth-row">
+                <div class="birth-col">
+                    <input list="yearList" id="birthYear" placeholder="年份 / Year">
+                    <datalist id="yearList"></datalist>
+                </div>
+                <div class="birth-col">
+                    <input list="monthList" id="birthMonth" placeholder="月份 / Month">
+                    <datalist id="monthList">
+                        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+                        <option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+                    </datalist>
+                </div>
+                <div class="birth-col">
+                    <input list="dayList" id="birthDay" placeholder="日期 / Day">
+                    <datalist id="dayList"></datalist>
+                </div>
+                <div class="birth-col">
+                    <input list="timeList" id="birthTime" placeholder="时辰 / Time">
+                    <datalist id="timeList">
+                        <option>子时 23:00‑01:00</option>
+                        <option>丑时 01:00‑03:00</option>
+                        <option>寅时 03:00‑05:00</option>
+                        <option>卯时 05:00‑07:00</option>
+                        <option>辰时 07:00‑09:00</option>
+                        <option>巳时 09:00‑11:00</option>
+                        <option>午时 11:00‑13:00</option>
+                        <option>未时 13:00‑15:00</option>
+                        <option>申时 15:00‑17:00</option>
+                        <option>酉时 17:00‑19:00</option>
+                        <option>戌时 19:00‑21:00</option>
+                        <option>亥时 21:00‑23:00</option>
+                    </datalist>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-item full">
+            <label>偏好寓意 <span class="en">/ Meaning Preference</span></label>
+            <input type="text" id="meaning" placeholder="平安顺遂、前程远大、温润如玉等 / Peace, success, gentleness etc.">
+        </div>
+        <div class="loading" id="loading">✨ 正在为你生成专属姓名，请稍候... | Generating your exclusive name, please wait...</div>
+        <button id="generateBtn">✨ 一键生成国风佳名 | Generate Chinese Name</button>
+    </div>
+    <div id="result"></div>
+    <div class="extra-box">
+        <div class="extra-card">
+            <h3>🌟 热门姓名案例 | Popular Names</h3>
+            <p>苏清晏 Su Qingyan｜水木 Water‑Wood｜清朗安然 Gentle & Peaceful<br>
+            景安瑾 Jing Anjin｜木金 Wood‑Metal｜温润如玉 Gentle as Jade<br>
+            知遥 Zhi Yao｜火火 Fire‑Fire｜自在豁达 Free‑spirited & Open‑minded</p>
+        </div>
+        <div class="extra-card">
+            <h3>📖 起名文化小知识 | Culture Tips</h3>
+            <p>• 八字五行：根据生辰匹配喜用神 | Eight‑Character Five‑Elements: Match lucky elements by birth time<br>
+            • 诗经起名：取自上古风雅诗句 | Book of Songs Names: Derived from ancient elegant poems<br>
+            • 分享领福利：分享得专属书法头像+免费重生成名额 | Share Bonus: Get free calligraphy avatar & extra generation</p>
+        </div>
+    </div>
+    <div class="price-box">
+        <div class="price-title">💰 升级付费定制套餐 | Upgrade Paid Packages</div>
+        <div class="price-row">
+            <div class="price-card">
+                <h3>基础版 Basic</h3>
+                <div class="price">$9.9</div>
+                <ul>
+                    <li>✅ 3个定制姓名 | 3 Custom Names</li>
+                    <li>✅ 基础五行解析 | Basic Five‑Element Analysis</li>
+                    <li>✅ 1次重生成 | 1 Regeneration</li>
+                    <li>❌ 无深度古籍溯源 | No In‑depth Ancient Book Source</li>
+                </ul>
+                <button class="buy-btn" onclick="alert('支付功能即将上线，敬请期待 | Payment coming soon')">Buy Now</button>
+            </div>
+            <div class="price-card hot">
+                <h3>尊享版 Premium</h3>
+                <div class="price">$19.9</div>
+                <ul>
+                    <li>✅ 5个专属姓名 | 5 Exclusive Names</li>
+                    <li>✅ 完整八字五行解析 | Full Eight‑Character & Five‑Element Analysis</li>
+                    <li>✅ 诗经/楚辞出处溯源 | Book of Songs/Chu Ci Source Trace</li>
+                    <li>✅ 高清起名证书 | HD Naming Certificate</li>
+                </ul>
+                <button class="buy-btn" onclick="alert('支付功能即将上线，敬请期待 | Payment coming soon')">Buy Now</button>
+            </div>
+            <div class="price-card">
+                <h3>至尊VIP Ultimate</h3>
+                <div class="price">$29.9</div>
+                <ul>
+                    <li>✅ 无限次生成 | Unlimited Generations</li>
+                    <li>✅ 一对一深度定制 | 1‑on‑1 In‑depth Customization</li>
+                    <li>✅ 终身姓名档案 | Lifetime Name File</li>
+                    <li>⚠️ 仅限本人IP/设备使用 | For personal IP & device only</li>
+                </ul>
+                <button class="buy-btn" onclick="alert('支付功能即将上线，敬请期待 | Payment coming soon')">Buy Now</button>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:15px;font-size:14px;color:#886655">
+            所有套餐绑定当前设备&IP，不可分享转借 | All packages bound to your device & IP, non‑shareable
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer-row">
+            <div class="footer-col">
+                <h4>关于我们 | About Us</h4>
+                <a href="/brand-intro">品牌介绍 | Brand Intro</a>
+                <a href="/contact-us">联系我们 | Contact Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>服务条款 | Terms</h4>
+                <a href="/terms">使用条款 | Terms of Use</a>
+                <a href="/privacy">隐私政策 | Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>帮助中心 | Help</h4>
+                <a href="/faq">常见问题 | FAQ</a>
+                <a href="/payment-guide">支付说明 | Payment Guide</a>
+            </div>
+            <div class="footer-col">
+                <h4>关注我们 | Follow Us</h4>
+                <a href="https://facebook.com" target="_blank">Facebook</a>
+                <a href="https://instagram.com" target="_blank">Instagram</a>
+                <a href="https://tiktok.com" target="_blank">TikTok</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 My Chinese Name | Creator Studio · All Rights Reserved · mychinesename.co
+        </div>
+    </div>
+    <div class="help-float">?</div>
+</div>
+
+<script>
+// 自动填充年份1920‑2025
+const yearList = document.getElementById('yearList');
+for(let y=2025;y>=1920;y--){
+    const opt=document.createElement('option');
+    opt.value=y;
+    yearList.appendChild(opt);
+}
+// 自动填充日期1‑31
+const dayList=document.getElementById('dayList');
+for(let d=1;d<=31;d++){
+    const opt=document.createElement('option');
+    opt.value=d;
+    dayList.appendChild(opt);
+}
+
+// 普通话朗读函数
+function readChinese(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
+}
+const shareTextEN = "✨ I got my exclusive elegant Chinese name from My Chinese Name! Customized with traditional 8‑character fortune & ancient poetry. Check it out: https://mychinesename.co";
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    // 非空校验
+    const englishName = document.getElementById('englishName').value.trim();
+    const englishSurname = document.getElementById('englishSurname').value.trim();
+    if(!englishName || !englishSurname){
+        document.getElementById('result').innerText = "请输入你的英文名和姓氏！| Please enter your given name and surname!";
+        return;
+    }
+
+    const loading = document.getElementById('loading');
+    loading.style.display = 'block';
+    const data = {
+        gender: document.getElementById('gender').value,
+        englishName: englishName,
+        englishSurname: englishSurname,
+        birthYear: document.getElementById('birthYear').value.trim(),
+        birthMonth: document.getElementById('birthMonth').value.trim(),
+        birthDay: document.getElementById('birthDay').value.trim(),
+        birthTime: document.getElementById('birthTime').value.trim(),
+        style: document.getElementById('style').value,
+        meaning: document.getElementById('meaning').value.trim()
+    };
+
+    try{
+        const res = await fetch('/api/getChineseName', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(!res.ok) throw new Error("接口异常");
+        const text = await res.text();
+        // 提取中文姓名，兼容·符号
+        const nameMatch = text.match(/【完整中文姓名】：(.+?)(?=\n)/);
+        const fullName = nameMatch ? nameMatch[1].replace(/·/g,'') : '';
+        // 生成喇叭按钮，放在姓名后面
+        const nameWithSpeaker = text.replace(/【完整中文姓名】：(.+?)(?=\n)/, `【完整中文姓名】：$1 <span class="speaker-btn" onclick="readChinese('${fullName}')">🔊</span>`);
+        loading.style.display = 'none';
+        // 修复分享区排版
+        document.getElementById('result').innerHTML = `
+${nameWithSpeaker}
+<div class="share-box">
+    <h4>🎁 分享领福利 | Share for Bonus</h4>
+    <p>分享你的姓名到社交平台，免费领取高清书法头像+1次重生成名额！<br>Share your name & get free calligraphy avatar & extra generation!</p>
+    <div class="share-buttons">
+        <button class="share-btn fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=https://mychinesename.co&quote=${encodeURIComponent(shareTextEN)}')">Facebook</button>
+        <button class="share-btn ig" onclick="alert('Copy the text & share to Instagram!')">Instagram</button>
+        <button class="share-btn x" onclick="window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextEN)}&url=https://mychinesename.co')">X(Twitter)</button>
+        <button class="share-btn wa" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareTextEN)}')">WhatsApp</button>
+    </div>
+    <button class="download-btn" onclick="downloadAvatar('${fullName}')">🔊 下载书法头像&朗读姓名 | Download Avatar & Play Audio</button>
+</div>
+        `;
+    }catch(err){
+        loading.style.display = 'none';
+        document.getElementById('result').innerText = "生成失败，请稍后重试 | Generation failed, please try again later";
+        console.error("错误详情：",err);
+    }
+});
+
+// 下载毛笔国风头像
+function downloadAvatar(name){
+    if(!name) return;
+    const svg = `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f7f2e9"/>
+        <text x="540" y="400" font-size="80" text-anchor="middle" fill="#8c2318" font-family="KaiTi,serif">${name}</text>
+        <text x="540" y="550" font-size="30" text-anchor="middle" fill="#b88646">My Chinese Name | Creator Studio</text>
+        <text x="540" y="600" font-size="24" text-anchor="middle" fill="#775533">mychinesename.co</text>
+    </svg>`;
+    const blob = new Blob([svg],{type:"image/svg+xml"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_avatar.svg`;
+    a.click();
+    readChinese(name);
+}
+</script>
+</body>
+</html>    <div class="footer">
+        <div class="footer-row">
+            <div class="footer-col">
+                <h4>关于我们 | About Us</h4>
+                <a href="/brand-intro">品牌介绍 | Brand Intro</a>
+                <a href="/contact-us">联系我们 | Contact Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>服务条款 | Terms</h4>
+                <a href="/terms">使用条款 | Terms of Use</a>
+                <a href="/privacy">隐私政策 | Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h4>帮助中心 | Help</h4>
+                <a href="/faq">常见问题 | FAQ</a>
+                <a href="/payment-guide">支付说明 | Payment Guide</a>
+            </div>
+            <div class="footer-col">
+                <h4>关注我们 | Follow Us</h4>
+                <a href="#">敬请期待 | Coming Soon</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 My Chinese Name | Creator Studio · All Rights Reserved · mychinesename.co
+        </div>
+    </div>
