@@ -7,7 +7,7 @@ const port = 3000;
 
 // 跨域、静态资源、解析JSON
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', 'https://mychinesename.co');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, X-Package');
     next();
 });
