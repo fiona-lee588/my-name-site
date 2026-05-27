@@ -1,0 +1,10 @@
+{
+  "user_::ffff:127_0_0_1": {
+    "quota": 9999,
+    "package": "test"
+  },
+  "user_::1": {
+    "quota": 9999,
+    "package": "test"
+  }
+}
