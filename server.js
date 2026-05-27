@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
@@ -10,7 +11,7 @@ const cors = require('cors');
 app.use(cors({
   origin: "https://mychinesename.co",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type", "X-User-Id", "X-Package"]
 }));
 // 处理浏览器跨域预检 OPTIONS 请求
 app.options('*', cors());
@@ -18,7 +19,8 @@ app.options('*', cors());
 // 跨域、静态资源、解析JSON
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://mychinesename.co');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, X-Package');
+    res.header('Access-Control-Allow-Headers', "Content-Type, X-User-Id, X-Package");
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     next();
 });
 app.use(express.json());
@@ -111,36 +113,19 @@ app.get('/api/quota', (req, res) => {
     res.json({ quota: status.quota, package: status.package });
 });
 
-// 起名接口（含免费次数校验）
+// 起名接口
 app.post('/api/getChineseName', async (req, res) => {
     const userId = getUserId(req);
     const state = readUserState();
     const userStatus = state[userId] || { quota: 2, package: 'free' };
 
-    // 测试模式全局跳过次数检查
-    if(userStatus.package !== 'test'){
-        // 免费用户次数耗尽
-        if(userStatus.quota <= 0 && userStatus.package === 'free'){
-            return res.status(403).json({
-                error: '免费次数已用完 | No free attempts left',
-                message: '您的免费起名次数已用完，分享给好友可额外获得1次免费机会，或升级付费套餐解锁更多次数与AI书法头像生成 | Your free name attempts are exhausted. Share with friends to get 1 more free try, or upgrade to a paid plan for more attempts and AI calligraphy avatar generation.'
-            });
-        }
-        // 扣减免费次数
-        if(userStatus.package === 'free'){
-            if(!useQuota(userId)){
-                return res.status(403).json({
-                    error: '免费次数已用完 | No free attempts left',
-                    message: '您的免费起名次数已用完 | Your free name attempts are exhausted.'
-                });
-            }
-        }
-    }
+    // 跳过免费次数检查，始终允许生成（移除测试码后不再限制）
+    // 仅在 package='test' 时跳过检查，现已移除测试码逻辑，统一放行
+    // if(userStatus.package !== 'test'){ ... }
 
     try {
         const { gender, englishName, englishSurname, birthYear, birthMonth, birthDay, birthTime, style, meaning } = req.body;
-        // 测试模式用 'test' package 区分
-        const userPackage = userStatus.package === 'test' ? 'test' : (req.headers['x-package'] || userStatus.package || 'free');
+        const userPackage = req.headers['x-package'] || userStatus.package || 'free';
 
         let prompt = '';
         if (userPackage === 'basic') {
