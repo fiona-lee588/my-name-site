@@ -944,7 +944,7 @@ async function tryUnlockTest(){
     const code = document.getElementById('testCode').value.trim();
     if(code === TEST_CODE){
         try {
-            const res = await fetch('/api/test-unlock', {
+            const res = await fetch('https://my-name-site-h9tq.onrender.com/api/test-unlock', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({code})
