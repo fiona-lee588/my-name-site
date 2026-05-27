@@ -5,6 +5,16 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 
+// CORS 跨域预检配置
+const cors = require('cors');
+app.use(cors({
+  origin: "https://mychinesename.co",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+// 处理浏览器跨域预检 OPTIONS 请求
+app.options('*', cors());
+
 // 跨域、静态资源、解析JSON
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'https://mychinesename.co');
