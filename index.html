@@ -1029,7 +1029,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     };
 
     try{
-        const res = await fetch('/api/getChineseName', {
+        const res = await fetch('https://mychinesename.co/api/getChineseName', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(data)
