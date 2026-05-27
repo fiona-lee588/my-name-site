@@ -87,22 +87,22 @@ app.post('/api/share-reward', (req, res) => {
     res.json(result);
 });
 
-// 测试码解锁接口
-app.post('/api/test-unlock', (req, res) => {
-    const { code } = req.body;
-    if(code === TEST_CODE){
-        const userId = getUserId(req);
-        const state = readUserState();
-        const user = state[userId] || { quota: 2, package: 'free' };
-        user.quota = 9999; // 无限次
-        user.package = 'test';
-        state[userId] = user;
-        writeUserState(state);
-        res.json({ success: true, message: '测试模式解锁成功 | Test mode unlocked' });
-    } else {
-        res.status(403).json({ success: false, message: '测试码错误 | Incorrect test code' });
-    }
-});
+// 测试码解锁接口（已禁用，直接返回成功）
+// app.post('/api/test-unlock', (req, res) => {
+//     const { code } = req.body;
+//     if(code === TEST_CODE){
+//         const userId = getUserId(req);
+//         const state = readUserState();
+//         const user = state[userId] || { quota: 2, package: 'free' };
+//         user.quota = 9999; // 无限次
+//         user.package = 'test';
+//         state[userId] = user;
+//         writeUserState(state);
+//         res.json({ success: true, message: '测试模式解锁成功 | Test mode unlocked' });
+//     } else {
+//         res.status(403).json({ success: false, message: '测试码错误 | Incorrect test code' });
+//     }
+// });
 
 // 查询当前用户免费次数
 app.get('/api/quota', (req, res) => {

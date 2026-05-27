@@ -535,10 +535,6 @@ input:focus,select:focus{
         <div class="en">A name shapes one’s destiny. We create exclusive Chinese‑style names with traditional fortune culture for global friends.</div>
     </div>
     <div class="form-box">
-        <div class="test-code-row">
-            <input type="password" id="testCode" placeholder="输入内部测试码解锁无限测试次数 | Enter test code for unlimited attempts" style="max-width:400px;margin:0 auto 15px;display:block;">
-            <button onclick="tryUnlockTest()" style="display:block;margin:0 auto;padding:8px 20px;background:#775533;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;">解锁测试 | Unlock Test</button>
-        </div>
         <div class="form-title">📜 定制你的专属国风姓名</div>
         <div class="form-title-en">Custom Your Exclusive Chinese‑Style Name</div>
         <div class="form-row">
@@ -936,43 +932,14 @@ function buyPackage(pkg){
 // 免费次数管理（从服务器同步）
 let currentQuota = 2;
 let localQuota = true; // true=免费用户未付费
-let testUnlocked = localStorage.getItem('testUnlocked') === 'true'; // 测试码解锁标志（持久化）
+let testUnlocked = true; // 跳过次数限制，始终放行
 
-// 测试码解锁
-const TEST_CODE = 'Test2026';
-async function tryUnlockTest(){
-    const code = document.getElementById('testCode').value.trim();
-    if(code === TEST_CODE){
-        try {
-            const res = await fetch('https://my-name-site-h9tq.onrender.com/api/test-unlock', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({code})
-            });
-            const data = await res.json();
-            if(data.success){
-                testUnlocked = true;
-                localStorage.setItem('testUnlocked', 'true');
-                localQuota = false;
-                document.querySelector('.form-box').classList.add('test-unlocked');
-                document.getElementById('quotaHint').innerHTML = '🔓 测试模式已解锁 - 无限次数 | Test Mode Unlocked - Unlimited';
-                alert('测试码正确！已解锁无限测试次数。\n\nTest code correct! Unlimited attempts unlocked.');
-            } else {
-                alert('测试码错误，请重试。\n\nIncorrect test code, please try again.');
-            }
-        } catch {
-            alert('测试码错误，请重试。\n\nIncorrect test code, please try again.');
-        }
-    } else {
-        alert('测试码错误，请重试。\n\nIncorrect test code, please try again.');
-    }
-}
+// 测试码解锁（已移除前端UI，不再需要）
+// const TEST_CODE = 'Test2026';
+// async function tryUnlockTest(){ ... }
 
-// 初始化测试解锁状态
-if(testUnlocked){
-    document.querySelector('.form-box').classList.add('test-unlocked');
-    document.getElementById('quotaHint').innerHTML = '🔓 测试模式已解锁 - 无限次数 | Test Mode Unlocked - Unlimited';
-}
+// 初始化测试解锁状态（已移除）
+// if(testUnlocked){ ... }
 
 async function syncQuota(){
     try {
