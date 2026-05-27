@@ -220,7 +220,8 @@ app.post('/api/getChineseName', async (req, res) => {
 
         res.send(response.data.choices[0].message.content);
     } catch (err) {
-        console.error('DeepSeek API error:', err.message);
+        console.error('【DeepSeek API 错误】', err.message);
+        console.error('请求详情:', req.body);
         res.status(500).json({
             error: '生成失败，请稍后重试 | Generation failed, please try again later',
             message: '抱歉，服务暂时繁忙，请稍后重试 | Sorry, service is temporarily busy, please try again later'
