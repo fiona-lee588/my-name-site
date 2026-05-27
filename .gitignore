@@ -1,0 +1,4 @@
+.env
+node_modules/
+user-state.json
+messages.txt

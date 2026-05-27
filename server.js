@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.static('./'));
 
 // DeepSeek密钥
-const DEEPSEEK_KEY = "sk-d878acfa22a84823a24d1f854cd58187";
+const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || "";
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
 // 内部测试密码
