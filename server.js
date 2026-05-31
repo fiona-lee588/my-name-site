@@ -35,7 +35,6 @@ app.use((req, res, next) => {
     next();
 });
 app.use(express.json());
-app.use(express.static('./'));
 
 // ============================================================
 // 安全中间件：IP 限流 + 频率限制
@@ -493,4 +492,5 @@ app.listen(port, () => {
     if(PAYPAL.email) console.log(`💳 PayPal收款：${PAYPAL.email} (${PAYPAL.mode})`);
     else console.warn('⚠️ 请在 .env 配置 PAYPAL_EMAIL');
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
+app.use(express.static('./'));
 });
