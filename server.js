@@ -493,4 +493,5 @@ app.listen(port, () => {
     else console.warn('⚠️ 请在 .env 配置 PAYPAL_EMAIL');
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
 app.use(express.static('./'));
+app.use(express.static("./"));
 });
