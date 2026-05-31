@@ -485,6 +485,7 @@ app.get('/api/avatar-svg', (req, res) => {
 // ============================================================
 // 启动
 // ============================================================
+	app.use(express.static("./"));
 app.listen(port, () => {
     console.log(`网站运行在 ${DOMAIN}`);
     console.log(`后台留言：http://localhost:${port}/admin-messages`);
@@ -492,6 +493,4 @@ app.listen(port, () => {
     if(PAYPAL.email) console.log(`💳 PayPal收款：${PAYPAL.email} (${PAYPAL.mode})`);
     else console.warn('⚠️ 请在 .env 配置 PAYPAL_EMAIL');
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
-app.use(express.static('./'));
-app.use(express.static("./"));
 });
