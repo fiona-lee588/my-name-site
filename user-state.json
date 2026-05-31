@@ -6,5 +6,40 @@
   "user_::1": {
     "quota": 9999,
     "package": "test"
+  },
+  "test_user_debug999": {
+    "quota": 3,
+    "package": "basic",
+    "transactionId": "TEST789"
+  },
+  "test_debug_me": {
+    "quota": 3,
+    "package": "basic",
+    "wuxingLevel": "basic",
+    "culturalDepth": false,
+    "certificate": false,
+    "avatarGeneration": 0,
+    "transactionId": "TEST_CURL_007",
+    "paidAt": "2026-05-31T00:55:11.709Z"
+  },
+  "manual_test_user": {
+    "quota": 3,
+    "package": "basic",
+    "wuxingLevel": "basic",
+    "culturalDepth": false,
+    "certificate": false,
+    "avatarGeneration": 0,
+    "transactionId": "MANUAL_BASIC_1780190520",
+    "paidAt": "2026-05-31T01:22:00.464Z"
+  },
+  "manual_ult_user": {
+    "quota": 9999,
+    "package": "ultimate",
+    "wuxingLevel": "full",
+    "culturalDepth": true,
+    "certificate": true,
+    "avatarGeneration": 999,
+    "transactionId": "MANUAL_ULT_1780190521",
+    "paidAt": "2026-05-31T01:22:01.608Z"
   }
 }

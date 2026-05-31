@@ -1,0 +1,67 @@
+[
+  {
+    "txn": "1780190493",
+    "userId": "test_user_BASIC_OK",
+    "pkg": "basic",
+    "err": "Amount mismatch: expected=9.90, got=",
+    "_ts": "2026-05-31T01:21:33.528Z"
+  },
+  {
+    "txn": "1780190493",
+    "userId": "test_user_PREMIUM_OK",
+    "pkg": "basic",
+    "err": "Amount mismatch: expected=9.90, got=",
+    "_ts": "2026-05-31T01:21:33.658Z"
+  },
+  {
+    "txn": "1780190493",
+    "userId": "test_user_ULTIMATE_OK",
+    "pkg": "basic",
+    "err": "Amount mismatch: expected=9.90, got=",
+    "_ts": "2026-05-31T01:21:33.741Z"
+  },
+  {
+    "txn": "1780190493",
+    "userId": "test_user_AMT_MISMATCH",
+    "pkg": "basic",
+    "err": "Receiver email mismatch: expected=https://paypal.me/fionalee588, got=AMT_MISMATCH",
+    "_ts": "2026-05-31T01:21:33.825Z"
+  },
+  {
+    "txn": "1780190493",
+    "userId": "test_user_CURRENCY_ERR",
+    "pkg": "basic",
+    "err": "Receiver email mismatch: expected=https://paypal.me/fionalee588, got=CURRENCY_ERR",
+    "_ts": "2026-05-31T01:21:33.907Z"
+  },
+  {
+    "txn": "1780190493",
+    "userId": "test_user_EMAIL_MISMATCH",
+    "pkg": "basic",
+    "err": "Receiver email mismatch: expected=https://paypal.me/fionalee588, got=EMAIL_MISMATCH",
+    "_ts": "2026-05-31T01:21:33.984Z"
+  },
+  {
+    "status": "Completed",
+    "txn": "MANUAL_BASIC_1780190520",
+    "userId": "manual_test_user",
+    "pkg": "basic",
+    "success": true,
+    "_ts": "2026-05-31T01:22:00.465Z"
+  },
+  {
+    "status": "Completed",
+    "txn": "MANUAL_ULT_1780190521",
+    "userId": "manual_ult_user",
+    "pkg": "ultimate",
+    "success": true,
+    "_ts": "2026-05-31T01:22:01.609Z"
+  },
+  {
+    "txn": "TEST",
+    "userId": "u1",
+    "pkg": "basic",
+    "err": "Receiver email mismatch: expected=https://paypal.me/fionalee588, got=test@test.com",
+    "_ts": "2026-05-31T01:23:39.819Z"
+  }
+]

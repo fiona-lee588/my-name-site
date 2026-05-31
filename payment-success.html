@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Success - My Chinese Name</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Noto Serif SC",serif}
+body{background:#f7f2e9;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.wrap{text-align:center;padding:40px;max-width:600px;}
+.check{font-size:80px;margin-bottom:20px;}
+h1{color:#8c2318;font-size:28px;margin-bottom:10px;}
+p{color:#554433;font-size:16px;line-height:1.8;margin-bottom:20px;}
+.btn{display:inline-block;padding:12px 30px;background:#8c2318;color:#fff;text-decoration:none;border-radius:8px;font-size:16px;}
+.btn:hover{background:#701c13;}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="check">✅</div>
+    <h1>支付成功！| Payment Successful!</h1>
+    <p>感谢您的支持！您的套餐已解锁。<br>Thank you! Your package has been unlocked.</p>
+    <p>请返回首页查看您的特权。<br>Please return to homepage to access your benefits.</p>
+    <a href="/" class="btn">返回首页 | Back to Home</a>
+</div>
+<script>
+// 从URL参数中提取支付状态并同步到服务器
+(async () => {
+    const params = new URLSearchParams(window.location.search);
+    const tx = params.get('tx') || params.get('transaction_id');
+    if(tx) {
+        try {
+            await fetch('/api/paypal-checkout', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ transactionId: tx })
+            });
+        } catch(e) { console.error('Sync error:', e); }
+    }
+})();
+</script>
+</body>
+</html>

@@ -1,22 +1,193 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>使用条款 | Terms of Use - My Chinese Name</title>
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service · 服务条款 | My Chinese Name</title>
 <style>
-*{margin:0;padding:20px;box-sizing:border-box;font-family:"Noto Serif SC",serif}
-body{background:#f7f2e9;color:#443322;line-height:1.8}
-h2{color:#8c2318;margin-bottom:15px}
-.en{color:#776655;margin-bottom:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c-primary:#8c2318;--c-primary-dark:#701c13;
+  --c-gold:#c9a96e;--c-gold-dark:#b88646;
+  --c-bg:#f7f2e9;--c-bg-card:#fffbf5;
+  --c-text:#443322;--c-text-light:#775533;
+  --c-border:#e2d0b8;--c-border-dark:#d8c6b0;
+  --shadow-card:0 2px 12px rgba(139,90,43,0.10);
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+    font-family:"Noto Serif SC","STKaiti","KaiTi",serif;
+    background:var(--c-bg);
+    background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4af37' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    color:var(--c-text);line-height:1.8;padding:24px 16px;
+}
+.wrap{max-width:900px;margin:0 auto}
+.back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--c-primary);text-decoration:none;font-size:14px;
+    margin-bottom:24px;padding:6px 12px;border:1px solid var(--c-border);
+    border-radius:var(--radius-sm);background:var(--c-bg-card);transition:background 0.2s;
+}
+.back:hover{background:#f5ebe0}
+.page-header{
+    background:var(--c-bg-card);border:2px solid var(--c-gold);
+    border-radius:var(--radius);padding:24px;margin-bottom:24px;text-align:center;
+}
+.page-header h1{font-size:26px;color:var(--c-primary);letter-spacing:3px;margin-bottom:8px}
+.page-header .en{font-size:14px;color:var(--c-text-light);letter-spacing:1px}
+.page-header .last-updated{font-size:12px;color:#997755;margin-top:8px}
+.content-card{
+    background:var(--c-bg-card);border:1px solid var(--c-border);
+    border-radius:var(--radius);padding:24px;margin-bottom:20px;
+}
+.content-card h2{
+    font-size:17px;color:var(--c-primary);margin-bottom:12px;
+    padding-bottom:8px;border-bottom:1px solid var(--c-border);
+}
+.content-card h3{font-size:15px;color:var(--c-primary);margin:14px 0 6px}
+.content-card p{font-size:14px;color:var(--c-text);margin-bottom:10px;word-break:break-word}
+.content-card ul{list-style:none;padding-left:8px}
+.content-card ul li{
+    font-size:14px;color:var(--c-text);margin-bottom:6px;
+    padding-left:16px;position:relative;word-break:break-word
+}
+.content-card ul li::before{content:'•';position:absolute;left:0;color:var(--c-gold)}
+.en-note{color:#997755;font-size:12px;margin-top:3px;display:block}
+.price-table{
+    width:100%;border-collapse:collapse;margin:10px 0;
+    font-size:13px;
+}
+.price-table th{
+    background:var(--c-primary);color:#fff;padding:8px 12px;text-align:left;
+}
+.price-table td{
+    padding:8px 12px;border-bottom:1px solid var(--c-border);color:var(--c-text);
+}
+.price-table tr:nth-child(even) td{background:#fdf9f2}
+.tag{
+    display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;
+    font-weight:bold;color:#fff;
+}
+.tag-hot{background:#e74c3c}.tag-new{background:#27ae60}.tag-basic{background:#2980b9}
+.footer{
+    background:var(--c-bg-card);border-top:1px solid var(--c-border);
+    padding:20px;text-align:center;color:#997755;font-size:13px;
+    border-radius:var(--radius);margin-top:24px;
+}
+.footer a{color:var(--c-primary)}
+@media(max-width:640px){
+    body{padding:12px 10px}html{font-size:15px}
+    .page-header{padding:18px 14px}.page-header h1{font-size:22px}
+    .content-card{padding:18px 14px}
+    .price-table{font-size:12px}
+}
 </style>
 </head>
 <body>
-<h2>使用条款 | Terms of Use</h2>
-<p>1. 本网站所有生成的中文姓名，仅供个人非商业使用，版权归本平台所有，禁止盗用、商用、二次售卖。</p>
-<p class="en">1. All Chinese names generated on this website are for personal non‑commercial use only. Copyright belongs to our platform. Theft, commercial use, and resale are prohibited.</p>
-<p>2. 付费套餐绑定用户设备与IP，不可转借、分享、转让。</p>
-<p class="en">2. Paid packages are bound to user devices and IPs and cannot be transferred or shared.</p>
-<p>3. 平台保留修改条款、优化服务的权利，最终解释权归My Chinese Name所有。</p>
-<p class="en">3. We reserve the right to modify terms and optimize services. Final interpretation belongs to My Chinese Name.</p>
+<div class="wrap">
+    <a class="back" href="/">← 返回首页 Back to Home</a>
+
+    <div class="page-header">
+        <h1>服务条款 Terms of Service</h1>
+        <div class="en">Package Entitlements, Refund Rules & IP Binding Policy</div>
+        <div class="last-updated">最后更新 | Last Updated: 2026/05/31</div>
+    </div>
+
+    <div class="content-card">
+        <h2>一、服务概述 Service Overview</h2>
+        <p>My Chinese Name 为海外用户提供定制中文姓名服务，融合《诗经》《楚辞》《易经》等中华传统文化，提供五行解析、诗经出处溯源、书法头像等增值服务。</p>
+        <p>My Chinese Name provides customized Chinese naming services for overseas users, integrating traditional Chinese culture such as the Book of Songs, Chu Ci, and I Ching, offering Five-Element analysis, classical source tracing, and calligraphy avatar services.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>二、套餐权益 Package Entitlements</h2>
+        <p>我们提供以下三档付费套餐，各套餐权益如下：</p>
+        <p>We offer three paid packages as follows:</p>
+        <table class="price-table" id="pkg-table">
+            <tr><th>套餐 Package</th><th>价格 Price</th><th>起名次数 Quota</th><th>五行解析 Wuxing</th><th>典故溯源 Culture</th><th>证书 Certificate</th><th>头像 Avatar</th></tr>
+            <tr data-pkg="basic">
+                <td><span class="tag tag-basic">基础版 Basic</span></td>
+                <td class="price-cell"><span class="p-current">$9.9</span> <s class="p-orig">$19.9</s></td>
+                <td>3组 / 3 sets</td><td>基础 Basic</td><td>❌ 无</td><td>❌ 无</td><td>❌ 无</td>
+            </tr>
+            <tr data-pkg="premium">
+                <td><span class="tag tag-hot">尊享版 Premium</span> <span class="tag tag-hot">最受欢迎</span></td>
+                <td class="price-cell"><span class="p-current">$19.9</span> <s class="p-orig">$39.9</s></td>
+                <td>5组 / 5 sets</td><td>完整 Full</td><td>✅ 诗经/楚辞</td><td>✅ 高清 HD</td><td>✅ 1次</td>
+            </tr>
+            <tr data-pkg="ultimate">
+                <td><span class="tag tag-new">至尊VIP Ultimate</span></td>
+                <td class="price-cell"><span class="p-current">$29.9</span> <s class="p-orig">$59.9</s></td>
+                <td>不限 Unlimited</td><td>完整 Full</td><td>✅ 诗经/楚辞/易经</td><td>✅ 高清 HD</td><td>✅ 不限</td>
+            </tr>
+        </table>
+        <script>
+        fetch('/api/pricing').then(r=>r.json()).then(d=>{
+            const p=d.packages;
+            document.querySelectorAll('[data-pkg]').forEach(tr=>{
+                const pkg=tr.dataset.pkg, data=p[pkg];
+                if(!data)return;
+                const cell=tr.querySelector('.price-cell');
+                if(cell){cell.querySelector('.p-current').textContent='$'+data.price;cell.querySelector('.p-orig').textContent='$'+data.originalPrice;}
+            });
+        });
+        </script>
+        <p style="margin-top:12px">所有套餐均包含首次起名后的 1 次不满意重生成机会（Premium/Ultimate 不限次数）。All packages include 1 regeneration if unsatisfied (unlimited for Premium/Ultimate).</p>
+    </div>
+
+    <div class="content-card">
+        <h2>三、设备与IP绑定 Device & IP Binding</h2>
+        <p>付费套餐绑定当前登录设备与IP地址，不可转借、分享、转让。每个账户限购一套同款套餐，违规使用将导致账号封禁且不予退款。</p>
+        <p>Paid packages are bound to the current device and IP address. They cannot be transferred, shared, or resold. Each account is limited to one purchase per package type. Violations will result in account suspension without refund.</p>
+        <ul>
+            <li>同一IP下的多个账户将被视为同一用户<br><span class="en-note">Multiple accounts under the same IP will be treated as the same user</span></li>
+            <li>套餐权益仅限本人使用，禁止商用或公开传播<br><span class="en-note">Package benefits are for personal use only; commercial use or public distribution is prohibited</span></li>
+            <li>IP变更（如使用VPN）可能导致权益验证失败，需联系客服<br><span class="en-note">IP changes (e.g. VPN usage) may cause verification failure — contact support if needed</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>四、支付与退款 Payment & Refund</h2>
+        <h3>4.1 支付方式 Payment Methods</h3>
+        <p>我们支持 PayPal 支付（支持 Visa、Mastercard、American Express 及各国本地支付方式）。Payment is processed securely via PayPal, supporting Visa, Mastercard, American Express, and local payment methods worldwide.</p>
+        <h3>4.2 退款政策 Refund Policy</h3>
+        <p>由于数字内容服务的特殊性，一经支付成功，不支持主动退款。购买前请充分了解套餐内容。不满意可免费重生成一次（基础版）。</p>
+        <p>Due to the nature of digital content services, all payments are non-refundable once processed. Please review package details carefully before purchasing. Unsatisfied names can be regenerated once for free (Basic plan).</p>
+        <ul>
+            <li>支付成功后套餐立即解锁生效<br><span class="en-note">Packages are activated immediately upon successful payment</span></li>
+            <li>如遇支付问题（重复扣款、未到账等），请在72小时内联系客服<br><span class="en-note">For payment issues (duplicate charges, non-receipt, etc.), contact support within 72 hours</span></li>
+            <li>欺诈性支付将通过法律途径追究<br><span class="en-note">Fraudulent payments will be pursued through legal action</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>五、知识产权 Intellectual Property</h2>
+        <p>网站本身（文字、界面设计、软件代码）版权归 My Chinese Name 所有。生成的中文姓名仅供您个人非商业使用，不可二次售卖、不可商用、不可对外公开传播。</p>
+        <p>The website itself (text, interface design, software code) is copyrighted by My Chinese Name. The Chinese names generated are for your personal non-commercial use only. Resale, commercial use, or public distribution is not permitted.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>六、服务变更与终止 Service Changes & Termination</h2>
+        <p>我们保留在不提前通知的情况下，随时优化、修改或终止部分服务的权利。因不可抗力（如服务器故障、政策变更）导致的服务中断，我们不承担直接损失赔偿责任，但会尽力提供替代方案。</p>
+        <p>We reserve the right to optimize, modify, or discontinue part of the services at any time without prior notice. We are not liable for direct damages caused by service interruptions due to force majeure (e.g. server failure, policy changes), but will endeavor to provide alternatives.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>七、免责声明 Disclaimer</h2>
+        <p>生成的中文姓名仅供文化参考，不构成任何宗教、风水、运势的正式认定。使用时应保持理性判断。</p>
+        <p>The Chinese names generated are for cultural reference only and do not constitute any formal determination of religion, feng shui, or fortune-telling. Please use your own judgment.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>八、联系我们 Contact Us</h2>
+        <p>如您对本条款有任何疑问，请通过以下方式联系我们：</p>
+        <p>Email: contact@mychinesename.co | Website: https://mychinesename.co/contact-us</p>
+    </div>
+
+    <div class="footer">
+        © 2026 My Chinese Name · All Rights Reserved · 保留所有权利<br>
+        <a href="/">← 返回首页 Back to Home</a>
+    </div>
+</div>
 </body>
 </html>

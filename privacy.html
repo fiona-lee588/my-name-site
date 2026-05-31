@@ -1,22 +1,176 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>隐私政策 | Privacy Policy - My Chinese Name</title>
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy · 隐私政策 | My Chinese Name</title>
 <style>
-*{margin:0;padding:20px;box-sizing:border-box;font-family:"Noto Serif SC",serif}
-body{background:#f7f2e9;color:#443322;line-height:1.8}
-h2{color:#8c2318;margin-bottom:15px}
-.en{color:#776655;margin-bottom:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c-primary:#8c2318;--c-primary-dark:#701c13;
+  --c-gold:#c9a96e;--c-gold-dark:#b88646;
+  --c-bg:#f7f2e9;--c-bg-card:#fffbf5;
+  --c-text:#443322;--c-text-light:#775533;
+  --c-border:#e2d0b8;--c-border-dark:#d8c6b0;
+  --shadow-card:0 2px 12px rgba(139,90,43,0.10);
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+    font-family:"Noto Serif SC","STKaiti","KaiTi",serif;
+    background:var(--c-bg);
+    background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4af37' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    color:var(--c-text);line-height:1.8;padding:24px 16px;
+}
+.wrap{max-width:900px;margin:0 auto}
+.back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--c-primary);text-decoration:none;font-size:14px;
+    margin-bottom:24px;padding:6px 12px;border:1px solid var(--c-border);
+    border-radius:var(--radius-sm);background:var(--c-bg-card);transition:background 0.2s;
+}
+.back:hover{background:#f5ebe0}
+.page-header{
+    background:var(--c-bg-card);border:2px solid var(--c-gold);
+    border-radius:var(--radius);padding:24px;margin-bottom:24px;text-align:center;
+}
+.page-header h1{font-size:26px;color:var(--c-primary);letter-spacing:3px;margin-bottom:8px}
+.page-header .en{font-size:14px;color:var(--c-text-light);letter-spacing:1px}
+.page-header .last-updated{font-size:12px;color:#997755;margin-top:8px}
+.content-card{
+    background:var(--c-bg-card);border:1px solid var(--c-border);
+    border-radius:var(--radius);padding:24px;margin-bottom:20px;
+}
+.content-card h2{
+    font-size:17px;color:var(--c-primary);margin-bottom:12px;
+    padding-bottom:8px;border-bottom:1px solid var(--c-border);
+}
+.content-card h3{font-size:15px;color:var(--c-primary);margin:14px 0 6px}
+.content-card p{font-size:14px;color:var(--c-text);margin-bottom:10px;word-break:break-word}
+.content-card ul{list-style:none;padding-left:8px}
+.content-card ul li{
+    font-size:14px;color:var(--c-text);margin-bottom:6px;
+    padding-left:16px;position:relative;word-break:break-word
+}
+.content-card ul li::before{content:'•';position:absolute;left:0;color:var(--c-gold)}
+.en-note{color:#997755;font-size:12px;margin-top:3px;display:block}
+.footer{
+    background:var(--c-bg-card);border-top:1px solid var(--c-border);
+    padding:20px;text-align:center;color:#997755;font-size:13px;
+    border-radius:var(--radius);margin-top:24px;
+}
+.footer a{color:var(--c-primary)}
+@media(max-width:640px){
+    body{padding:12px 10px}html{font-size:15px}
+    .page-header{padding:18px 14px}.page-header h1{font-size:22px}
+    .content-card{padding:18px 14px}
+}
 </style>
 </head>
 <body>
-<h2>隐私政策 | Privacy Policy</h2>
-<p>1. 我们仅收集起名必需的基础信息（英文名、生辰等），**绝不收集、存储用户敏感隐私信息**。</p>
-<p class="en">1. We only collect basic naming information such as your English name and birth details. No sensitive private data will be collected or stored.</p>
-<p>2. 所有用户数据严格保密，不会向第三方泄露、出售、共享。</p>
-<p class="en">2. All user data is strictly confidential and will never be leaked, sold, or shared with third parties.</p>
-<p>3. 网站使用安全加密传输，保障用户数据安全，符合全球隐私合规要求。</p>
-<p class="en">3. Our website uses secure encrypted transmission to protect user data, complying with global privacy regulations.</p>
+<div class="wrap">
+    <a class="back" href="/">← 返回首页 Back to Home</a>
+
+    <div class="page-header">
+        <h1>隐私政策 Privacy Policy</h1>
+        <div class="en">How We Collect, Store & Use Your Data</div>
+        <div class="last-updated">最后更新 | Last Updated: 2026/05/31</div>
+    </div>
+
+    <div class="content-card">
+        <h2>一、信息收集 Information We Collect</h2>
+        <h3>1.1 您主动提供的信息 / Information You Provide</h3>
+        <p>当您使用本服务时，您可能主动提供以下信息：</p>
+        <ul>
+            <li>英文姓名、姓氏（用于起名匹配）<br><span class="en-note">Your given name & surname (used for name matching)</span></li>
+            <li>性别与出生日期（用于五行分析）<br><span class="en-note">Gender & date of birth (used for Five-Element analysis)</span></li>
+            <li>电子邮箱（用于接收通知）<br><span class="en-note">Email address (for order notifications)</span></li>
+            <li>留言反馈内容<br><span class="en-note">Message & feedback content</span></li>
+        </ul>
+        <h3>1.2 自动收集的信息 / Information Automatically Collected</h3>
+        <ul>
+            <li>IP地址及访问时间（用于频率限制与安全防护）<br><span class="en-note">IP address & access timestamp (for rate limiting & security)</span></li>
+            <li>浏览器类型与设备信息（用于体验优化）<br><span class="en-note">Browser type & device info (for UX optimization)</span></li>
+            <li>Quota 使用记录（存储于本地 user-state.json）<br><span class="en-note">Quota usage records (stored locally in user-state.json)</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>二、信息使用与目的 Use of Information</h2>
+        <p>我们收集您的信息仅用于以下目的：</p>
+        <ul>
+            <li>生成符合您偏好的中文姓名<br><span class="en-note">Generate Chinese names tailored to your preferences</span></li>
+            <li>提供五行分析、八字解析等文化定制服务<br><span class="en-note">Provide Five-Element analysis & cultural customization</span></li>
+            <li>记录您的套餐权益与使用配额<br><span class="en-note">Track your package entitlements & usage quota</span></li>
+            <li>频率限制与安全防护，阻止恶意请求<br><span class="en-note">Rate limiting & security protection against malicious requests</span></li>
+            <li>处理支付与订单状态查询<br><span class="en-note">Process payments & order status inquiries</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>三、数据存储与安全 Data Storage & Security</h2>
+        <h3>3.1 本地存储 / Local Storage</h3>
+        <p>您的用户状态（配额、套餐信息）存储在服务器本地的 <code>user-state.json</code> 文件中。该文件通过服务器进程管理，不对外公开访问。</p>
+        <p>Your user state (quota, package info) is stored locally in <code>user-state.json</code>, managed by the server process and not publicly accessible.</p>
+        <h3>3.2 第三方服务 / Third-Party Services</h3>
+        <p>我们使用以下第三方服务，处理您明确知情的数据：</p>
+        <ul>
+            <li><strong>DeepSeek AI</strong>：用于生成姓名与文化解析，内容仅用于当次请求，不做永久存储<br><span class="en-note">DeepSeek AI: used for name generation, content used only for the current request and not stored permanently</span></li>
+            <li><strong>PayPal</strong>：处理支付信息，遵循 PayPal 官方隐私政策<br><span class="en-note">PayPal: processes payment information under PayPal\'s official privacy policy</span></li>
+            <li><strong>Anthropic Claude</strong>：作为备用 AI 生成服务（若启用）<br><span class="en-note">Anthropic Claude: used as a backup AI service (if enabled)</span></li>
+        </ul>
+        <h3>3.3 数据保留 / Data Retention</h3>
+        <p>支付记录与套餐权益数据将保留至您主动注销账户或联系我们删除。留言反馈内容在服务器侧保留，供后台管理使用，不对外公开。</p>
+        <p>Payment records and package entitlement data are retained until you voluntarily close your account or request deletion. Message logs are retained on the server for admin purposes and are not publicly accessible.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>四、Cookie 与追踪 Cookies & Tracking</h2>
+        <p>我们使用必要的浏览器 Cookie 来维护您的会话状态，以及用于负载均衡和安全验证的服务器端工具。我们不通过第三方追踪脚本追踪您的跨网站行为。</p>
+        <p>We use essential browser cookies to maintain your session state, and server-side tools for load balancing and security verification. We do not track your cross-site behavior through third-party tracking scripts.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>五、信息共享 Disclosure of Information</h2>
+        <p>我们不会出售、租借或转让您的个人信息给任何第三方，除非：</p>
+        <ul>
+            <li>遵守适用法律或政府、司法机构的合法要求<br><span class="en-note">To comply with applicable laws or legitimate requests from government/judicial authorities</span></li>
+            <li>保护我们的合法权益免受侵害<br><span class="en-note">To protect our legitimate rights and interests from harm</span></li>
+            <li>涉及 PayPal 支付纠纷时，提供必要的交易信息<br><span class="en-note">To provide necessary transaction information in PayPal payment disputes</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>六、您的权利 Your Rights</h2>
+        <p>您有权：</p>
+        <ul>
+            <li>联系我们查询我们持有的您的个人信息<br><span class="en-note">Contact us at any time to inquire about your personal information held by us</span></li>
+            <li>要求我们删除您的使用记录<br><span class="en-note">Request deletion of your usage records</span></li>
+            <li>不同意本隐私政策时停止使用我们的服务<br><span class="en-note">Stop using our services if you disagree with this Privacy Policy</span></li>
+        </ul>
+    </div>
+
+    <div class="content-card">
+        <h2>七、未成年人保护 Children\'s Privacy</h2>
+        <p>我们的服务不面向未满18岁的未成年人，亦不故意收集未成年人信息。如果你是未成年人，请在父母或监护人陪同下一同使用本服务。</p>
+        <p>Our services are not intended for minors under 18. We do not knowingly collect information from minors. If you are a minor, please use this service together with a parent or guardian.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>八、政策变更 Policy Updates</h2>
+        <p>我们可能不时更新本隐私政策。更新版本将在本页发布，重大变更将提前7天通过网站公告通知。我们建议您定期查阅本页面以获取最新信息。</p>
+        <p>We may update this Privacy Policy from time to time. Updated versions will be posted on this page, and significant changes will be notified via site announcements 7 days in advance. We recommend reviewing this page regularly for the latest information.</p>
+    </div>
+
+    <div class="content-card">
+        <h2>九、联系我们 Contact Us</h2>
+        <p>如您对本隐私政策有任何疑问，请通过以下方式联系我们：</p>
+        <p>Email: contact@mychinesename.co | Website: https://mychinesename.co/contact-us</p>
+    </div>
+
+    <div class="footer">
+        © 2026 My Chinese Name · All Rights Reserved · 保留所有权利<br>
+        <a href="/">← 返回首页 Back to Home</a>
+    </div>
+</div>
 </body>
 </html>

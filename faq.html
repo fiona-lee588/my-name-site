@@ -1,22 +1,250 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>常见问题 | FAQ - My Chinese Name</title>
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ · 常见问题 | My Chinese Name</title>
 <style>
-*{margin:0;padding:20px;box-sizing:border-box;font-family:"Noto Serif SC",serif}
-body{background:#f7f2e9;color:#443322;line-height:1.8}
-h2{color:#8c2318;margin-bottom:15px}
-.en{color:#776655;margin-bottom:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c-primary:#8c2318;--c-primary-dark:#701c13;
+  --c-gold:#c9a96e;--c-gold-dark:#b88646;
+  --c-bg:#f7f2e9;--c-bg-card:#fffbf5;
+  --c-text:#443322;--c-text-light:#775533;
+  --c-border:#e2d0b8;--c-border-dark:#d8c6b0;
+  --shadow-card:0 2px 12px rgba(139,90,43,0.10);
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+    font-family:"Noto Serif SC","STKaiti","KaiTi",serif;
+    background:var(--c-bg);
+    background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4af37' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    color:var(--c-text);line-height:1.8;padding:24px 16px;
+}
+.wrap{max-width:900px;margin:0 auto}
+.back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--c-primary);text-decoration:none;font-size:14px;
+    margin-bottom:24px;padding:6px 12px;border:1px solid var(--c-border);
+    border-radius:var(--radius-sm);background:var(--c-bg-card);transition:background 0.2s;
+}
+.back:hover{background:#f5ebe0}
+.page-header{
+    background:var(--c-bg-card);border:2px solid var(--c-gold);
+    border-radius:var(--radius);padding:24px;margin-bottom:24px;text-align:center;
+}
+.page-header h1{font-size:26px;color:var(--c-primary);letter-spacing:3px;margin-bottom:8px}
+.page-header .en{font-size:14px;color:var(--c-text-light);letter-spacing:1px}
+.category-label{
+    font-size:13px;color:var(--c-gold-dark);font-weight:bold;margin:24px 0 10px;
+    letter-spacing:1px;
+}
+.category-label::before{content:'// ';color:var(--c-gold)}
+.faq-item{
+    background:var(--c-bg-card);border:1px solid var(--c-border);
+    border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;
+}
+.faq-item h3{
+    font-size:15px;color:var(--c-primary);margin-bottom:8px;font-weight:500;
+}
+.faq-item .q{color:var(--c-primary);font-weight:bold;margin-bottom:6px;font-size:14px}
+.faq-item .a{font-size:14px;color:var(--c-text);margin-bottom:6px;word-break:break-word}
+.faq-item .en{color:var(--c-text-light);font-size:12px;line-height:1.6}
+.toc{
+    background:var(--c-bg-card);border:1px solid var(--c-border);
+    border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;
+}
+.toc-title{font-size:15px;color:var(--c-primary);margin-bottom:10px;font-weight:bold}
+.toc-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.toc-list a{
+    display:inline-block;padding:4px 12px;background:#f7f0e4;border:1px solid var(--c-border);
+    border-radius:20px;font-size:13px;color:var(--c-text-light);text-decoration:none;
+    transition:all 0.2s;
+}
+.toc-list a:hover{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.footer{
+    background:var(--c-bg-card);border-top:1px solid var(--c-border);
+    padding:20px;text-align:center;color:#997755;font-size:13px;
+    border-radius:var(--radius);margin-top:24px;
+}
+.footer a{color:var(--c-primary)}
+@media(max-width:640px){
+    body{padding:12px 10px}html{font-size:15px}
+    .page-header{padding:18px 14px}.page-header h1{font-size:22px}
+    .faq-item{padding:14px 14px}
+    .toc-list a{font-size:12px}
+}
 </style>
 </head>
 <body>
-<h2>常见问题 | FAQ</h2>
-<p>Q：生成的姓名可以商用吗？<br>A：免费姓名仅限个人使用，付费套餐姓名可用于合规商用。</p>
-<p class="en">Q：Can generated names be used commercially?<br>A：Free names are for personal use only. Paid‑package names allow legal commercial use.</p>
-<p>Q：可以重新生成姓名吗？<br>A：免费版支持有限重生成，付费套餐支持多次/无限次生成。</p>
-<p class="en">Q：Can I regenerate names?<br>A：Free version has limited regenerations. Paid packages support multiple/unlimited generations.</p>
-<p>Q：支持定制特殊风格姓名吗？<br>A：支持，可在偏好寓意栏填写你的特殊需求。</p>
-<p class="en">Q：Can I customize special‑style names?<br>A：Yes, you may enter your special requirements in the meaning preference box.</p>
+<div class="wrap">
+    <a class="back" href="/">← 返回首页 Back to Home</a>
+
+    <div class="page-header">
+        <h1>常见问题 FAQ</h1>
+        <div class="en">Payment, Naming Rules & Entitlement Issues</div>
+    </div>
+
+    <div class="toc">
+        <div class="toc-title">快速导航 | Quick Navigation</div>
+        <div class="toc-list">
+            <a href="#payment">支付问题 Payment</a>
+            <a href="#naming">起名规则 Naming</a>
+            <a href="#quota">权限问题 Quota</a>
+            <a href="#avatar">头像问题 Avatar</a>
+            <a href="#account">账号安全 Account</a>
+            <a href="#service">服务规则 Service</a>
+        </div>
+    </div>
+
+    <div class="category-label" id="payment">支付问题 PAYMENT</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 支持哪些支付方式？| What payment methods are supported?</div>
+        <div class="a">A: 我们支持 PayPal 支付，包括 Visa、Mastercard、American Express 以及各国本地 PayPal 支付方式，覆盖全球 200+ 国家和地区。</div>
+        <div class="en">A: We support PayPal payments, including Visa, Mastercard, American Express, and local PayPal payment methods, covering 200+ countries and regions worldwide.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 支付后套餐多久生效？| How long does it take for the package to activate after payment?</div>
+        <div class="a">A: PayPal 支付成功后，套餐权益将在 5-10 秒内自动解锁，无需手动操作。如遇延迟，请刷新页面或联系客服。</div>
+        <div class="en">A: After successful PayPal payment, your package will be activated within 5-10 seconds automatically. If there is a delay, please refresh the page or contact support.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 支付失败了怎么办？| What if my payment fails?</div>
+        <div class="a">A: 请检查 PayPal 账户余额或银行卡状态，确保网络连接稳定。如问题持续，请稍后重试或联系 support@mychinesename.co。</div>
+        <div class="en">A: Please check your PayPal account balance or bank card status and ensure your network connection is stable. If the problem persists, please try again later or contact support@mychinesename.co.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 可以退款吗？| Can I get a refund?</div>
+        <div class="a">A: 由于数字内容服务的特殊性，支付成功后不支持主动退款。如有支付异常（重复扣款、未到账等），请在 72 小时内联系客服。</div>
+        <div class="en">A: Due to the nature of digital content services, all payments are non-refundable once processed. For payment anomalies (duplicate charges, non-receipt, etc.), please contact support within 72 hours.</div>
+    </div>
+
+    <div class="category-label" id="naming">起名规则 NAMING</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 起名需要提供哪些信息？| What information do I need to provide for naming?</div>
+        <div class="a">A: 必填：英文名（Given Name）和姓氏（Surname）；选填：性别、出生年月日时、偏好风格、期望寓意。这些信息帮助我们生成更精准的姓名。</div>
+        <div class="en">A: Required: Given Name and Surname; Optional: Gender, Birth Date & Time, Style Preference, Meaning Preference. This information helps us generate more accurate names.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 生成的姓名可以商用吗？| Can the generated names be used commercially?</div>
+        <div class="a">A: 付费套餐姓名可用于个人非商业用途，如社交媒体昵称、个人品牌。商用（如商业代言、产品命名）请联系我们获取授权。</div>
+        <div class="en">A: Paid-package names can be used for personal non-commercial purposes such as social media nicknames and personal branding. For commercial use (e.g. commercial endorsement, product naming), please contact us for authorization.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 不满意生成的结果可以重新生成吗？| Can I regenerate if I am not satisfied with the result?</div>
+        <div class="a">A: 基础版有 1 次免费重生成机会；Premium 和 Ultimate 套餐不限次数重生成。直接点击「重新生成」按钮即可。</div>
+        <div class="en">A: Basic plan has 1 free regeneration; Premium and Ultimate plans have unlimited regenerations. Simply click the Regenerate button.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 五行分析是什么？| What is Five-Element (Wuxing) analysis?</div>
+        <div class="a">A: 根据您的出生时间，结合八字命理分析五行喜用，帮助选择与您命格相合的汉字。所有套餐均包含基础五行解析，Premium/Ultimate 提供完整分析。</div>
+        <div class="en">A: Based on your birth time, we analyze the Five Elements (Wuxing) to identify favorable elements, helping select characters that match your destiny. All plans include basic analysis; Premium/Ultimate provide full analysis.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 典故溯源是什么意思？| What is "Cultural Source Tracing"?</div>
+        <div class="a">A: Premium 和 Ultimate 套餐提供生成姓名的古籍出处，解释名字中每个字在《诗经》《楚辞》《论语》《易经》等典籍中的来源和寓意。</div>
+        <div class="en">A: Premium and Ultimate plans provide the classical source of each character in the generated name, explaining its origin and meaning in classics such as Book of Songs, Chu Ci, Analects, and I Ching.</div>
+    </div>
+
+    <div class="category-label" id="quota">权限问题 QUOTA</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 免费用户有多少次机会？| How many free attempts do I have?</div>
+        <div class="a">A: 注册用户获得 2 次免费起名机会。每成功分享到社交平台可额外获得 1 次。</div>
+        <div class="en">A: Registered users receive 2 free naming attempts. Each successful share to social media grants 1 additional attempt.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 付费套餐包含哪些特权？| What privileges are included in paid packages?</div>
+        <div class="a">A: 基础版（$9.9）：3 组姓名 + 基础五行 + 1 次重生成；Premium（$19.9）：5 组 + 完整五行 + 典故溯源 + 起名证书 + 1 次头像生成；Ultimate（$29.9）：不限次数 + 完整服务。</div>
+        <div class="en">A: Basic ($9.9): 3 name sets + basic Wuxing + 1 regeneration; Premium ($19.9): 5 sets + full Wuxing + cultural tracing + naming certificate + 1 avatar generation; Ultimate ($29.9): unlimited + all services.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 我的套餐权益显示不正确怎么办？| What if my package entitlements are not showing correctly?</div>
+        <div class="a">A: 请刷新浏览器页面（Ctrl+Shift+R 强制刷新）清除缓存后重试。如仍有问题，请提供交易流水号（Transaction ID）联系客服核实。</div>
+        <div class="en">A: Please hard-refresh your browser (Ctrl+Shift+R) to clear the cache. If the problem persists, please provide your Transaction ID to our support team for verification.</div>
+    </div>
+
+    <div class="category-label" id="avatar">头像问题 AVATAR</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 如何下载书法头像？| How do I download the calligraphy avatar?</div>
+        <div class="a">A: 姓名生成后，页面会展示书法头像，点击「下载」按钮即可保存 SVG 高清图片（1080×1080px）。Premium/Ultimate 套餐不限制下载次数。</div>
+        <div class="en">A: After name generation, the page displays the calligraphy avatar. Click the Download button to save the SVG high-definition image (1080×1080px). Premium/Ultimate plans have unlimited downloads.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 可以换字体或背景吗？| Can I change the font or background?</div>
+        <div class="a">A: 可以！点击「换字体」按钮，头像会自动切换为另一套毛笔字体（内置 4 套可选）。背景随机变化，点击下载时随机选取。</div>
+        <div class="en">A: Yes! Click the "Change Font" button to cycle through our 4 built-in calligraphy fonts. The background randomizes with each download.</div>
+    </div>
+
+    <div class="category-label" id="account">账号安全 ACCOUNT</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 套餐可以多人共享吗？| Can a package be shared by multiple people?</div>
+        <div class="a">A: 不可以。套餐权益绑定您的设备和 IP 地址，不可转让、分享或转借。违规使用将导致账号封禁且不予退款。</div>
+        <div class="en">A: No. Package entitlements are bound to your device and IP address and cannot be transferred, shared, or lent. Violations will result in account suspension without refund.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 使用 VPN 后权益失效了怎么办？| What if my entitlements stop working after using VPN?</div>
+        <div class="a">A: IP 变更可能导致系统无法识别您的身份。请联系客服并提供 Transaction ID，我们将在核实后手动恢复您的权益。</div>
+        <div class="en">A: IP changes may cause the system to fail to recognize your identity. Please contact support with your Transaction ID and we will manually restore your entitlements after verification.</div>
+    </div>
+
+    <div class="category-label" id="service">服务规则 SERVICE</div>
+
+    <div class="faq-item">
+        <div class="q">Q: 服务每天都可以使用吗？| Is the service available every day?</div>
+        <div class="a">A: 是的，网站 24 小时运行。如遇服务器维护，我们会提前 24 小时通过网站公告通知。预计维护时间一般不超过 2 小时。</div>
+        <div class="en">A: Yes, the website runs 24/7. For server maintenance, we will notify you 24 hours in advance via the site announcement. Maintenance windows are typically under 2 hours.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 可以定制特殊风格或偏好的姓名吗？| Can I customize names with special styles or preferences?</div>
+        <div class="a">A: 可以！在「偏好寓意」栏填写您的期望，如"温润如玉"、"大气磅礴"、"平安顺遂"等，我们的 AI 会结合《诗经》《易经》等典籍为您生成匹配的姓名。</div>
+        <div class="en">A: Yes! Enter your preferences in the "Meaning Preference" field, such as "gentle as jade", "grand and bold", "peace and smoothness", etc. Our AI will generate matching names from the Book of Songs, I Ching, and other classics.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="q">Q: 如果遇到问题如何联系客服？| How do I contact customer support?</div>
+        <div class="a">A: 请发送邮件至 contact@mychinesename.co，或通过网站的留言表单提交您的问题。我们通常在 24-48 小时内回复。</div>
+        <div class="en">A: Please send an email to contact@mychinesename.co, or submit your question via the contact form on the website. We typically respond within 24-48 hours.</div>
+    </div>
+
+    <div class="footer">
+        © 2026 My Chinese Name · All Rights Reserved · 保留所有权利<br>
+        <a href="/">← 返回首页 Back to Home</a>
+    </div>
+</div>
+<script>
+fetch('/api/pricing').then(r=>r.json()).then(d=>{
+  const P=d.packages;
+  // Replace in faq-item text nodes
+  const replaces={
+    '$9.9': P.basic?.price, '$19.9': P.premium?.price, '$29.9': P.ultimate?.price,
+    '$19.9再': P.premium?.price+'再', '$39.9再': P.premium?.originalPrice+'再',
+    '$59.9再': P.ultimate?.originalPrice+'再',
+  };
+  document.querySelectorAll('.faq-item .a').forEach(el=>{
+    let html=el.innerHTML;
+    for(const [k,v] of Object.entries(replaces)){
+      if(v && html.includes(k)) html=html.replace(k,'$'+v);
+    }
+    el.innerHTML=html;
+  });
+});
+</script>
 </body>
 </html>
