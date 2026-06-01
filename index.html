@@ -676,12 +676,8 @@ input:focus,select:focus{
 // ============================================================
 // API_BASE 自动检测：本地开发用相对路径，线上用环境变量
 // ============================================================
-const API_BASE = (function(){
-    const hostname = window.location.hostname;
-    if(hostname === 'localhost' || hostname === '127.0.0.1') return '';
-    // Render backend URL
-    return 'https://mychinesename-api.onrender.com';
-});onst yearList = document.getElementById('yearList');
+const API_BASE = "https://mychinesename-api.onrender.com";
+const yearList = document.getElementById('yearList');
 for(let y=2025;y>=1920;y--){
     const opt=document.createElement('option');
     opt.value=y;
@@ -794,7 +790,7 @@ function closePaywall(){
 // 从后端加载定价数据并动态更新套餐卡片
 async function loadPricing(){
     try {
-        const res = await fetch(API_BASE+'/api/pricing';
+        const res = await fetch('https://mychinesename-api.onrender.com/api/pricing';
         const data = await res.json();
         const packages = data.packages;
         document.querySelectorAll('.paypal-btn').forEach(btn => {
@@ -819,13 +815,13 @@ async function loadPricing(){
 async function buyPackage(pkg){
     try {
         // 直接从 /api/pricing 拉取最新定价，再调支付订单接口
-        const pricingRes = await fetch(API_BASE+'/api/pricing';
+        const pricingRes = await fetch('https://mychinesename-api.onrender.com/api/pricing';
         if(!pricingRes.ok) throw new Error('Pricing API error');
         const pricing = await pricingRes.json();
         const amount = pricing.packages?.[pkg]?.price;
         if(!amount) throw new Error('Unknown package: ' + pkg);
 
-        const orderRes = await fetch(API_BASE+'/api/paypal-order', {
+        const orderRes = await fetch('https://mychinesename-api.onrender.com/api/paypal-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ package: pkg }
@@ -883,7 +879,7 @@ document.getElementById('debugMode').addEventListener('change', function(){
 
 async function syncQuota(){
     try {
-        const res = await fetch(API_BASE+'/api/quota';
+        const res = await fetch('https://mychinesename-api.onrender.com/api/quota';
         const data = await res.json();
         currentQuota = data.quota || 0;
     } catch {
@@ -941,7 +937,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     };
 
     try{
-        const res = await fetch(API_BASE+'/api/generate-name', {
+        const res = await fetch('https://mychinesename-api.onrender.com/api/generate-name', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(data
