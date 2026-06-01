@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 // 环境配置（全部从 .env 读取，禁止硬编码）
 // ============================================================
 const IS_PROD     = process.env.NODE_ENV === 'production';
-const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : `http://localhost:${port}`);
+const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 
@@ -85,7 +85,7 @@ function rateLimitMiddleware(req, res, next) {
     if(record.count > RATE_LIMIT_MAX) {
         ipBlocked.set(ip, now + 10 * 60 * 1000);
         ipCounts.delete(ip);
-        logError(`[RateLimit] IP ${ip} blocked for 10min (exceeded ${RATE_LIMIT_MAX} req/min)`);
+        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         return res.status(429).json({ error: 'Too many requests, please try again later.' });
     }
 
@@ -96,7 +96,7 @@ function rateLimitMiddleware(req, res, next) {
 app.use((req, res, next) => {
     if(!IS_PROD) {
         const ip = getClientIp(req);
-        log(`[${new Date().toISOString()}] ${req.method} ${req.path} from ${ip}`);
+        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     }
     next();
 });
@@ -180,7 +180,7 @@ function unlockPackage(userId, pkg, transactionId){
     });
     state[userId] = user;
     writeUserState(state);
-    log(`✅ 用户 ${userId} 套餐解锁: ${pkg} | quota=${ent.quota}`);
+    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     return true;
 }
 
@@ -238,20 +238,20 @@ app.post('/api/paypal-order', (req, res) => {
 
     const amounts = { basic:'9.9', premium:'19.9', ultimate:'29.9' };
     const amount = amounts[pkg];
-    const returnUrl  = encodeURIComponent(`${DOMAIN}/payment-success.html?pkg=${pkg}`);
-    const cancelUrl  = encodeURIComponent(`${DOMAIN}/payment-cancel.html`);
-    const notifyUrl  = encodeURIComponent(`${DOMAIN}/api/paypal-ipn`);
+    const returnUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    const cancelUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    const notifyUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
 
     // PayPal 按钮链接（无需ClientID，适合个人认证账户）
-    const paypalUrl = `https://www.paypal.com/cgi-bin/websrc` +
-        `?cmd=_xclick` +
-        `&business=${encodeURIComponent(PAYPAL.email)}` +
-        `&item_name=MyChineseName_${pkg.toUpperCase()}` +
-        `&amount=${amount}&currency=USD` +
-        `&return=${returnUrl}&cancel_return=${cancelUrl}&notify_url=${notifyUrl}` +
-        `&custom=${getUserId(req)}`;
+    const paypalUrl = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
+        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
 
-    log(`💰 [PayPal] 订单: ${pkg} $${amount} from ${getUserId(req)}`);
+    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     res.json({ paypalUrl });
 });
 
@@ -260,7 +260,7 @@ app.post('/api/paypal-order', (req, res) => {
 // --------------------------------------------------------
 app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
     const ipn = req.body;
-    log(`📨 [PayPal IPN] 收到: ${JSON.stringify(ipn).substring(0,150)}`);
+    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
 
     if(!ipn.txn_id || !ipn.payment_status) {
         appendPaymentLog({ err: 'Missing required fields', ipn: JSON.stringify(ipn).substring(0,200) });
@@ -280,23 +280,23 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     // === 三层安全校验 ===
     // ① 收款邮箱校验
     if(PAYPAL.email && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== PAYPAL.email.toLowerCase()) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `Receiver email mismatch: expected=${PAYPAL.email}, got=${ipn.receiver_email}` });
-        logError(`❌ [IPN] 收款邮箱校验失败: ${ipn.receiver_email}`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
     // ② 币种校验（仅支持USD）
     if(ipn.mc_currency !== 'USD') {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `Currency not USD: got=${ipn.mc_currency}` });
-        logError(`❌ [IPN] 币种校验失败: ${ipn.mc_currency}`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
     // ③ 金额校验
     const expected = { basic:'9.90', premium:'19.90', ultimate:'29.90' };
     if(ipn.mc_gross !== expected[pkg]) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `Amount mismatch: expected=${expected[pkg]}, got=${ipn.mc_gross}` });
-        logError(`❌ [IPN] 金额校验失败: ${pkg} expected=${expected[pkg]} got=${ipn.mc_gross}`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
@@ -304,10 +304,10 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     try {
         unlockPackage(userId, pkg, ipn.txn_id);
         appendPaymentLog({ status: ipn.payment_status, txn: ipn.txn_id, userId, pkg, success: true });
-        log(`✅ [IPN] 套餐解锁: ${pkg} -> ${userId}`);
+        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     } catch(err) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: err.message });
-        logError(`❌ [IPN] 解锁异常: ${err.message}`);
+        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     }
 
     res.send('ok');
@@ -326,7 +326,7 @@ app.post('/api/paypal-checkout', (req, res) => {
     user.transactionId = transactionId;
     user.quota = PACKAGE_ENTITLEMENTS[pkg]?.quota || 9999;
     writeUserState(state);
-    log(`✅ [Checkout] 用户 ${userId} 套餐 ${pkg} 已标记 (txn: ${transactionId})`);
+    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     res.json({ success: true });
 });
 
@@ -337,13 +337,9 @@ app.get('/admin-payment-log', (req, res) => {
     fs.readFile(PAYMENT_LOG_FILE, 'utf8', (err, data) => {
         if(err) return res.send('暂无支付日志');
         const logs = JSON.parse(data);
-        const html = `<html><head><meta charset="UTF-8"><title>Payment Logs</title></head><body>
-        <h2 style="padding:20px">💳 支付日志 <a href="/">← 返回首页</a></h2>
-        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
-        <tr style="background:#8c2318;color:#fff"><th>时间</th><th>Txn</th><th>套餐</th><th>用户</th><th>状态</th><th>备注</th></tr>
-        ${logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
+        const html = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
         <td>${l._ts||''}</td><td>${l.txn||''}</td><td>${l.pkg||''}</td><td>${l.userId||''}</td><td>${l.status||''}</td><td>${l.err||(l.success?'✅成功':'❌失败')}</td>
-        </tr>`).join('')}</table></body></html>`;
+        </tr>`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
         res.send(html);
     });
 });
@@ -364,20 +360,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         }
     }
 
-    const prompt = `你是专业国风中文起名大师，为海外用户起名，严格遵守以下规则：
-1. 姓氏：根据英文姓氏"${englishSurname}"，匹配中国百家姓对应中文姓氏
-2. 名字：单字或双字，取自《诗经》《楚辞》《论语》《易经》等古典典籍
-3. 五行：${status.wuxingLevel === 'full' ? '完整八字五行解析' : '极简一句话：生辰八字XX，喜用神为XX，宜用XX五行'}
-4. ${status.culturalDepth ? '诗经/楚辞完整典故溯源' : '仅输出基础古籍出处一句话，无完整典故、无证书'}
-5. 英文翻译：每一句中文直接放在中文正下方
-6. 用户偏好：${meaning || '无特殊要求'}
-输出格式：
-【完整中文姓名】：姓+名
-【对应百家姓姓氏】：XXX
-【五行喜用】：极简一句话
-【诗经/典籍出处】：原文+出处（仅一句话）
-【寓意解读】：中文（仅一句话）
-（对应英文翻译，放在中文正下方）`;
+    const prompt = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
 
     const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat", key:process.env.DEEPSEEK_API_KEY };
     const anthropic = { url:'https://api.anthropic.com/v1/messages', model:'claude-sonnet-4-20250514', key:process.env.ANTHROPIC_API_KEY };
@@ -394,28 +377,28 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
             const resp = await fetch(provider === 'deepseek' ? deepseek.url : anthropic.url, {
                 method:'POST', signal:controller.signal,
                 headers: provider === 'deepseek'
-                    ? {'Content-Type':'application/json','Authorization':`Bearer ${deepseek.key}`}
+                    ? {'Content-Type':'application/json','Authorization':`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`}
                     : {'Content-Type':'application/json','x-api-key':anthropic.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
                 body: JSON.stringify(body)
             });
             clearTimeout(timeout);
             const data = await resp.json();
             if(!resp.ok) {
-                logError(`${provider} error ${resp.status}:`, JSON.stringify(data).substring(0,100));
+                logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`, JSON.stringify(data).substring(0,100));
                 if(retryCount === 0) return callAI(provider === 'deepseek' ? 'anthropic' : 'deepseek', 1);
-                throw new Error(data.error?.message || `HTTP ${resp.status}`);
+                throw new Error(data.error?.message || `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
             }
             return provider === 'deepseek' ? data.choices[0].message.content : data.content[0].text;
         } catch(err) {
             clearTimeout(timeout);
-            logError(`[${provider}] error:`, err.message);
+            logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`, err.message);
             if(retryCount < MAX_RETRIES) return callAI(provider === 'deepseek' ? 'anthropic' : 'deepseek', retryCount + 1);
             throw err;
         }
     }
 
     try {
-        log(`===【AI起名请求】 user=${userId}===`);
+        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         const result = await callAI('deepseek');
         res.send(result);
     } catch(err) {
@@ -430,7 +413,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 app.post('/api/submit-message', (req, res) => {
     const { name, email, message } = req.body;
     const time = new Date().toLocaleString();
-    const content = `【留言时间】${time}\n姓名：${name}\n邮箱：${email}\n留言：${message}\n----------------------------------------\n`;
+    const content = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
     fs.appendFile('messages.txt', content, err => {
         res.send(err ? "留言提交失败" : "留言提交成功，感谢反馈！");
     });
@@ -439,7 +422,7 @@ app.post('/api/submit-message', (req, res) => {
 app.get('/admin-messages', (req, res) => {
     fs.readFile('messages.txt', 'utf8', (err, data) => {
         if(err) res.send("暂无留言");
-        else res.send(`<pre style="padding:20px;white-space:pre-wrap;font-size:14px">${data}</pre>`);
+        else res.send(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     });
 });
 
@@ -469,16 +452,9 @@ app.get('/api/avatar-svg', (req, res) => {
     const b = bg[Math.floor(Math.random() * bg.length)];
     const gradId = 'bg' + Date.now();
     const bgDef = b.type === 'solid'
-        ? `<radialGradient id="${gradId}" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="${b.colors[0]}"/><stop offset="100%" stop-color="${b.colors[1]}"/></radialGradient>`
-        : `<linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${b.colors[0]}"/><stop offset="100%" stop-color="${b.colors[1]}"/></linearGradient>`;
-    const svg = `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
-    <defs>${bgDef}<filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/></filter></defs>
-    <rect width="1080" height="1080" fill="url(#${gradId})"/>
-    <rect x="40" y="40" width="1000" height="1000" fill="none" stroke="#8c2318" stroke-width="3" rx="15"/>
-    <rect x="55" y="55" width="970" height="970" fill="none" stroke="#c9a96e" stroke-width="1.5" rx="10"/>
-    <text x="540" y="540" font-size="220" text-anchor="middle" fill="#1a1a1a" font-family="${font}" filter="url(#ink)" letter-spacing="12">${name}</text>
-    <text x="540" y="900" font-size="28" text-anchor="middle" fill="#8c2318" font-family="ZCOOLKuaiLe, KaiTi, serif">mychinesename.co</text>
-</svg>`;
+        ? `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`
+        : `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+    const svg = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
     res.type('image/svg+xml').send(svg);
 });
 
@@ -498,10 +474,10 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`网站运行在 ${DOMAIN}`);
-    console.log(`后台留言：http://localhost:${port}/admin-messages`);
-    console.log(`后台支付日志：http://localhost:${port}/admin-payment-log`);
-    if(PAYPAL.email) console.log(`💳 PayPal收款：${PAYPAL.email} (${PAYPAL.mode})`);
+    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    if(PAYPAL.email) console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     else console.warn('⚠️ 请在 .env 配置 PAYPAL_EMAIL');
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
 });
