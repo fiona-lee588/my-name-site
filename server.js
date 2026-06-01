@@ -337,9 +337,9 @@ app.get('/admin-payment-log', (req, res) => {
     fs.readFile(PAYMENT_LOG_FILE, 'utf8', (err, data) => {
         if(err) return res.send('暂无支付日志');
         const logs = JSON.parse(data);
-        const html = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
+        const html = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` + logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
         <td>${l._ts||''}</td><td>${l.txn||''}</td><td>${l.pkg||''}</td><td>${l.userId||''}</td><td>${l.status||''}</td><td>${l.err||(l.success?'✅成功':'❌失败')}</td>
-        </tr>`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+        </tr>`).join('');
         res.send(html);
     });
 });
