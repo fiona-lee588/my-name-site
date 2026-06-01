@@ -379,7 +379,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 【寓意解读】：中文（仅一句话）
 （对应英文翻译，放在中文正下方）`;
 
-    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat', key:process.env.DEEPSEEK_API_KEY };
+    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat", key:process.env.DEEPSEEK_API_KEY };
     const anthropic = { url:'https://api.anthropic.com/v1/messages', model:'claude-sonnet-4-20250514', key:process.env.ANTHROPIC_API_KEY };
 
     async function callAI(provider, retryCount = 0) {
