@@ -382,8 +382,11 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         englishName.length > 50 || englishSurname.length > 50) {
         return res.status(400).json({ error: 'Invalid name length' });
     }
-    if (gender && !['male', 'female'].includes(gender)) {
-        return res.status(400).json({ error: 'gender must be male or female' });
+    // 兼容gender格式：自动识别中文"男"/"女"，忽略后续英文
+    if (gender && typeof gender === 'string') {
+        if (!gender.includes('男') && !gender.includes('女')) {
+            return res.status(400).json({ error: 'gender must contain 男 or 女' });
+        }
     }
 
     const userId = getUserId(req);
