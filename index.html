@@ -946,13 +946,6 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         });
         const text = await res.text();
         if(!res.ok){
-            try {
-                JSON.parse(text);
-            } catch {
-                loading.style.display = 'none';
-                document.getElementById('result').innerText = '生成失败，请稍后重试 | Generation failed';
-                return;
-            }
             loading.style.display = 'none';
             showPaywall();
             return;
@@ -962,8 +955,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             currentQuota -= 1;
             updateQuotaUI();
         }
-
-        // 提取第一组姓名中的纯中文名
+        // res.ok = 200 → 直接渲染名字预览
         const nameMatch = text.match(/【完整中文姓名】：([^\n【]+)/);
         const fullName = nameMatch ? nameMatch[1].replace(/[^一-龥]/g,'') : '';
 
