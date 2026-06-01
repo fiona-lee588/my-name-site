@@ -409,7 +409,7 @@ input:focus,select:focus{
             </div>
             <div class="form-item">
                 <label>你的姓氏 <span class="en">/ Surname</span></label>
-                <input type="text" id="englishSurname" placeholder="输入你的英文姓氏 / Enter your surname">
+                <input type="text" id="englishSurname" placeholder="输入你的英文姓氏 / Enter your englishSurname">
             </div>
         </div>
 
@@ -520,7 +520,7 @@ input:focus,select:focus{
                     <div class="scroll-item">
                         <div class="item-title">姓氏溯源</div>
                         <div class="item-en">Surname Origin Tracing</div>
-                        <div class="item-desc">追根姓氏历史，传承家族血脉<br>Trace surname history & inherit family heritage</div>
+                        <div class="item-desc">追根姓氏历史，传承家族血脉<br>Trace englishSurname history & inherit family heritage</div>
                     </div>
                 </div>
             </div>
@@ -920,7 +920,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     const englishName = document.getElementById('englishName').value.trim();
     const englishSurname = document.getElementById('englishSurname').value.trim();
     if(!englishName || !englishSurname){
-        document.getElementById('result').innerText = "请输入你的英文名和姓氏！| Please enter your given name and surname!";
+        document.getElementById('result').innerText = "请输入你的英文名和姓氏！| Please enter your given name and englishSurname!";
         return;
     }
 
