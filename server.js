@@ -486,6 +486,17 @@ app.get('/api/avatar-svg', (req, res) => {
 // 启动
 // ============================================================
 	app.use(express.static(path.join(__dirname, "./")));
+
+// ============================================================
+// CORS 跨域配置（允许 Netlify 前端访问）
+// ============================================================
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, X-Package');
+    next();
+});
+
 app.listen(port, () => {
     console.log(`网站运行在 ${DOMAIN}`);
     console.log(`后台留言：http://localhost:${port}/admin-messages`);
