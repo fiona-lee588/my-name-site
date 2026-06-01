@@ -26,6 +26,8 @@ const logError = (...args) => { console.error(...args); };
 log("DeepSeek密钥：", !!process.env.DEEPSEEK_API_KEY);
 log("Anthropic密钥：", !!process.env.ANTHROPIC_API_KEY);
 log("PayPal模式：", process.env.PAYPAL_MODE || 'sandbox');
+log("PayPal_CLIENT_ID：", !!process.env.PAYPAL_CLIENT_ID);
+log("PayPal_CLIENT_SECRET：", !!process.env.PAYPAL_CLIENT_SECRET);
 log("网站域名：", DOMAIN);
 
 // ============================================================
@@ -411,7 +413,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
             const resp = await fetch(provider === 'deepseek' ? deepseek.url : anthropic.url, {
                 method:'POST', signal:controller.signal,
                 headers: provider === 'deepseek'
-                    ? {'Content-Type':'application/json','Authorization':`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`}
+                    ? {'Content-Type':'application/json','Authorization':`Bearer ${deepseek.key}`}
                     : {'Content-Type':'application/json','x-api-key':anthropic.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
                 body: JSON.stringify(body)
             });
@@ -503,7 +505,12 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 404 全局处理（所有路由之后）
+// 静态文件服务（favicon.ico 等）
+// ============================================================
+app.use(express.static(path.join(__dirname, "./")));
+
+// ============================================================
+// 404 全局处理（静态文件之后）
 // ============================================================
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
@@ -511,9 +518,6 @@ app.use((req, res) => {
 
 // ============================================================
 // 启动
-// ============================================================
-	app.use(express.static(path.join(__dirname, "./")));
-
 // ============================================================
 app.listen(port, () => {
     console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
