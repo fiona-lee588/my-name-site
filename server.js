@@ -1,5 +1,5 @@
 require('dotenv').config();
-// My Chinese Name - 中文起名服务后端 API，支持 DeepSeek/Claude 双引擎起名
+// My Chinese Name - 中文起名服务后端 API，支持 DeepSeek 单引擎起名
 
 const express = require('express');
 const path = require('path');
@@ -9,13 +9,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const paypal = require('paypal-rest-sdk');
 const app = express();
+app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 
 // ============================================================
 // 环境配置（全部从 .env 读取，禁止硬编码）
 // ============================================================
 const IS_PROD     = process.env.NODE_ENV === 'production';
-const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 
@@ -24,7 +25,6 @@ const log = (...args) => { if(!IS_PROD) console.log(...args); };
 const logError = (...args) => { console.error(...args); };
 
 log("DeepSeek密钥：", !!process.env.DEEPSEEK_API_KEY);
-log("Anthropic密钥：", !!process.env.ANTHROPIC_API_KEY);
 log("PayPal模式：", process.env.PAYPAL_MODE || 'sandbox');
 log("PayPal_CLIENT_ID：", !!process.env.PAYPAL_CLIENT_ID);
 log("PayPal_CLIENT_SECRET：", !!process.env.PAYPAL_CLIENT_SECRET);
@@ -103,7 +103,7 @@ function rateLimitMiddleware(req, res, next) {
     if(record.count > RATE_LIMIT_MAX) {
         ipBlocked.set(ip, now + 10 * 60 * 1000);
         ipCounts.delete(ip);
-        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         return res.status(429).json({ error: 'Too many requests, please try again later.' });
     }
 
@@ -114,7 +114,7 @@ function rateLimitMiddleware(req, res, next) {
 app.use((req, res, next) => {
     if(!IS_PROD) {
         const ip = getClientIp(req);
-        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     }
     next();
 });
@@ -193,7 +193,7 @@ function unlockPackage(userId, pkg, transactionId){
     });
     state[userId] = user;
     writeUserState(state);
-    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     return true;
 }
 
@@ -284,7 +284,7 @@ app.post('/api/paypal-order', (req, res) => {
 // --------------------------------------------------------
 app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
     const ipn = req.body;
-    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
 
     if(!ipn.txn_id || !ipn.payment_status) {
         appendPaymentLog({ err: 'Missing required fields', ipn: JSON.stringify(ipn).substring(0,200) });
@@ -303,23 +303,23 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     // === 三层安全校验（IPN 异步通知校验，email 从 .env 读取）===
     const paypalEmail = process.env.PAYPAL_EMAIL || '';
     if(paypalEmail && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== paypalEmail.toLowerCase()) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
-        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
     // ② 币种校验（仅支持USD）
     if(ipn.mc_currency !== 'USD') {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
-        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
     // ③ 金额校验
     const expected = { basic:'9.90', premium:'19.90', ultimate:'29.90' };
     if(ipn.mc_gross !== expected[pkg]) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
-        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析` });
+        logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
     }
 
@@ -327,10 +327,10 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     try {
         unlockPackage(userId, pkg, ipn.txn_id);
         appendPaymentLog({ status: ipn.payment_status, txn: ipn.txn_id, userId, pkg, success: true });
-        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     } catch(err) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: err.message });
-        logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     }
 
     res.send('ok');
@@ -349,7 +349,7 @@ app.post('/api/paypal-checkout', (req, res) => {
     user.transactionId = transactionId;
     user.quota = PACKAGE_ENTITLEMENTS[pkg]?.quota || 9999;
     writeUserState(state);
-    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     res.json({ success: true });
 });
 
@@ -360,7 +360,7 @@ app.get('/admin-payment-log', (req, res) => {
     fs.readFile(PAYMENT_LOG_FILE, 'utf8', (err, data) => {
         if(err) return res.send('暂无支付日志');
         const logs = JSON.parse(data);
-        const html = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` + logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
+        const html = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析` + logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
         <td>${l._ts||''}</td><td>${l.txn||''}</td><td>${l.pkg||''}</td><td>${l.userId||''}</td><td>${l.status||''}</td><td>${l.err||(l.success?'✅成功':'❌失败')}</td>
         </tr>`).join('');
         res.send(html);
@@ -368,7 +368,7 @@ app.get('/admin-payment-log', (req, res) => {
 });
 
 // ============================================================
-// 起名API（DeepSeek 主接口 + Claude 备用，自动重试）
+// 起名API（DeepSeek 唯一接口）
 // 受 rateLimitMiddleware 保护
 // ============================================================
 app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
@@ -399,45 +399,40 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         }
     }
 
-    const prompt = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+    const prompt = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
 
-    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat", key:process.env.DEEPSEEK_API_KEY };
-    const anthropic = { url:'https://api.anthropic.com/v1/messages', model:'claude-sonnet-4-20250514', key:process.env.ANTHROPIC_API_KEY };
+    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat" };
 
-    async function callAI(provider, retryCount = 0) {
+    async function callAI(retryCount = 0) {
         const MAX_RETRIES = 2;
         if(retryCount > MAX_RETRIES) throw new Error('Max retries exceeded');
-        const body = provider === 'deepseek'
-            ? { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.7 }
-            : { model: anthropic.model, max_tokens:600, messages:[{role:'user',content:prompt}] };
+        const body = { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.7 };
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 12000);
         try {
-            const resp = await fetch(provider === 'deepseek' ? deepseek.url : anthropic.url, {
+            const resp = await fetch(deepseek.url, {
                 method:'POST', signal:controller.signal,
-                headers: provider === 'deepseek'
-                    ? {'Content-Type':'application/json','Authorization':`Bearer ${process.env.DEEPSEEK_API_KEY}`}
-                    : {'Content-Type':'application/json','x-api-key':anthropic.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+                headers: {'Content-Type':'application/json','Authorization':`Bearer ${process.env.DEEPSEEK_API_KEY}`},
                 body: JSON.stringify(body)
             });
             clearTimeout(timeout);
             const data = await resp.json();
             if(!resp.ok) {
-                logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`, JSON.stringify(data).substring(0,100));
-                if(retryCount === 0) return callAI(provider === 'deepseek' ? 'anthropic' : 'deepseek', 1);
-                throw new Error(data.error?.message || `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+                logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`, JSON.stringify(data).substring(0,100));
+                if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
+                throw new Error(data.error?.message || `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
             }
-            return provider === 'deepseek' ? data.choices[0].message.content : data.content[0].text;
+            return data.choices[0].message.content;
         } catch(err) {
             clearTimeout(timeout);
-            logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`, err.message);
-            if(retryCount < MAX_RETRIES) return callAI(provider === 'deepseek' ? 'anthropic' : 'deepseek', retryCount + 1);
+            logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`, err.message);
+            if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
             throw err;
         }
     }
 
     try {
-        log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         const result = await callAI('deepseek');
         res.send(result);
     } catch(err) {
@@ -452,7 +447,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 app.post('/api/submit-message', (req, res) => {
     const { name, email, message } = req.body;
     const time = new Date().toLocaleString();
-    const content = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+    const content = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
     fs.appendFile('messages.txt', content, err => {
         res.send(err ? "留言提交失败" : "留言提交成功，感谢反馈！");
     });
@@ -461,7 +456,7 @@ app.post('/api/submit-message', (req, res) => {
 app.get('/admin-messages', (req, res) => {
     fs.readFile('messages.txt', 'utf8', (err, data) => {
         if(err) res.send("暂无留言");
-        else res.send(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+        else res.send(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     });
 });
 
@@ -491,9 +486,9 @@ app.get('/api/avatar-svg', (req, res) => {
     const b = bg[Math.floor(Math.random() * bg.length)];
     const gradId = 'bg' + Date.now();
     const bgDef = b.type === 'solid'
-        ? `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`
-        : `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
-    const svg = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+        ? `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`
+        : `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
+    const svg = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
     res.type('image/svg+xml').send(svg);
 });
 
@@ -523,6 +518,6 @@ app.use((req, res) => {
 // 启动
 // ============================================================
 app.listen(port, () => {
-    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    console.log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
 });
