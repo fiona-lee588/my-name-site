@@ -811,18 +811,28 @@ async function loadPricing(){
 // PayPal支付弹窗（从后端获取支付链接，含IPN回调地址）
 async function buyPackage(pkg){
     try {
-        const res = await fetch('/api/paypal-order', {
+        // 直接从 /api/pricing 拉取最新定价，再调支付订单接口
+        const pricingRes = await fetch('/api/pricing');
+        if(!pricingRes.ok) throw new Error('Pricing API error');
+        const pricing = await pricingRes.json();
+        const amount = pricing.packages?.[pkg]?.price;
+        if(!amount) throw new Error('Unknown package: ' + pkg);
+
+        const orderRes = await fetch('/api/paypal-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ package: pkg })
         });
-        const data = await res.json();
-        if(data.paypalUrl){
-            window.open(data.paypalUrl, '_blank', 'width=600,height=500');
+        const orderData = await orderRes.json();
+        if(orderData.paypalUrl){
+            window.open(orderData.paypalUrl, '_blank', 'width=600,height=500');
         } else {
-            alert('支付链接生成失败，请稍后重试 | Payment link generation failed, please try again');
+            alert('支付链接生成失败，请稍后重试 | Payment link generation failed');
         }
-    } catch(e){ alert('加载价格失败，请稍后重试 | Failed to load pricing, please try again later'); }
+    } catch(e){
+        console.error('buyPackage error:', e);
+        alert('支付加载失败，请稍后重试 | Payment failed, please try again');
+    }
 }
 
 // 免费次数管理（从服务器同步）
@@ -843,8 +853,10 @@ document.addEventListener('click', function(e){
     buyPackage(pkg);
 });
 
-// 页面加载时从后端拉取最新定价数据
-loadPricing();
+// 等 DOM Ready 后再执行定价加载（避免 paywall 元素不存在导致 querySelector 返回 null）
+document.addEventListener('DOMContentLoaded', function(){
+    loadPricing().catch(function(e){ console.error('loadPricing failed:', e); });
+});
 
 // 调试模式开关 - 勾选后强制弹出付费弹窗
 document.getElementById('debugMode').addEventListener('change', function(){
@@ -930,13 +942,15 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const text = await res.text();
         if(!res.ok){
             try {
-                const errData = JSON.parse(text);
-                loading.style.display = 'none';
-                showPaywall();
-                return;
+                JSON.parse(text);
             } catch {
-                throw new Error(text);
+                loading.style.display = 'none';
+                document.getElementById('result').innerText = '生成失败，请稍后重试 | Generation failed';
+                return;
             }
+            loading.style.display = 'none';
+            showPaywall();
+            return;
         }
         // 测试模式跳过本地次数扣减
         if(!testUnlocked){

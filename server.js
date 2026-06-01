@@ -485,7 +485,7 @@ app.get('/api/avatar-svg', (req, res) => {
 // ============================================================
 // 启动
 // ============================================================
-	app.use(express.static("./"));
+	app.use(express.static(path.join(__dirname, "./")));
 app.listen(port, () => {
     console.log(`网站运行在 ${DOMAIN}`);
     console.log(`后台留言：http://localhost:${port}/admin-messages`);
