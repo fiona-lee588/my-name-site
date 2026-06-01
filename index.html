@@ -790,7 +790,7 @@ function closePaywall(){
 // 从后端加载定价数据并动态更新套餐卡片
 async function loadPricing(){
     try {
-        const res = await fetch('https://mychinesename-api.onrender.com/api/pricing';
+        const res = await fetch('https://mychinesename-api.onrender.com/api/pricing');
         const data = await res.json();
         const packages = data.packages;
         document.querySelectorAll('.paypal-btn').forEach(btn => {
