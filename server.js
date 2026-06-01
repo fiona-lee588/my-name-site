@@ -416,7 +416,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
             const resp = await fetch(provider === 'deepseek' ? deepseek.url : anthropic.url, {
                 method:'POST', signal:controller.signal,
                 headers: provider === 'deepseek'
-                    ? {'Content-Type':'application/json','Authorization':`Bearer ${deepseek.key}`}
+                    ? {'Content-Type':'application/json','Authorization':`Bearer ${process.env.DEEPSEEK_API_KEY}`}
                     : {'Content-Type':'application/json','x-api-key':anthropic.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
                 body: JSON.stringify(body)
             });
