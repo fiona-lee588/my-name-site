@@ -1,0 +1,29 @@
+# render.yaml — Render Node.js Web Service 部署配置
+# 部署命令: render blueprint create
+# 文档: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: mychinesename-api
+    env: node
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/pricing
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: DEEPSEEK_API_KEY
+        sync: false   # 在 Render Dashboard 中填入
+      - key: PAYPAL_EMAIL
+        sync: false
+      - key: PAYPAL_MODE
+        value: live
+      - key: DOMAIN
+        value: https://mychinesename.co
+      - key: CORS_ORIGIN
+        value: https://mychinesename.co
+      - key: LOG_LEVEL
+        value: error
