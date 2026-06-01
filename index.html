@@ -679,16 +679,9 @@ input:focus,select:focus{
 const API_BASE = (function(){
     const hostname = window.location.hostname;
     if(hostname === 'localhost' || hostname === '127.0.0.1') return '';
-    // 线上生产环境：需要填入你的 Render 后端专属 URL
-    // 例如: return 'https://your-backend.onrender.com';
-    return '';
-})();
-if(API_BASE) console.log('[API] Production mode, backend:', API_BASE);
-else console.log('[API] Development mode, using relative paths');
-
-
-// 自动填充年份1920‑2025
-const yearList = document.getElementById('yearList');
+    // Render backend URL
+    return 'https://my-chinesename-api.onrender.com';
+});onst yearList = document.getElementById('yearList');
 for(let y=2025;y>=1920;y--){
     const opt=document.createElement('option');
     opt.value=y;
