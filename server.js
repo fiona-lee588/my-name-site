@@ -1,9 +1,12 @@
 require('dotenv').config();
+// My Chinese Name - 中文起名服务后端 API，支持 DeepSeek/Claude 双引擎起名
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -27,17 +30,29 @@ log("网站域名：", DOMAIN);
 // ============================================================
 // CORS 配置
 // ============================================================
-app.use(cors({ origin: CORS_ORIGIN, methods: ["GET","POST","OPTIONS"], allowedHeaders: ["Content-Type","X-User-Id","X-Package"] }));
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', CORS_ORIGIN);
-    res.header('Access-Control-Allow-Headers', "Content-Type, X-User-Id, X-Package");
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    next();
-});
-app.use(express.json());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
+}));
+app.use(helmet());
+app.use(express.json({ limit: '10kb' }));
 
 // ============================================================
-// 安全中间件：IP 限流 + 频率限制
+// API 全局限流（/api 路径，60秒内最多60次）
+// ============================================================
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' }
+});
+app.use('/api/', apiLimiter);
+
+// ============================================================
+// 安全中间件：IP 限流 + 频率限制（精细化）
 // ============================================================
 
 // IP 请求计数（内存中简单计数，生产环境建议用 Redis）
@@ -243,13 +258,7 @@ app.post('/api/paypal-order', (req, res) => {
     const notifyUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
 
     // PayPal 按钮链接（无需ClientID，适合个人认证账户）
-    const paypalUrl = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` +
-        `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+    const paypalUrl = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
 
     log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
     res.json({ paypalUrl });
@@ -350,6 +359,19 @@ app.get('/admin-payment-log', (req, res) => {
 // ============================================================
 app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const { englishName, englishSurname, gender, birthYear, birthMonth, birthDay, birthTime, style, meaning } = req.body;
+
+    // 基础输入校验
+    if (!englishName || !englishSurname) {
+        return res.status(400).json({ error: 'englishName and englishSurname are required' });
+    }
+    if (typeof englishName !== 'string' || typeof englishSurname !== 'string' ||
+        englishName.length > 50 || englishSurname.length > 50) {
+        return res.status(400).json({ error: 'Invalid name length' });
+    }
+    if (gender && !['male', 'female'].includes(gender)) {
+        return res.status(400).json({ error: 'gender must be male or female' });
+    }
+
     const userId = getUserId(req);
     const status = getUserStatus(userId);
 
@@ -459,25 +481,29 @@ app.get('/api/avatar-svg', (req, res) => {
 });
 
 // ============================================================
+// 错误处理中间件（正式环境屏蔽报错栈）
+// ============================================================
+app.use((err, req, res, next) => {
+    if (!IS_PROD) {
+        console.error(err.stack);
+    }
+    res.status(500).json({ error: 'Internal server error' });
+});
+
+// ============================================================
+// 404 全局处理（所有路由之后）
+// ============================================================
+app.use((req, res) => {
+    res.status(404).json({ error: 'Not found' });
+});
+
+// ============================================================
 // 启动
 // ============================================================
 	app.use(express.static(path.join(__dirname, "./")));
 
 // ============================================================
-// CORS 跨域配置（允许 Netlify 前端访问）
-// ============================================================
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, X-Package');
-    next();
-});
-
 app.listen(port, () => {
     console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    if(PAYPAL.email) console.log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    else console.warn('⚠️ 请在 .env 配置 PAYPAL_EMAIL');
     if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
 });

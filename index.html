@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+<!-- My Chinese Name - 中文起名服务海外版，生成中文名+拼音+英文释义+寓意 -->
 <html lang="zh-CN">
 <head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="keywords" content="Chinese name for foreigners,custom Chinese name,foreign Chinese name,mychinesename">
 <meta name="description" content="Get your elegant and meaningful Chinese name for foreigners, reliable cross‑border payment consultation service.">
+<meta name="robots" content="index, follow">
 <title>My Chinese Name｜Custom Elegant Chinese Name for Foreigners</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -815,7 +817,7 @@ async function loadPricing(){
 async function buyPackage(pkg){
     try {
         // 直接从 /api/pricing 拉取最新定价，再调支付订单接口
-        const pricingRes = await fetch('https://mychinesename-api.onrender.com/api/pricing';
+        const pricingRes = await fetch('https://mychinesename-api.onrender.com/api/pricing');
         if(!pricingRes.ok) throw new Error('Pricing API error');
         const pricing = await pricingRes.json();
         const amount = pricing.packages?.[pkg]?.price;
@@ -824,7 +826,7 @@ async function buyPackage(pkg){
         const orderRes = await fetch('https://mychinesename-api.onrender.com/api/paypal-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ package: pkg }
+            body: JSON.stringify({ package: pkg })
         });
         const orderData = await orderRes.json();
         if(orderData.paypalUrl){
@@ -879,7 +881,7 @@ document.getElementById('debugMode').addEventListener('change', function(){
 
 async function syncQuota(){
     try {
-        const res = await fetch('https://mychinesename-api.onrender.com/api/quota';
+        const res = await fetch('https://mychinesename-api.onrender.com/api/quota');
         const data = await res.json();
         currentQuota = data.quota || 0;
     } catch {
@@ -940,7 +942,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const res = await fetch('https://mychinesename-api.onrender.com/api/generate-name', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data
+            body: JSON.stringify(data)
         });
         const text = await res.text();
         if(!res.ok){
