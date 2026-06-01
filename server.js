@@ -7,6 +7,7 @@ const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const paypal = require('paypal-rest-sdk');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -119,18 +120,13 @@ app.use((req, res, next) => {
 // ============================================================
 // PayPal 配置（从 .env 读取）
 // ============================================================
-const PAYPAL = {
-    email: process.env.PAYPAL_EMAIL || '',
-    mode:  process.env.PAYPAL_MODE  || 'sandbox',
-    get verifyUrl() {
-        return this.mode === 'live'
-            ? 'https://ipnpb.paypal.com/cgi-bin/websrc'
-            : 'https://ipnpb.sandbox.paypal.com/cgi-bin/websrc';
-    },
-    get baseUrl() {
-        return this.mode === 'live' ? 'https://api.paypal.com' : 'https://api.sandbox.paypal.com';
-    }
-};
+// PayPal REST API 配置（从 .env 读取，live/sandbox 自动切换）
+// ============================================================
+paypal.configure({
+    mode: process.env.PAYPAL_MODE || 'sandbox',
+    client_id: process.env.PAYPAL_CLIENT_ID,
+    client_secret: process.env.PAYPAL_CLIENT_SECRET
+});
 
 // ============================================================
 // 套餐权益表（全部从后端读取，前端禁止硬编码）
@@ -245,23 +241,40 @@ app.post('/api/share-reward', (req, res) => {
 });
 
 // --------------------------------------------------------
-// PayPal 支付请求
+// PayPal 支付请求（REST API 正式版）
 // --------------------------------------------------------
 app.post('/api/paypal-order', (req, res) => {
     const { package: pkg } = req.body;
     if(!PACKAGE_ENTITLEMENTS[pkg]) return res.status(400).json({ error: 'Unknown package' });
 
     const amounts = { basic:'9.9', premium:'19.9', ultimate:'29.9' };
+    const pkgNames = { basic:'Basic Plan', premium:'Premium Plan', ultimate:'Ultimate VIP' };
     const amount = amounts[pkg];
-    const returnUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    const cancelUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    const notifyUrl  = encodeURIComponent(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
+    const domain = process.env.DOMAIN || 'http://localhost:3000';
 
-    // PayPal 按钮链接（无需ClientID，适合个人认证账户）
-    const paypalUrl = `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`;
+    const payment = {
+        intent: 'sale',
+        payer: { payment_method: 'paypal' },
+        redirect_urls: {
+            return_url: `${domain}/payment-success.html?package=${pkg}`,
+            cancel_url: `${domain}/payment-cancel.html`
+        },
+        transactions: [{
+            amount: { total: amount, currency: 'USD' },
+            description: `MyChineseName - ${pkgNames[pkg]} ($ ${amount})`,
+            custom: pkg
+        }]
+    };
 
-    log(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
-    res.json({ paypalUrl });
+    paypal.payment.create(payment, (error, result) => {
+        if(error) {
+            logError('PayPal payment create error:', error.message);
+            return res.status(500).json({ error: 'Payment creation failed', detail: error.message });
+        }
+        const approvalUrl = result.links.find(l => l.rel === 'approval_url');
+        if(!approvalUrl) return res.status(500).json({ error: 'No approval URL' });
+        res.json({ paypalUrl: approvalUrl.href });
+    });
 });
 
 // --------------------------------------------------------
@@ -281,14 +294,13 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
         return res.send('ok');
     }
 
-    // 解析套餐
-    const pkgKey = (ipn.item_name || '').toUpperCase().replace(/MYCHINESENAME_/i, '');
-    const pkg = ({'BASIC':'basic','PREMIUM':'premium','ULTIMATE':'ultimate'}[pkgKey]) || 'basic';
+    // 解析套餐（REST API 通过 custom 字段传递）
+    const pkg = ipn.custom || 'basic';
     const userId = ipn.custom || getUserId(req);
 
-    // === 三层安全校验 ===
-    // ① 收款邮箱校验
-    if(PAYPAL.email && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== PAYPAL.email.toLowerCase()) {
+    // === 三层安全校验（IPN 异步通知校验，email 从 .env 读取）===
+    const paypalEmail = process.env.PAYPAL_EMAIL || '';
+    if(paypalEmail && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== paypalEmail.toLowerCase()) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析` });
         logError(`你是面向海外用户的中文起名师，根据性别、风格生成名字，输出格式：中文名+拼音+英文释义+寓意解析`);
         return res.send('ok');
