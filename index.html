@@ -942,7 +942,14 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const res = await fetch('https://mychinesename-api.onrender.com/api/generate-name', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                gender: data.gender,
+                englishName: data.givenName,
+                englishSurname: data.surname,
+                birthDate: data.birthDate,
+                style: data.style,
+                meaning: data.meaning
+            })
         });
         const text = await res.text();
         if(!res.ok){
