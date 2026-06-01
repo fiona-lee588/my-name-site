@@ -947,7 +947,11 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const text = await res.text();
         if(!res.ok){
             loading.style.display = 'none';
-            showPaywall();
+            if(res.status === 402 && text.includes('quota')){
+                showPaywall();  // 额度耗尽 → 弹付费墙
+            } else {
+                document.getElementById('result').innerText = '生成失败，请稍后重试 | Generation failed';
+            }
             return;
         }
         // 测试模式跳过本地次数扣减
