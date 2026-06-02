@@ -944,8 +944,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({
                 gender: data.gender,
-                englishName: data.givenName,
-                englishSurname: data.surname,
+                englishName: data.englishName,
+                englishSurname: data.englishSurname,
                 birthDate: data.birthDate,
                 style: data.style,
                 meaning: data.meaning
