@@ -373,13 +373,23 @@ app.get('/admin-payment-log', (req, res) => {
 // ============================================================
 app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const { englishName, englishSurname, gender, birthYear, birthMonth, birthDay, birthTime, style, meaning } = req.body;
+    // 兼容前端旧字段名 givenName→englishName, surname→englishSurname
+    const givenName = req.body.givenName || englishName;
+    const surname = req.body.surname || englishSurname;
+    // 兼容 birthDate 拆解为 birthYear/Month/Day
+    const bd = req.body.birthDate || '';
+    const by = req.body.birthYear || (bd.match(/^(\d{4})/)?.[1]) || birthYear;
+    const bm = req.body.birthMonth || (bd.match(/[-/](\d{1,2})/)?.[1]) || birthMonth;
+    const bd2 = req.body.birthDay || (bd.match(/[-/](\d{1,2})[-/](\d{1,2})/)?.[2]) || birthDay;
+    const finalEnglishName = givenName;
+    const finalEnglishSurname = surname;
 
     // 基础输入校验
-    if (!englishName || !englishSurname) {
+    if (!finalEnglishName || !finalEnglishSurname) {
         return res.status(400).json({ error: 'englishName and englishSurname are required' });
     }
-    if (typeof englishName !== 'string' || typeof englishSurname !== 'string' ||
-        englishName.length > 50 || englishSurname.length > 50) {
+    if (typeof finalEnglishName !== 'string' || typeof finalEnglishSurname !== 'string' ||
+        finalEnglishName.length > 50 || finalEnglishSurname.length > 50) {
         return res.status(400).json({ error: 'Invalid name length' });
     }
     // 兼容gender格式：自动识别中文"男"/"女"，忽略后续英文
