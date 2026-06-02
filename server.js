@@ -254,8 +254,8 @@ app.post('/api/share-reward', (req, res) => {
 // PayPal 支付请求（REST API 正式版）
 // --------------------------------------------------------
 app.post('/api/paypal-order', (req, res) => {
-    const { package: pkg } = req.body;
-    if(!PACKAGE_ENTITLEMENTS[pkg]) return res.status(400).json({ error: 'Unknown package' });
+    const pkg = cleanStr(req.body.package) || cleanStr(req.body.pkg);
+    if(!pkg || !PACKAGE_ENTITLEMENTS[pkg]) return res.status(400).json({ error: 'Unknown package' });
 
     const amounts = { basic:'9.9', premium:'19.9', ultimate:'29.9' };
     const pkgNames = { basic:'Basic Plan', premium:'Premium Plan', ultimate:'Ultimate VIP' };
@@ -348,7 +348,9 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
 // PayPal 同步回调
 // --------------------------------------------------------
 app.post('/api/paypal-checkout', (req, res) => {
-    const { transactionId, pkg, userId: reqUserId } = req.body;
+    const transactionId = cleanStr(req.body.transactionId);
+    const pkg = cleanStr(req.body.package) || cleanStr(req.body.pkg);
+    const reqUserId = cleanStr(req.body.userId);
     if(!transactionId) return res.status(400).json({ success: false });
     const userId = reqUserId || getUserId(req);
     const state = readUserState();
@@ -404,10 +406,8 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         return res.status(400).json({ error: 'Invalid name length' });
     }
     // 兼容gender格式：自动识别中文"男"/"女"，忽略后续英文
-    if (gender && typeof gender === 'string') {
-        if (!gender.includes('男') && !gender.includes('女')) {
-            return res.status(400).json({ error: 'gender must contain 男 or 女' });
-        }
+    if (finalGender && !finalGender.includes('男') && !finalGender.includes('女')) {
+        return res.status(400).json({ error: 'gender must contain 男 or 女' });
     }
 
     const userId = getUserId(req);
@@ -466,9 +466,11 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 // 留言板
 // ============================================================
 app.post('/api/submit-message', (req, res) => {
-    const { name, email, message } = req.body;
+    const name = cleanStr(req.body.name) || 'anonymous';
+    const email = cleanStr(req.body.email) || '';
+    const message = cleanStr(req.body.message) || '';
     const time = new Date().toLocaleString();
-    const content = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
+    const content = `[${time}] ${name}(${email}): ${message}\n`;
     fs.appendFile('messages.txt', content, err => {
         res.send(err ? "留言提交失败" : "留言提交成功，感谢反馈！");
     });
