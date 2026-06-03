@@ -156,11 +156,11 @@ function readUserState(){
 }
 
 // ============================================================
-// 输入清洗（过滤非ASCII可见字符 \x20-\x7E）
+// 输入清洗（保留中文、ASCII可见字符，去除控制字符和特殊符号）
 // ============================================================
 function cleanStr(str){
     if(typeof str !== 'string') return str;
-    return str.replace(/[^\x20-\x7E]/g, '').trim();
+    return str.replace(/[\x00-\x1F\x7F]/g, '').trim();
 }
 function writeUserState(state){
     fs.writeFileSync(USER_STATE_FILE, JSON.stringify(state, null, 2));
@@ -397,7 +397,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const finalStyle = cleanStr(style);
     const finalMeaning = cleanStr(meaning);
 
-    // 基础输入校验
+    // 基础输入校验（englishName/surname 必填，meaning/style/gender 可空）
     if (!finalEnglishName || !finalEnglishSurname) {
         return res.status(400).json({ error: 'englishName and englishSurname are required' });
     }
@@ -405,10 +405,14 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         finalEnglishName.length > 50 || finalEnglishSurname.length > 50) {
         return res.status(400).json({ error: 'Invalid name length' });
     }
-    // 兼容gender格式：自动识别中文"男"/"女"，忽略后续英文
-    if (finalGender && !finalGender.includes('男') && !finalGender.includes('女')) {
-        return res.status(400).json({ error: 'gender must contain 男 or 女' });
+    // gender 可空；如有值则中英文混搭均兼容（男/Male/Female/男Male/男male均可）
+    if (finalGender && finalGender.trim().length > 0) {
+        const g = finalGender.toLowerCase();
+        if (!g.includes('男') && !g.includes('male')) {
+            return res.status(400).json({ error: 'gender must contain 男/male/female' });
+        }
     }
+    // meaning/style 均可选，空值不拦截
 
     const userId = getUserId(req);
     const status = getUserStatus(userId);
