@@ -436,6 +436,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         const MAX_RETRIES = 2;
         if(retryCount > MAX_RETRIES) throw new Error('Max retries exceeded');
         const body = { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.7 };
+        console.log('[DeepSeek] prompt:', prompt.substring(0, 300));
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 12000);
         try {
@@ -446,11 +447,13 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
             });
             clearTimeout(timeout);
             const data = await resp.json();
+            console.log('[DeepSeek] status:', resp.status, '| response:', JSON.stringify(data).substring(0, 300));
             if(!resp.ok) {
-                logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`, JSON.stringify(data).substring(0,100));
+                console.error('[DeepSeek] API error:', JSON.stringify(data).substring(0, 200));
                 if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
-                throw new Error(data.error?.message || `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
+                throw new Error(data.error?.message || 'DeepSeek API error');
             }
+            console.log('[DeepSeek] result:', data.choices[0].message.content.substring(0, 200));
             return data.choices[0].message.content;
         } catch(err) {
             clearTimeout(timeout);
