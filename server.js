@@ -391,8 +391,8 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const by = cleanStr(req.body.birthYear) || (bd.match(/^(\d{4})/)?.[1]) || cleanStr(birthYear);
     const bm = cleanStr(req.body.birthMonth) || (bd.match(/[-/](\d{1,2})/)?.[1]) || cleanStr(birthMonth);
     const bd2 = cleanStr(req.body.birthDay) || (bd.match(/[-/](\d{1,2})[-/](\d{1,2})/)?.[2]) || cleanStr(birthDay);
-    const finalEnglishName = givenName;
-    const finalEnglishSurname = surname;
+    const finalEnglishName = englishName;
+    const finalEnglishSurname = englishSurname;
     const finalGender = cleanStr(gender);
     // 性别提取：原始值不走cleanStr，直接识别英文Male/Female/中性
     const rawGender = gender || '';
