@@ -424,14 +424,21 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         }
     }
 
-    const prompt = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
+    // 组装用户信息prompt
+    const genderInfo = finalGender ? `性别:${finalGender}` : '';
+    const styleInfo = finalStyle ? `风格偏好:${finalStyle}` : '';
+    const meaningInfo = finalMeaning ? `用户期望:${finalMeaning}` : '';
+    const birthInfo = [by, bm, bd2].filter(Boolean).length > 0 ? `出生日期:${by || ''}-${bm || ''}-${bd2 || ''}` : '';
+    const userInfo = [genderInfo, styleInfo, meaningInfo, birthInfo].filter(Boolean).join('，');
+
+    const prompt = `You are a Chinese naming expert. User: ${finalEnglishName} ${finalEnglishSurname}${userInfo ? ', '+userInfo : ''}. CRITICAL: You MUST respond with ONLY valid JSON. No explanations, no markdown, no text before or after. Format: {"chineseName":"安澜","pinyin":"Ān Lán","meaning":"清雅宁静中品味生活本真\nPure Joy"}. If you include any non-JSON text, the response will be rejected.`;
 
     const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat" };
 
     async function callAI(retryCount = 0) {
         const MAX_RETRIES = 2;
         if(retryCount > MAX_RETRIES) throw new Error('Max retries exceeded');
-        const body = { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.7 };
+        const body = { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.2 };
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 12000);
         try {
@@ -447,7 +454,20 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
                 if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
                 throw new Error(data.error?.message || `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
             }
-            return data.choices[0].message.content;
+            const raw = data.choices[0].message.content;
+            // 尝试解析AI返回的JSON
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed.chineseName || !parsed.pinyin || !parsed.meaning) {
+                    throw new Error('Invalid JSON schema: missing required fields');
+                }
+                return raw; // 返回原始JSON字符串供前端解析
+            } catch(parseErr) {
+                // JSON解析失败或字段不全，返回200+错误提示，不抛500
+                logError('AI返回JSON解析失败:', parseErr.message, 'raw:', raw.substring(0, 200));
+                if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
+                return `{"error":"AI返回格式异常，请重试","detail":"${parseErr.message}"}`;
+            }
         } catch(err) {
             clearTimeout(timeout);
             logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`, err.message);
@@ -462,7 +482,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         res.send(result);
     } catch(err) {
         logError('===【AI起名全部失败】===', err.message);
-        res.status(200).send('生成失败，请稍后重试 | Generation failed, please try again');
+        res.status(200).send(err.message);
     }
 });
 
