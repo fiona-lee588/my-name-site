@@ -523,6 +523,10 @@ app.get('/api/avatar-svg', (req, res) => {
 // 错误处理中间件（正式环境屏蔽报错栈）
 // ============================================================
 app.use((err, req, res, next) => {
+    // 捕获 JSON 解析错误
+    if (err && (err.type === 'entity.parse.failed' || err instanceof SyntaxError)) {
+        return res.status(400).json({ error: 'Invalid JSON payload' });
+    }
     if (!IS_PROD) {
         console.error(err.stack);
     }
