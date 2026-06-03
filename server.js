@@ -462,7 +462,7 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
         res.send(result);
     } catch(err) {
         logError('===【AI起名全部失败】===', err.message);
-        res.status(500).json({ error: '生成失败，请稍后重试', message: err.message });
+        res.status(200).send('生成失败，请稍后重试 | Generation failed, please try again');
     }
 });
 
