@@ -8,6 +8,7 @@
 <meta name="robots" content="index, follow">
 <title>My Chinese Name｜Custom Elegant Chinese Name for Foreigners</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --c-primary:#8c2318;--c-primary-dark:#701c13;
@@ -234,7 +235,7 @@ input:focus,select:focus{
 .speaker-btn:hover{transform:scale(1.2)}
 /* 姓名放大加粗独立区块 */
 .result-name-block{text-align:center;margin:16px 0 10px;padding:14px;background:linear-gradient(135deg,#fdf6e9 0%,#f5e6c8 100%);border-radius:var(--radius);border:2px solid var(--c-gold)}
-.result-name{font-size:30px;font-weight:bold;color:var(--c-primary);letter-spacing:3px;font-family:'KaiTi','STKaiti',serif;display:inline-block;word-break:break-word}
+.result-name{font-size:34px;font-weight:bold;color:var(--c-primary);letter-spacing:3px;font-family:"Noto Serif SC","STKaiti","KaiTi",serif;display:inline-block;word-break:break-word}
 .result-name .speaker-btn{font-size:26px;vertical-align:middle;margin-left:10px}
 /* 免费次数提示 */
 .quota-hint{text-align:center;font-size:13px;color:var(--c-text-light);margin-top:8px}
@@ -266,24 +267,19 @@ input:focus,select:focus{
 /* 付费弹窗 */
 .paywall-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:10000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .paywall-modal.show{display:flex}
-.paywall-content{background:var(--c-bg-card);border-radius:16px;padding:24px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
-.paywall-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;cursor:pointer;color:#997755;line-height:1;padding:4px}
-.paywall-title{text-align:center;font-size:20px;color:var(--c-primary);margin-bottom:18px}
-.paywall-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.paywall-card{border:1px solid var(--c-border-dark);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;background:#fffef9;word-break:break-word;overflow-wrap:break-word}
+.paywall-content{background:var(--c-bg-card);border-radius:0;padding:28px 22px 16px;width:100%;max-width:1184px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
+.paywall-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:42px;cursor:pointer;color:#997755;line-height:1;padding:4px}
+.paywall-title{text-align:center;font-size:32px;color:var(--c-primary);margin-bottom:28px;font-weight:500}
+.paywall-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
+.paywall-card{border:2px solid var(--c-border-dark);border-radius:14px;padding:32px 22px 20px;text-align:left;background:#fffef9;word-break:break-word;overflow-wrap:break-word;display:flex;flex-direction:column;min-height:660px}
 .paywall-card.hot{border:2px solid var(--c-primary)}
-.paywall-card h3{color:var(--c-primary);margin-bottom:6px;font-size:14px;word-break:break-word}
+.paywall-card h3{color:var(--c-primary);margin-bottom:22px;font-size:24px;text-align:center;word-break:break-word}
 .paywall-card .price{font-size:20px;font-weight:bold;color:#b8422a;margin-bottom:10px}
-.paywall-card ul{list-style:none;font-size:12px;line-height:1.7;text-align:left;padding:0 4px;word-break:break-word}
-.paywall-card li{margin-bottom:3px;word-break:break-word}
+.paywall-card ul{list-style:none;font-size:20px;line-height:1.55;text-align:left;padding:0 8px;word-break:break-word;flex:1}
+.paywall-card li{margin-bottom:14px;word-break:break-word}
 .buy-btn{margin-top:8px;padding:7px 12px;background:var(--c-primary);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;width:100%;max-width:200px;transition:background 0.2s;word-break:break-word}
 .buy-btn:hover{background:var(--c-primary-dark)}
-.paywall-note{text-align:center;font-size:12px;color:#886655;margin-top:12px}
-/* 调试模式 */
-.debug-toggle{text-align:center;padding:7px;background:#fff3cd;border-bottom:1px dashed #ffc107;font-size:12px;margin:-24px -16px 24px;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
-.debug-toggle input{margin-right:5px}
-.debug-toggle label{cursor:pointer;color:#856404}
-.debug-toggle span{color:#b42a2a;font-weight:bold;margin-left:6px}
+.paywall-note{text-align:center;font-size:20px;color:#886655;margin-top:12px}
 /* 套餐价格样式 */
 .price-wrap{
     text-align:center;
@@ -292,12 +288,12 @@ input:focus,select:focus{
 .price-original{
     text-decoration:line-through;
     color:#999;
-    font-size:14px;
+    font-size:20px;
     margin-right:6px;
 }
 .price-current{
     color:#b8422a;
-    font-size:22px;
+    font-size:42px;
     font-weight:bold;
 }
 .price-badge{
@@ -346,30 +342,37 @@ input:focus,select:focus{
   .extra-box{grid-template-columns:1fr}.scroll-item{flex:1 1 100%}
   .footer-row{grid-template-columns:1fr 1fr;gap:14px}
   #result{padding:18px 14px}.result-name{font-size:24px}
-  .paywall-content{padding:18px 14px}.fixed-share-bar{display:none}.help-float{right:12px;bottom:12px}
+  .paywall-content{padding:18px 14px}.paywall-title{font-size:24px}.paywall-card{min-height:auto;padding:22px 18px}.paywall-card ul{font-size:16px}.fixed-share-bar{display:none}.help-float{right:12px;bottom:12px}
 }
 @media(max-width:400px){.birth-col{flex:1 1 100%}.footer-row{grid-template-columns:1fr}.price-current{font-size:18px}}
 .bilingual-block{margin:16px 0;font-size:15px;line-height:2;}
-.bi-line{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px dashed #e8d8c0;}
+.bilingual-block{max-width:820px;margin:18px auto;font-size:15px;line-height:1.8;white-space:normal}
+.bi-line{display:flex;flex-direction:column;padding:9px 0;border-bottom:1px dashed #e8d8c0;}
 .bi-line:last-child{border-bottom:none;}
 .bi-cn{color:#443322;}
 .bi-en{color:#997755;font-size:13px;margin-top:2px;}
+.meaning-section{padding:16px 0;border-bottom:1px dashed #e8d8c0}
+.meaning-section:last-child{border-bottom:none}
+.meaning-title{color:#8c2318;font-weight:bold;font-size:15px;margin-bottom:4px}
+.meaning-title .en{color:#997755;font-size:12px;font-weight:normal;margin-left:6px}
+.meaning-cn{color:#443322;font-size:15px;line-height:1.75;margin-bottom:6px;max-width:760px;white-space:normal}
+.meaning-en{color:#997755;font-size:13px;line-height:1.65;max-width:760px;white-space:normal}
 /* 书法头像展示区 */
-.avatar-showcase{margin:20px 0;padding:20px;background:#fffbf5;border:2px solid #c9a96e;border-radius:12px;text-align:center;}
-.avatar-label{font-size:16px;color:#8c2318;margin-bottom:12px;}
+.avatar-showcase{max-width:760px;margin:28px auto;padding:24px 20px;background:#fffbf5;border:1px solid #e4cfad;border-radius:12px;text-align:center;white-space:normal;box-shadow:0 8px 24px rgba(140,35,24,0.08)}
+.avatar-label{font-size:18px;color:#8c2318;margin-bottom:6px;}
+.avatar-subtitle{font-size:13px;color:#997755;margin-bottom:16px;line-height:1.6}
 .avatar-img{max-width:360px;width:100%;border-radius:8px;border:2px solid #8c2318;}
-.avatar-actions{display:flex;gap:10px;justify-content:center;margin-top:12px;}
-.avatar-btn{padding:8px 16px;background:#8c2318;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;}
+.avatar-svg-wrap{max-width:430px;width:100%;margin:0 auto;border-radius:10px;background:#f4ead7;padding:10px;box-shadow:0 10px 30px rgba(68,51,34,0.12)}
+.avatar-svg-wrap svg{display:block;width:100%;height:auto}
+.avatar-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;}
+.avatar-btn{padding:10px 18px;background:#8c2318;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:15px;}
 .avatar-btn:hover{background:#701c13;}
+.dev-test-badge{position:fixed;right:14px;top:14px;z-index:10001;background:#2e7d32;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.18)}
 </style>
 </head>
 <body>
 <div class="wrap">
     <div class="header">
-        <div class="debug-toggle">
-            <label><input type="checkbox" id="debugMode"> 调试模式 Debug Mode</label>
-            <span id="debugStatus"></span>
-        </div>
         <h1>雅韵中华 · 赐你佳名</h1>
         <div class="en-title">My Chinese Name | Creator Studio</div>
         <div class="domain">🌐 mychinesename.co</div>
@@ -649,7 +652,6 @@ input:focus,select:focus{
                     <li>✅ 高清可下载起名证书 | HD Downloadable Naming Certificate</li>
                     <li>✅ 单次AI书法头像生成 | 1 AI Calligraphy Avatar Generation</li>
                 </ul>
-                <div class="qrcode-placeholder">QR Code Placeholder</div>
                 <button class="buy-btn paypal-btn" data-package="premium" data-price="19.9">Buy Now</button>
             </div>
             <div class="paywall-card">
@@ -665,7 +667,6 @@ input:focus,select:focus{
                     <li>✅ 终身姓名档案保存 | Lifetime Name Record Storage</li>
                     <li>⚠️ 仅限本人IP/设备使用 | For personal IP & device only</li>
                 </ul>
-                <div class="qrcode-placeholder">QR Code Placeholder</div>
                 <button class="buy-btn paypal-btn" data-package="ultimate" data-price="29.9">Buy Now</button>
             </div>
         </div>
@@ -675,9 +676,15 @@ input:focus,select:focus{
 
 <script>
 // ============================================================
-// API_BASE 自动检测：本地开发用相对路径，线上用环境变量
+// API_BASE 自动检测：同域部署默认用相对路径；如需跨域，可在页面前置脚本写 window.API_BASE 覆盖。
 // ============================================================
-const API_BASE = "https://mychinesename-api.onrender.com";
+const API_BASE = window.API_BASE || '';
+const DEV_TEST_HOST = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const DEV_TEST_QUERY = new URLSearchParams(window.location.search).get('devtest') === '1';
+if(DEV_TEST_HOST && DEV_TEST_QUERY) {
+    localStorage.setItem('DEV_TEST_MODE', '1');
+}
+const DEV_TEST_MODE = DEV_TEST_HOST && localStorage.getItem('DEV_TEST_MODE') === '1';
 const yearList = document.getElementById('yearList');
 for(let y=2025;y>=1920;y--){
     const opt=document.createElement('option');
@@ -788,10 +795,23 @@ function closePaywall(){
     document.getElementById('paywallModal').classList.remove('show');
     paywallClosed = true;
 }
+
+function apiUrl(path){
+    return `${API_BASE}${path}`;
+}
+
+function renderPackageFeatures(features){
+    return (features || []).map(item => {
+        const icon = item.icon || '✅';
+        const text = item.text || '';
+        return `<li>${escapeHtml(icon)} ${escapeHtml(text)}</li>`;
+    }).join('');
+}
+
 // 从后端加载定价数据并动态更新套餐卡片
 async function loadPricing(){
     try {
-        const res = await fetch('https://mychinesename-api.onrender.com/api/pricing');
+        const res = await fetch(apiUrl('/api/pricing'));
         const data = await res.json();
         const packages = data.packages;
         document.querySelectorAll('.paypal-btn').forEach(btn => {
@@ -801,12 +821,18 @@ async function loadPricing(){
             // 找到最近的card父元素并更新价格区
             const card = btn.closest('.paywall-card') || btn.closest('.price-card');
             if(!card) return;
+            const titleEl = card.querySelector('h3');
+            if(titleEl && pkg.label) titleEl.textContent = pkg.label;
             const priceWrap = card.querySelector('.price-wrap');
             if(priceWrap){
                 priceWrap.innerHTML = `<span class="price-original">$${pkg.originalPrice}</span><span class="price-current">$${pkg.price}</span><span class="price-badge">${pkg.badge}</span>`;
             } else {
                 const priceEl = card.querySelector('.price');
                 if(priceEl) priceEl.textContent = `$${pkg.price}`;
+            }
+            const featureList = card.querySelector('ul');
+            if(featureList && pkg.features) {
+                featureList.innerHTML = renderPackageFeatures(pkg.features);
             }
         });
     } catch(e){ console.error('Failed to load pricing:', e); }
@@ -816,13 +842,13 @@ async function loadPricing(){
 async function buyPackage(pkg){
     try {
         // 直接从 /api/pricing 拉取最新定价，再调支付订单接口
-        const pricingRes = await fetch('https://mychinesename-api.onrender.com/api/pricing');
+        const pricingRes = await fetch(apiUrl('/api/pricing'));
         if(!pricingRes.ok) throw new Error('Pricing API error');
         const pricing = await pricingRes.json();
         const amount = pricing.packages?.[pkg]?.price;
         if(!amount) throw new Error('Unknown package: ' + pkg);
 
-        const orderRes = await fetch('https://mychinesename-api.onrender.com/api/paypal-order', {
+        const orderRes = await fetch(apiUrl('/api/paypal-order'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ package: pkg })
@@ -842,11 +868,6 @@ async function buyPackage(pkg){
 // 免费次数管理（从服务器同步）
 let currentQuota = 2;
 let localQuota = true; // true=免费用户未付费
-let testUnlocked = true; // 跳过次数限制，始终放行
-
-// 测试码解锁（已移除前端UI，不再需要）
-// const TEST_CODE = 'Test2026';
-// async function tryUnlockTest(){ ... }
 
 // PayPal按钮点击事件绑定（委托模式，兼容动态元素）
 document.addEventListener('click', function(e){
@@ -859,28 +880,29 @@ document.addEventListener('click', function(e){
 
 // 等 DOM Ready 后再执行定价加载（避免 paywall 元素不存在导致 querySelector 返回 null）
 document.addEventListener('DOMContentLoaded', function(){
-    loadPricing().catch(function(e){ console.error('loadPricing failed:', e); });
-});
-
-// 调试模式开关 - 勾选后强制弹出付费弹窗
-document.getElementById('debugMode').addEventListener('change', function(){
-    const debugStatus = document.getElementById('debugStatus');
-    if(this.checked){
-        testUnlocked = false;
-        debugStatus.textContent = '(已启用调试)';
-        showPaywall();
-    } else {
-        testUnlocked = true;
-        debugStatus.textContent = '';
+    if(DEV_TEST_MODE){
+        const badge = document.createElement('div');
+        badge.className = 'dev-test-badge';
+        badge.textContent = 'Developer Test Mode';
+        badge.title = '点击关闭开发者自测模式';
+        badge.onclick = function(){
+            localStorage.removeItem('DEV_TEST_MODE');
+            window.location.href = window.location.pathname;
+        };
+        document.body.appendChild(badge);
     }
+    loadPricing().catch(function(e){ console.error('loadPricing failed:', e); });
+    syncQuota().catch(function(e){ console.error('syncQuota failed:', e); });
 });
-
-// 初始化测试解锁状态（已移除）
-// if(testUnlocked){ ... }
 
 async function syncQuota(){
+    if(DEV_TEST_MODE){
+        currentQuota = 2;
+        updateQuotaUI();
+        return;
+    }
     try {
-        const res = await fetch('https://mychinesename-api.onrender.com/api/quota');
+        const res = await fetch(apiUrl('/api/quota'));
         const data = await res.json();
         currentQuota = data.quota || 0;
     } catch {
@@ -889,10 +911,15 @@ async function syncQuota(){
     updateQuotaUI();
 }
 function updateQuotaUI(){
-    document.getElementById('quotaCount').textContent = currentQuota;
     const hint = document.getElementById('quotaHint');
+    if(DEV_TEST_MODE){
+        hint.innerHTML = '开发者自测模式：不扣免费次数 | Developer test mode: free attempts are not used';
+        return;
+    }
     if(currentQuota <= 0){
         hint.innerHTML = '❌ 免费次数已用完 | No free attempts left — <a href="javascript:void(0)" onclick="showPaywall()">升级付费套餐</a>';
+    } else {
+        hint.innerHTML = `剩余免费次数 | Free Attempts: <span id="quotaCount">${currentQuota}</span>`;
     }
 }
 function addQuota(){
@@ -906,9 +933,79 @@ function escapeHtml(str){
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function parseGeneratedName(text){
+    let payload = null;
+    try { payload = JSON.parse(text); } catch {}
+
+    if(payload?.success && payload.data) {
+        const data = payload.data;
+        return {
+            fullName: String(data.chineseName || '').replace(/[^\u4e00-\u9fa5]/g, ''),
+            pinyin: data.pinyin || '',
+            meaning: data.meaning || '',
+            sections: Array.isArray(data.sections) ? data.sections : [],
+            raw: data.raw || ''
+        };
+    }
+
+    if(payload?.chineseName) {
+        return {
+            fullName: String(payload.chineseName || '').replace(/[^\u4e00-\u9fa5]/g, ''),
+            pinyin: payload.pinyin || '',
+            meaning: payload.meaning || '',
+            sections: Array.isArray(payload.sections) ? payload.sections : [],
+            raw: text
+        };
+    }
+
+    const nameMatch = text.match(/【完整中文姓名】：([^\n【]+)/) || text.match(/"chineseName"\s*:\s*"([^"]+)"/);
+    const pinyinMatch = text.match(/【拼音】：([^\n【]+)/) || text.match(/"pinyin"\s*:\s*"([^"]+)"/);
+    const meaningMatch = text.match(/【寓意解析】：([\s\S]+)/) || text.match(/"meaning"\s*:\s*"([^"]+)"/);
+    return {
+        fullName: nameMatch ? nameMatch[1].replace(/[^\u4e00-\u9fa5]/g, '') : '',
+        pinyin: pinyinMatch ? pinyinMatch[1] : '',
+        meaning: meaningMatch ? meaningMatch[1].replace(/\\n/g, '\n') : '',
+        sections: [],
+        raw: text
+    };
+}
+
+function renderMeaningSections(result){
+    if(Array.isArray(result.sections) && result.sections.length){
+        return result.sections.map(section => {
+            const titleCn = section.titleCn || section.title || '';
+            const titleEn = section.titleEn || '';
+            const cn = section.cn || section.chinese || '';
+            const en = section.en || section.english || '';
+            return `<div class="meaning-section">
+                <div class="meaning-title">${escapeHtml(titleCn)}${titleEn ? ` <span class="en">/ ${escapeHtml(titleEn)}</span>` : ''}</div>
+                ${cn ? `<div class="meaning-cn">${escapeHtml(cn)}</div>` : ''}
+                ${en ? `<div class="meaning-en">${escapeHtml(en)}</div>` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    const lines = (result.meaning || result.raw || '').split('\n').map(l => l.trim()).filter(Boolean);
+    return lines.map(line => `<div class="bi-line"><span class="bi-cn">${escapeHtml(line)}</span></div>`).join('');
+}
+
+function buildResultLines(result){
+    const lines = [];
+    if(result.fullName) lines.push(`【完整中文姓名】：${result.fullName}`);
+    if(result.pinyin) lines.push(`【拼音】：${result.pinyin}`);
+    if(result.meaning) {
+        result.meaning.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
+            lines.push(line);
+        });
+    }
+    if(!lines.length && result.raw) {
+        return result.raw.split('\n').map(l => l.trim()).filter(Boolean);
+    }
+    return lines;
+}
+
 document.getElementById('generateBtn').addEventListener('click', async () => {
-    // 检查免费次数（测试码解锁则跳过检查）
-    if(!testUnlocked){
+    if(!DEV_TEST_MODE){
         await syncQuota();
         if(currentQuota <= 0){
             showPaywall();
@@ -938,14 +1035,20 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     };
 
     try{
-        const res = await fetch('https://mychinesename-api.onrender.com/api/generate-name', {
+        const res = await fetch(apiUrl('/api/generate-name'), {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: {
+                'Content-Type':'application/json',
+                ...(DEV_TEST_MODE ? {'x-dev-test':'true'} : {})
+            },
             body: JSON.stringify({
                 gender: data.gender,
                 englishName: data.englishName,
                 englishSurname: data.englishSurname,
-                birthDate: data.birthDate,
+                birthYear: data.birthYear,
+                birthMonth: data.birthMonth,
+                birthDay: data.birthDay,
+                birthTime: data.birthTime,
                 style: data.style,
                 meaning: data.meaning
             })
@@ -960,14 +1063,16 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             }
             return;
         }
-        // 测试模式跳过本地次数扣减
-        if(!testUnlocked){
-            currentQuota -= 1;
+        if(!DEV_TEST_MODE){
+            currentQuota = Math.max(0, currentQuota - 1);
             updateQuotaUI();
         }
-        // res.ok = 200 → 直接渲染名字预览
-        const nameMatch = text.match(/【完整中文姓名】：([^\n【]+)/);
-        const fullName = nameMatch ? nameMatch[1].replace(/[^一-龥]/g,'') : '';
+        const result = parseGeneratedName(text);
+        const fullName = result.fullName;
+        if(!fullName){
+            document.getElementById('result').innerText = '生成结果格式异常，请稍后重试 | Invalid generation result, please try again';
+            return;
+        }
 
         // 提取五行喜用（用于显示在头像下方）
         const wuxingMatch = text.match(/【五行喜用】：(.+)/);
@@ -975,59 +1080,34 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
         loading.style.display = 'none';
 
-        // 双语展示：中文一行、英文一行，严格交替
-        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         let html = `<div class="result-name-block">
     <div class="result-name">${escapeHtml(fullName)} <span class="speaker-btn" onclick="readChinese('${escapeHtml(fullName)}')">🔊</span></div>
 </div>`;
         html += `<div class="bilingual-block">`;
-        lines.forEach(line => {
-            // 检测中英双语行：中文在上，英文翻译在()内或独立一行
-            const cnMatch = line.match(/^【([^】]+)】：(.+)/); // 标签行
-            if(cnMatch){
-                const label = cnMatch[1]; // 标签中文
-                const rest = cnMatch[2]; // 内容（含可能的英文翻译）
-                const enMatch = rest.match(/[(（]([A-Za-z].+)[)）]$/); // 英文在末尾括号
-                if(enMatch){
-                    const cn = rest.replace(/[(（][A-Za-z].+[)）]$/, '').trim();
-                    const en = enMatch[1];
-                    html += `<div class="bi-line"><span class="bi-cn">${escapeHtml(label)}：${escapeHtml(cn)}</span><span class="bi-en">${escapeHtml(en)}</span></div>`;
-                } else {
-                    html += `<div class="bi-line"><span class="bi-cn">${escapeHtml(label)}：${escapeHtml(rest)}</span></div>`;
-                }
-            } else {
-                // 无标签普通行，直接显示
-                html += `<div class="bi-line"><span class="bi-cn">${escapeHtml(line)}</span></div>`;
-            }
-        });
+        html += `<div class="bi-line"><span class="bi-cn">完整中文姓名：${escapeHtml(fullName)}</span><span class="bi-en">Full Chinese name: ${escapeHtml(fullName)}</span></div>`;
+        if(result.pinyin){
+            html += `<div class="bi-line"><span class="bi-cn">拼音：${escapeHtml(result.pinyin)}</span><span class="bi-en">Pinyin: ${escapeHtml(result.pinyin)}</span></div>`;
+        }
+        html += renderMeaningSections(result);
         html += `</div>`;
 
-        // 书法头像 SVG 展示（前端生成，无需后端）
-        const avatarFonts = [
-            "ZCOOLKuaiLe, Ma Shan Zheng, STKaiti, KaiTi, serif",
-            "Noto Serif SC, HanYiJianJian, STZhongsong, KaiTi, serif",
-            "HanYiJianJian, STKaiti, KaiTi, serif",
-            "cwTeXMing, ZCOOLKuaiLe, KaiTi, serif"
-        ];
-        const avatarBgs = ['#fdf6e9','#f5f0e6','#f0ebe0','#f7f2e3','#f5ede0'];
         const fontsIdx = Math.floor(Math.random() * avatarFonts.length);
-        const bgIdx = Math.floor(Math.random() * avatarBgs.length);
-        const svgId = 'av' + Date.now();
-        const avatarSvg = `<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="400" fill="${avatarBgs[bgIdx]}"/>
-  <rect x="15" y="15" width="370" height="370" fill="none" stroke="#8c2318" stroke-width="2" rx="8"/>
-  <text x="200" y="200" font-size="80" text-anchor="middle" fill="#1a1a1a" font-family="${avatarFonts[fontsIdx]}" letter-spacing="8">${escapeHtml(fullName)}</text>
-  <text x="200" y="320" font-size="14" text-anchor="middle" fill="#8c2318" font-family="ZCOOLKuaiLe, KaiTi, serif">mychinesename.co</text>
-  <text x="200" y="345" font-size="11" text-anchor="middle" fill="#b88646">${escapeHtml(wuxingText)}</text>
-</svg>`;
-        const avatarDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(avatarSvg);
-
+        const bgIdx = Math.floor(Math.random() * avatarThemes.length);
+        currentAvatarFontsIdx = fontsIdx;
+        currentAvatarBgIdx = bgIdx;
+        const avatarSvg = createChineseStyleAvatarSvg(fullName, {
+            size: 400,
+            font: avatarFonts[fontsIdx],
+            theme: avatarThemes[bgIdx],
+            subtitle: wuxingText
+        });
         html += `<div class="avatar-showcase">
-    <div class="avatar-label">🎨 书法头像 | Calligraphy Avatar</div>
-    <img src="${avatarDataUrl}" class="avatar-img" alt="calligraphy avatar" id="avatarImg"/>
+    <div class="avatar-label">专属中文名卡 | Shareable Chinese Name Card</div>
+    <div class="avatar-subtitle">毛笔书法效果，适合保存并分享到社交平台<br>Brush-calligraphy style, designed for saving and sharing</div>
+    <div class="avatar-svg-wrap" id="avatarSvgWrap">${avatarSvg}</div>
     <div class="avatar-actions">
-        <button class="avatar-btn" onclick="regenerateAvatar('${escapeHtml(fullName)}')">🔄 换字体 | Change Font</button>
-        <button class="avatar-btn" onclick="downloadAvatarImg('${escapeHtml(fullName)}')">💾 下载 | Download</button>
+        <button class="avatar-btn" onclick="regenerateAvatar('${escapeHtml(fullName)}')">🔄 换一张 | New Style</button>
+        <button class="avatar-btn" onclick="downloadAvatarImg('${escapeHtml(fullName)}')">💾 保存分享图 | Save Card</button>
     </div>
 </div>`;
 
@@ -1051,49 +1131,123 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
 // 前端生成书法头像（多字体多背景切换，无需后端）
 const avatarFonts = [
-    "ZCOOLKuaiLe, Ma Shan Zheng, STKaiti, KaiTi, serif",
-    "Noto Serif SC, HanYiJianJian, STZhongsong, KaiTi, serif",
-    "HanYiJianJian, STKaiti, KaiTi, serif",
-    "cwTeXMing, ZCOOLKuaiLe, KaiTi, serif"
+    "'Zhi Mang Xing', 'Ma Shan Zheng', STXingkai, FZShuTi, KaiTi, cursive",
+    "'Ma Shan Zheng', 'Zhi Mang Xing', STXingkai, FZShuTi, KaiTi, cursive",
+    "STXingkai, 'Zhi Mang Xing', 'Ma Shan Zheng', FZShuTi, KaiTi, cursive",
+    "FZShuTi, 'Zhi Mang Xing', 'Ma Shan Zheng', KaiTi, cursive"
 ];
-const avatarBgs = ['#fdf6e9','#f5f0e6','#f0ebe0','#f7f2e3','#f5ede0'];
+const avatarThemes = ['cloud','ink','paper','mountain'];
 let currentAvatarFontsIdx = 0;
 let currentAvatarBgIdx = 0;
+
+function createChineseStyleAvatarSvg(name, options){
+    const size = options?.size || 400;
+    const font = options?.font || avatarFonts[currentAvatarFontsIdx];
+    const theme = options?.theme || avatarThemes[currentAvatarBgIdx];
+    const subtitle = options?.subtitle || '';
+    const scale = size / 400;
+    const safeName = escapeHtml(name);
+    const safeSubtitle = escapeHtml(subtitle);
+    const uid = `${Date.now()}${Math.floor(Math.random()*1000)}`;
+    const gradId = `paper${uid}`;
+    const paperId = `paperNoise${uid}`;
+    const brushId = `brushInk${uid}`;
+    const titleSize = Math.max(64, Math.min(100, 116 - safeName.length * 7)) * scale;
+    const background = {
+        cloud: `
+  <rect width="${size}" height="${size}" fill="url(#${gradId})"/>
+  <g fill="none" stroke="#c9a96e" stroke-width="${0.9*scale}" opacity="0.18" stroke-linecap="round">
+    <path d="M${24*scale} ${108*scale}c${38*scale}-${28*scale} ${86*scale}-${20*scale} ${110*scale} ${12*scale}c${31*scale}-${18*scale} ${72*scale}-${2*scale} ${82*scale} ${28*scale}"/>
+    <path d="M${210*scale} ${86*scale}c${42*scale}-${34*scale} ${92*scale}-${22*scale} ${120*scale} ${13*scale}c${28*scale}-${14*scale} ${58*scale}-${2*scale} ${70*scale} ${24*scale}"/>
+    <path d="M${46*scale} ${304*scale}c${42*scale}-${38*scale} ${112*scale}-${34*scale} ${136*scale} ${12*scale}c${34*scale}-${16*scale} ${76*scale} ${0*scale} ${92*scale} ${33*scale}"/>
+  </g>`,
+        ink: `
+  <rect width="${size}" height="${size}" fill="url(#${gradId})"/>
+  <g opacity="0.18" filter="url(#softBlur)">
+    <ellipse cx="${106*scale}" cy="${96*scale}" rx="${108*scale}" ry="${64*scale}" fill="#66735f"/>
+    <ellipse cx="${292*scale}" cy="${280*scale}" rx="${126*scale}" ry="${78*scale}" fill="#806a54"/>
+    <ellipse cx="${206*scale}" cy="${194*scale}" rx="${158*scale}" ry="${92*scale}" fill="#b1a182"/>
+  </g>
+  <path d="M0 ${306*scale}c${74*scale}-${70*scale} ${128*scale}-${26*scale} ${190*scale}-${86*scale}c${42*scale}-${42*scale} ${76*scale}-${54*scale} ${120*scale}-${7*scale}c${34*scale} ${36*scale} ${58*scale} ${31*scale} ${90*scale} ${8*scale}v${180*scale}H0z" fill="#3f4c44" opacity="0.10"/>`,
+        paper: `
+  <rect width="${size}" height="${size}" fill="url(#${gradId})"/>
+  <g opacity="0.13">
+    <circle cx="${70*scale}" cy="${76*scale}" r="${2*scale}" fill="#9b7656"/><circle cx="${310*scale}" cy="${88*scale}" r="${1.6*scale}" fill="#9b7656"/>
+    <circle cx="${138*scale}" cy="${314*scale}" r="${1.8*scale}" fill="#9b7656"/><circle cx="${348*scale}" cy="${272*scale}" r="${2.2*scale}" fill="#9b7656"/>
+    <path d="M${42*scale} ${122*scale}h${316*scale}M${42*scale} ${214*scale}h${316*scale}M${42*scale} ${306*scale}h${316*scale}" stroke="#d8c6a8" stroke-width="${0.55*scale}"/>
+  </g>`,
+        mountain: `
+  <rect width="${size}" height="${size}" fill="url(#${gradId})"/>
+  <path d="M${8*scale} ${296*scale}c${62*scale}-${78*scale} ${106*scale}-${42*scale} ${146*scale}-${106*scale}c${56*scale} ${72*scale} ${90*scale} ${50*scale} ${134*scale}-${13*scale}c${38*scale} ${46*scale} ${60*scale} ${75*scale} ${104*scale} ${98*scale}v${130*scale}H${8*scale}z" fill="#536154" opacity="0.12"/>
+  <path d="M${46*scale} ${126*scale}c${54*scale}-${30*scale} ${98*scale}-${19*scale} ${130*scale} ${8*scale}M${218*scale} ${108*scale}c${46*scale}-${24*scale} ${92*scale}-${16*scale} ${132*scale} ${20*scale}" fill="none" stroke="#b98c5b" stroke-width="${0.9*scale}" opacity="0.28"/>`
+    }[theme] || '';
+
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="48%" stop-color="#f5ead6"/>
+      <stop offset="100%" stop-color="#dfc8a2"/>
+    </linearGradient>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="${12*scale}"/></filter>
+    <filter id="${paperId}">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="8"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.12"/></feComponentTransfer>
+    </filter>
+    <filter id="${brushId}">
+      <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="5" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="${1.9*scale}" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation="${0.18*scale}"/>
+    </filter>
+  </defs>
+  ${background}
+  <rect width="${size}" height="${size}" filter="url(#${paperId})" opacity="0.75"/>
+  <rect x="${24*scale}" y="${24*scale}" width="${352*scale}" height="${352*scale}" fill="none" stroke="#9b2a1f" stroke-width="${1.15*scale}" opacity="0.72" rx="${18*scale}"/>
+  <rect x="${38*scale}" y="${38*scale}" width="${324*scale}" height="${324*scale}" fill="none" stroke="#d6b982" stroke-width="${0.7*scale}" opacity="0.55"/>
+  <g font-family="${font}" text-anchor="middle" dominant-baseline="middle" letter-spacing="${7*scale}">
+    <text x="${201*scale}" y="${207*scale}" font-size="${titleSize}" fill="#1b1712" opacity="0.16" filter="url(#softBlur)">${safeName}</text>
+    <text x="${198.5*scale}" y="${204*scale}" font-size="${titleSize}" fill="#0d0b09" opacity="0.30">${safeName}</text>
+    <text x="${200*scale}" y="${204*scale}" font-size="${titleSize}" fill="#050403" filter="url(#${brushId})">${safeName}</text>
+  </g>
+  <text x="${200*scale}" y="${318*scale}" font-size="${12*scale}" text-anchor="middle" fill="#8c2318" font-family="Georgia, 'Times New Roman', serif" letter-spacing="${1.2*scale}">mychinesename.co</text>
+  <text x="${200*scale}" y="${344*scale}" font-size="${11*scale}" text-anchor="middle" fill="#9a6b2f">${safeSubtitle}</text>
+  <g transform="translate(${310*scale} ${292*scale})">
+    <rect width="${48*scale}" height="${48*scale}" fill="#9d2419" opacity="0.92" rx="${3*scale}"/>
+    <text x="${24*scale}" y="${19*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">雅</text>
+    <text x="${24*scale}" y="${35*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">名</text>
+  </g>
+</svg>`;
+}
 
 // 换字体（随机切换）
 function regenerateAvatar(name){
     currentAvatarFontsIdx = (currentAvatarFontsIdx + 1) % avatarFonts.length;
+    currentAvatarBgIdx = (currentAvatarBgIdx + 1) % avatarThemes.length;
     const font = avatarFonts[currentAvatarFontsIdx];
-    const bg = avatarBgs[currentAvatarBgIdx];
-    const img = document.getElementById('avatarImg');
-    if(!img || !name) return;
-    const svg = `<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="400" fill="${bg}"/>
-  <rect x="15" y="15" width="370" height="370" fill="none" stroke="#8c2318" stroke-width="2" rx="8"/>
-  <text x="200" y="200" font-size="80" text-anchor="middle" fill="#1a1a1a" font-family="${font}" letter-spacing="8">${escapeHtml(name)}</text>
-  <text x="200" y="320" font-size="14" text-anchor="middle" fill="#8c2318" font-family="ZCOOLKuaiLe, KaiTi, serif">mychinesename.co</text>
-</svg>`;
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    const theme = avatarThemes[currentAvatarBgIdx];
+    const wrap = document.getElementById('avatarSvgWrap');
+    if(!wrap || !name) return;
+    const svg = createChineseStyleAvatarSvg(name, { size: 400, font, theme });
+    wrap.innerHTML = svg;
 }
 
 // 下载当前展示的头像SVG
 function downloadAvatarImg(name){
-    const img = document.getElementById('avatarImg');
-    if(!img) return;
+    const svg = document.querySelector('#avatarSvgWrap svg');
+    if(!svg) return;
+    const blob = new Blob([svg.outerHTML], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = img.src;
+    a.href = url;
     a.download = (name || 'chinese_name') + '_avatar.svg';
     a.click();
+    URL.revokeObjectURL(url);
 }
 
 // 下载书法头像（旧兼容函数）
 function handleDownload(name){
     if(!name) return;
-    // 测试模式直接下载
-    if(testUnlocked){
-        downloadAvatar(name, false);
-        return;
-    }
     // 免费用户弹出提示，禁止直接下载
     if(localQuota){
         alert('免费用户暂时无法下载书法头像，请分享到社交平台获取下载资格，或升级付费套餐解锁高清下载权限。\n\nFree users cannot download calligraphy avatars yet. Share to social media to unlock download access, or upgrade to a paid plan for HD download.');
@@ -1105,13 +1259,12 @@ function handleDownload(name){
 // 下载书法头像（区分奖励版和付费版）
 function downloadAvatar(name, isReward){
     if(!name) return;
-    const svg = `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f7f2e9"/>
-        ${isReward ? '<text x="540" y="200" font-size="24" text-anchor="middle" fill="#b8422a">🎁 Share Reward Avatar</text>' : ''}
-        <text x="540" y="${isReward?320:400}" font-size="80" text-anchor="middle" fill="#8c2318" font-family="KaiTi,serif">${name}</text>
-        <text x="540" y="${isReward?470:550}" font-size="30" text-anchor="middle" fill="#b88646">My Chinese Name | Creator Studio</text>
-        <text x="540" y="${isReward?520:600}" font-size="24" text-anchor="middle" fill="#775533">mychinesename.co</text>
-    </svg>`;
+    const svg = createChineseStyleAvatarSvg(name, {
+        size: 1080,
+        font: avatarFonts[currentAvatarFontsIdx],
+        theme: avatarThemes[currentAvatarBgIdx],
+        subtitle: isReward ? 'Share Reward Avatar' : ''
+    });
     const blob = new Blob([svg],{type:"image/svg+xml"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
