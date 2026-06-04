@@ -1,6 +1,5 @@
-# render.yaml — Render Node.js Web Service 部署配置
-# 部署命令: render blueprint create
-# 文档: https://render.com/docs/blueprint-spec
+# Render Node.js Web Service deployment config.
+# Sensitive values marked sync:false must be set in the Render dashboard.
 
 services:
   - type: web
@@ -16,8 +15,12 @@ services:
       - key: PORT
         value: "10000"
       - key: DEEPSEEK_API_KEY
-        sync: false   # 在 Render Dashboard 中填入
+        sync: false
       - key: PAYPAL_EMAIL
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
         sync: false
       - key: PAYPAL_MODE
         value: live
@@ -27,3 +30,7 @@ services:
         value: https://mychinesename.co
       - key: LOG_LEVEL
         value: error
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_SESSION_SECRET
+        sync: false
