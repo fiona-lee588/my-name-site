@@ -16,12 +16,12 @@ const port = process.env.PORT || 3000;
 // 环境配置（全部从 .env 读取，禁止硬编码）
 // ============================================================
 const IS_PROD     = process.env.NODE_ENV === 'production';
-const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
+const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : 'http://localhost:3000');
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 
 // 仅在非正式环境输出启动日志
-const log = (...args) => { if(!IS_PROD) console.log(...args); };
+const log = (...args) => { console.log(...args); };
 const logError = (...args) => { console.error(...args); };
 
 log("DeepSeek密钥：", !!process.env.DEEPSEEK_API_KEY);
@@ -34,12 +34,13 @@ log("网站域名：", DOMAIN);
 // CORS 配置
 // ============================================================
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: CORS_ORIGIN,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
     credentials: true
 }));
-app.use(helmet());
+// helmet() 已移除 CSP
+// app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 
 // ============================================================
@@ -216,6 +217,7 @@ function useQuota(userId){
     const user = state[userId] || { quota: 2 };
     if(user.quota <= 0) return false;
     user.quota--;
+    state[userId] = user;
     writeUserState(state);
     return true;
 }
@@ -224,8 +226,61 @@ function addShareReward(userId){
     const state = readUserState();
     const user = state[userId] || { quota: 2 };
     user.quota = (user.quota || 0) + 1;
+    state[userId] = user;
     writeUserState(state);
     return { success: true, quota: user.quota };
+}
+
+function isLocalDevTest(req){
+    const host = (req.hostname || '').toLowerCase();
+    const hostHeader = (req.get('host') || '').toLowerCase();
+    const isLocalHost = host === 'localhost'
+        || host === '127.0.0.1'
+        || host === '::1'
+        || hostHeader.startsWith('localhost:')
+        || hostHeader.startsWith('127.0.0.1:')
+        || hostHeader.startsWith('[::1]:');
+    return isLocalHost && String(req.headers['x-dev-test']).toLowerCase() === 'true';
+}
+
+function extractJsonObject(text){
+    if(!text || typeof text !== 'string') return null;
+    const cleaned = text.trim()
+        .replace(/^```(?:json)?/i, '')
+        .replace(/```$/i, '')
+        .trim();
+    try { return JSON.parse(cleaned); } catch {}
+
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if(start === -1 || end === -1 || end <= start) return null;
+    try { return JSON.parse(cleaned.slice(start, end + 1)); } catch { return null; }
+}
+
+function normalizeNameResult(raw){
+    const parsed = extractJsonObject(raw) || {};
+    const chineseName = cleanStr(parsed.chineseName || parsed.name || parsed.fullName || '') ||
+        ((raw || '').match(/【完整中文姓名】：([^\n【]+)/)?.[1] || '').replace(/[^\u4e00-\u9fa5]/g, '');
+    const pinyin = cleanStr(parsed.pinyin || '') ||
+        ((raw || '').match(/【拼音】：([^\n【]+)/)?.[1] || '');
+    const meaning = cleanStr(parsed.meaning || parsed.explanation || parsed.description || '') ||
+        ((raw || '').match(/【寓意解析】：([\s\S]+)/)?.[1] || '');
+    const sections = Array.isArray(parsed.sections)
+        ? parsed.sections.map(section => ({
+            titleCn: cleanStr(section.titleCn || section.title || ''),
+            titleEn: cleanStr(section.titleEn || ''),
+            cn: cleanStr(section.cn || section.chinese || ''),
+            en: cleanStr(section.en || section.english || '')
+        })).filter(section => section.titleCn || section.cn || section.en)
+        : [];
+
+    return {
+        chineseName,
+        pinyin,
+        meaning,
+        sections,
+        raw: raw || ''
+    };
 }
 
 // ============================================================
@@ -239,10 +294,55 @@ app.get('/api/quota', (req, res) => {
 app.get('/api/pricing', (req, res) => {
     res.json({
         packages: {
-            basic:    { price: 9.9,  originalPrice: 19.9, label: '基础版 Basic',     badge: '限时特惠'  },
-            premium:  { price: 19.9, originalPrice: 39.9, label: '尊享版 Premium',    badge: '最受欢迎'  },
-            ultimate: { price: 29.9, originalPrice: 59.9, label: '至尊VIP Ultimate', badge: '终极特惠'  }
+            basic: {
+                price: 9.9,
+                originalPrice: 19.9,
+                label: '基础版 Basic',
+                badge: '限时特惠',
+                features: [
+                    { icon: '✅', text: '3组定制姓名 | 3 Sets of Custom Names' },
+                    { icon: '✅', text: '基础五行解析 | Basic Five-Element Analysis' },
+                    { icon: '✅', text: '不满意可重生成1次 | 1 Regeneration if Unsatisfied' },
+                    { icon: '❌', text: '无完整典故深度溯源 | No Full In-depth Cultural Allusion Analysis' }
+                ]
+            },
+            premium: {
+                price: 19.9,
+                originalPrice: 39.9,
+                label: '尊享版 Premium',
+                badge: '最受欢迎',
+                features: [
+                    { icon: '✅', text: '5组专属姓名 | 5 Sets of Exclusive Names' },
+                    { icon: '✅', text: '完整八字五行解析 | Full Eight-Character & Five-Element Analysis' },
+                    { icon: '✅', text: '诗经/楚辞完整典故溯源 | Full Source Trace from Book of Songs & Chu Ci' },
+                    { icon: '✅', text: '高清可下载起名证书 | HD Downloadable Naming Certificate' },
+                    { icon: '✅', text: '单次AI书法头像生成 | 1 AI Calligraphy Avatar Generation' }
+                ]
+            },
+            ultimate: {
+                price: 29.9,
+                originalPrice: 59.9,
+                label: '至尊VIP Ultimate',
+                badge: '终极特惠',
+                features: [
+                    { icon: '✅', text: '不限次数起名生成 | Unlimited Name Generations' },
+                    { icon: '✅', text: '一对一深度文化定制 | 1-on-1 In-depth Cultural Customization' },
+                    { icon: '✅', text: '终身姓名档案保存 | Lifetime Name Record Storage' },
+                    { icon: '⚠️', text: '仅限本人IP/设备使用 | For personal IP & device only' }
+                ]
+            }
         }
+    });
+});
+
+app.get('/api/dev-test-status', (req, res) => {
+    res.json({
+        nodeEnv: process.env.NODE_ENV || '',
+        isProd: IS_PROD,
+        host: req.hostname || '',
+        hostHeader: req.get('host') || '',
+        xDevTest: req.headers['x-dev-test'] || '',
+        devTest: isLocalDevTest(req)
     });
 });
 
@@ -358,6 +458,7 @@ app.post('/api/paypal-checkout', (req, res) => {
     user.package = pkg || user.package;
     user.transactionId = transactionId;
     user.quota = PACKAGE_ENTITLEMENTS[pkg]?.quota || 9999;
+    state[userId] = user;
     writeUserState(state);
     log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
     res.json({ success: true });
@@ -388,11 +489,11 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const surname = cleanStr(req.body.surname) || cleanStr(englishSurname);
     // 兼容 birthDate 拆解为 birthYear/Month/Day
     const bd = cleanStr(req.body.birthDate) || '';
-    const by = cleanStr(req.body.birthYear) || (bd.match(/^(\d{4})/)?.[1]) || cleanStr(birthYear);
-    const bm = cleanStr(req.body.birthMonth) || (bd.match(/[-/](\d{1,2})/)?.[1]) || cleanStr(birthMonth);
-    const bd2 = cleanStr(req.body.birthDay) || (bd.match(/[-/](\d{1,2})[-/](\d{1,2})/)?.[2]) || cleanStr(birthDay);
-    const finalEnglishName = englishName;
-    const finalEnglishSurname = englishSurname;
+    const by = cleanStr(req.body.birthYear) || (bd.match(/^(\d{4})/)?.[1]) || cleanStr(birthYear) || '';
+    const bm = cleanStr(req.body.birthMonth) || (bd.match(/[-/](\d{1,2})/)?.[1]) || cleanStr(birthMonth) || '';
+    const bd2 = cleanStr(req.body.birthDay) || (bd.match(/[-/](\d{1,2})[-/](\d{1,2})/)?.[2]) || cleanStr(birthDay) || '';
+    const finalEnglishName = givenName;
+    const finalEnglishSurname = surname;
     const finalGender = cleanStr(gender);
     // 性别提取：原始值不走cleanStr，直接识别英文Male/Female/中性
     const rawGender = gender || '';
@@ -420,25 +521,34 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 
     const userId = getUserId(req);
     const status = getUserStatus(userId);
+    const devTest = isLocalDevTest(req);
 
-    // 免费用户扣配额
-    if(status.package === 'free' || !status.package) {
-        if(!useQuota(userId)) {
+    const shouldUseFreeQuota = !devTest && (status.package === 'free' || !status.package);
+
+    // 免费用户先校验配额，生成成功后再扣减，避免AI失败也消耗次数。
+    if(shouldUseFreeQuota) {
+        if((status.quota || 0) <= 0) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
     }
 
-    const prompt = `你是面向海外用户的中文起名师，用户英文姓名：${finalEnglishName} ${finalEnglishSurname}，性别：${genderDisplay}，生日：${by||''}-${bm||''}-${bd2||''}，寓意偏好：${finalMeaning||'无'}，根据性别、风格生成名字，输出格式:中文名+拼音+英文释义+寓意解析`;
+    const prompt = `你是面向海外用户的中文起名师。起名规则固定不变，必须严格遵守：
+1. 依据客户英文姓氏音译，在百家姓中匹配一个读音、气质或文化意象最贴近的中文姓氏；
+2. 结合客户出生年月日时辰（${by||''}-${bm||''}-${bd2||''} ${cleanStr(birthTime)||''}）进行易经命理、阴阳五行、时辰气韵推演；
+3. 从《诗经》《楚辞》《易经》及其他中国古籍中甄选名字用字；
+4. 每个名字必须配套中文释义和英文释义，说明姓氏音译依据、命理取向、古籍出处与整体寓意；
+5. 解释必须按固定结构输出：姓氏解释、名字解释、古籍出处、整体寓意，每一项都必须包含中文和英文。
+
+客户信息：英文姓名 ${finalEnglishName} ${finalEnglishSurname}，性别 ${genderDisplay}，名字风格 ${finalStyle||'无'}，寓意偏好 ${finalMeaning||'无'}。
+请生成一个适合海外用户长期使用的中文姓名。只返回JSON，不要Markdown代码块，不要额外说明。JSON格式:{"chineseName":"中文姓名","pinyin":"拼音","meaning":"简短总述","sections":[{"titleCn":"姓氏解释","titleEn":"Surname Explanation","cn":"中文说明","en":"English explanation"},{"titleCn":"名字解释","titleEn":"Given Name Explanation","cn":"中文说明","en":"English explanation"},{"titleCn":"古籍出处","titleEn":"Classical Source","cn":"中文说明","en":"English explanation"},{"titleCn":"整体寓意","titleEn":"Overall Meaning","cn":"中文说明","en":"English explanation"}]}`;
 
     const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat" };
 
-    async function callAI(retryCount = 0) {
-        const MAX_RETRIES = 2;
-        if(retryCount > MAX_RETRIES) throw new Error('Max retries exceeded');
+    async function callAI() {
         const body = { model: deepseek.model, messages:[{role:'user',content:prompt}], temperature:0.7 };
         console.log('[DeepSeek] prompt:', prompt.substring(0, 300));
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 12000);
+        const timeout = setTimeout(() => controller.abort(), 30000);
         try {
             const resp = await fetch(deepseek.url, {
                 method:'POST', signal:controller.signal,
@@ -446,19 +556,25 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
                 body: JSON.stringify(body)
             });
             clearTimeout(timeout);
-            const data = await resp.json();
-            console.log('[DeepSeek] status:', resp.status, '| response:', JSON.stringify(data).substring(0, 300));
-            if(!resp.ok) {
-                console.error('[DeepSeek] API error:', JSON.stringify(data).substring(0, 200));
-                if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
-                throw new Error(data.error?.message || 'DeepSeek API error');
+            let data;
+            try { data = await resp.json(); } catch {
+                const raw = await resp.text().catch(() => '');
+                const jsonMatch = raw.match(/\{[^}]+\}/);
+                try { data = jsonMatch ? JSON.parse(jsonMatch[0]) : { ok:false, error:'JSON parse failed', raw }; }
+                catch { data = { ok:false, error:'JSON parse failed', raw }; }
             }
-            console.log('[DeepSeek] result:', data.choices[0].message.content.substring(0, 200));
-            return data.choices[0].message.content;
+            console.log('[DeepSeek] status:', resp.status, '| data.ok:', data.ok);
+            if(!resp.ok || !data.choices?.[0]?.message?.content) {
+                const errMsg = data.error?.message || data.error || 'API error';
+                console.error('[DeepSeek] error:', errMsg);
+                throw new Error(errMsg);
+            }
+            const result = data.choices[0].message.content;
+            console.log('[DeepSeek] result:', result.substring(0, 200));
+            return result;
         } catch(err) {
             clearTimeout(timeout);
-            logError(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`, err.message);
-            if(retryCount < MAX_RETRIES) return callAI(retryCount + 1);
+            console.error('[DeepSeek] exception:', err.message);
             throw err;
         }
     }
@@ -466,10 +582,17 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     try {
         log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
         const result = await callAI('deepseek');
-        res.send(result);
+        const normalized = normalizeNameResult(result);
+        if(!normalized.chineseName) {
+            return res.status(502).json({ success: false, error: 'AI response missing chineseName', raw: result });
+        }
+        if(shouldUseFreeQuota && !useQuota(userId)) {
+            return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
+        }
+        res.json({ success: true, devTest, data: normalized });
     } catch(err) {
         logError('===【AI起名全部失败】===', err.message);
-        res.status(200).send('生成失败，请稍后重试 | Generation failed, please try again');
+        res.status(502).json({ success: false, error: 'Generation failed, please try again' });
     }
 });
 
@@ -510,19 +633,62 @@ app.get('/payment-guide',     (req, res) => res.sendFile(path.join(__dirname, 'p
 app.get('/api/avatar-svg', (req, res) => {
     const name = (req.query.name || '李明').replace(/[^一-龥]/g, '').substring(0, 6);
     const fonts = [
-        "ZCOOLKuaiLe, Ma Shan Zheng, STKaiti, KaiTi, serif",
-        "Noto Serif SC, HanYiJianJian, STZhongsong, KaiTi, serif",
-        "HanYiJianJian, STKaiti, KaiTi, serif",
-        "cwTeXMing, ZCOOLKuaiLe, KaiTi, serif"
+        "Ma Shan Zheng, STXingkai, FZShuTi, STFangsong, KaiTi, cursive",
+        "STXingkai, Ma Shan Zheng, FZShuTi, KaiTi, cursive",
+        "FZShuTi, Ma Shan Zheng, STXingkai, KaiTi, cursive",
+        "HanziPen SC, Xingkai SC, Ma Shan Zheng, KaiTi, cursive"
     ];
-    const bg = [{type:'solid',colors:['#fdf6e9','#e8d5b0']},{type:'paper',colors:['#f5f0e6','#d4c4a8']},{type:'inkwash',colors:['#f0ebe0','#c8b896']},{type:'cloud',colors:['#f7f2e3','#e0d2b0']},{type:'window',colors:['#f5ede0','#d9c9a8']}];
     const font = fonts[Math.floor(Math.random() * fonts.length)];
-    const b = bg[Math.floor(Math.random() * bg.length)];
     const gradId = 'bg' + Date.now();
-    const bgDef = b.type === 'solid'
-        ? `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`
-        : `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
-    const svg = `你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`;
+    const paperId = 'paper' + Date.now();
+    const brushId = 'brush' + Date.now();
+    const titleSize = Math.max(64, Math.min(100, 116 - name.length * 7));
+    const svg = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="48%" stop-color="#f5ead6"/>
+      <stop offset="100%" stop-color="#dfc8a2"/>
+    </linearGradient>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="${paperId}">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="8"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.12"/></feComponentTransfer>
+    </filter>
+    <filter id="${brushId}">
+      <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="5" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.9" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation="0.18"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#${gradId})"/>
+  <g opacity="0.18" filter="url(#softBlur)">
+    <ellipse cx="106" cy="96" rx="108" ry="64" fill="#66735f"/>
+    <ellipse cx="292" cy="280" rx="126" ry="78" fill="#806a54"/>
+    <ellipse cx="206" cy="194" rx="158" ry="92" fill="#b1a182"/>
+  </g>
+  <g fill="none" stroke="#c9a96e" stroke-width="0.9" opacity="0.18" stroke-linecap="round">
+    <path d="M24 108c38-28 86-20 110 12c31-18 72-2 82 28"/>
+    <path d="M210 86c42-34 92-22 120 13c28-14 58-2 70 24"/>
+    <path d="M46 304c42-38 112-34 136 12c34-16 76 0 92 33"/>
+  </g>
+  <path d="M0 306c74-70 128-26 190-86c42-42 76-54 120-7c34 36 58 31 90 8v180H0z" fill="#3f4c44" opacity="0.10"/>
+  <rect width="400" height="400" filter="url(#${paperId})" opacity="0.75"/>
+  <rect x="24" y="24" width="352" height="352" fill="none" stroke="#9b2a1f" stroke-width="1.15" opacity="0.72" rx="18"/>
+  <rect x="38" y="38" width="324" height="324" fill="none" stroke="#d6b982" stroke-width="0.7" opacity="0.55"/>
+  <g font-family="${font}" text-anchor="middle" dominant-baseline="middle" letter-spacing="7">
+    <text x="201" y="207" font-size="${titleSize}" fill="#1b1712" opacity="0.16" filter="url(#softBlur)">${name}</text>
+    <text x="198.5" y="204" font-size="${titleSize}" fill="#0d0b09" opacity="0.30">${name}</text>
+    <text x="200" y="204" font-size="${titleSize}" fill="#050403" filter="url(#${brushId})">${name}</text>
+  </g>
+  <text x="200" y="318" font-size="12" text-anchor="middle" fill="#8c2318" font-family="Georgia, 'Times New Roman', serif" letter-spacing="1.2">mychinesename.co</text>
+  <g transform="translate(310 292)">
+    <rect width="48" height="48" fill="#9d2419" opacity="0.92" rx="3"/>
+    <text x="24" y="19" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">雅</text>
+    <text x="24" y="35" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">名</text>
+  </g>
+</svg>`;
     res.type('image/svg+xml').send(svg);
 });
 
@@ -557,5 +723,5 @@ app.use((req, res) => {
 // ============================================================
 app.listen(port, () => {
     console.log(`你是面向海外用户的中文起名师,根据性别,风格生成名字,输出格式:中文名+拼音+英文释义+寓意解析`);
-    if(IS_PROD) console.log('🔒 正式环境：调试日志已关闭，限流严格（5次/分钟）');
+    console.log(`Server is running on port ${port}`);
 });
