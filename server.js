@@ -103,6 +103,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type'],
     credentials: true
 }));
+app.use((req, res, next) => {
+    res.charset = 'utf-8';
+    next();
+});
 // helmet() 宸茬Щ闄?CSP
 // app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
