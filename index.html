@@ -598,7 +598,8 @@ input:focus,select:focus{
 
 <script>
 // ============================================================
-// API_BASE 鑷姩妫€娴嬶細鍚屽煙閮ㄧ讲榛樿鐢ㄧ浉瀵硅矾寰勶紱濡傞渶璺ㄥ煙锛屽彲鍦ㄩ〉闈㈠墠缃剼鏈啓 window.API_BASE 瑕嗙洊銆?// ============================================================
+// API_BASE \u81ea\u52a8\u68c0\u6d4b\uff1a\u540c\u57df\u90e8\u7f72\u9ed8\u8ba4\u7528\u76f8\u5bf9\u8def\u5f84\uff1b\u5982\u9700\u8de8\u57df\uff0c\u53ef\u5728\u9875\u9762\u524d\u7f6e\u811a\u672c\u5199 window.API_BASE \u8986\u76d6\u3002
+// ============================================================
 const API_BASE = window.API_BASE || '';
 const DEV_TEST_HOST = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const DEV_TEST_QUERY = new URLSearchParams(window.location.search).get('devtest') === '1';
@@ -612,7 +613,7 @@ for(let y=2025;y>=1920;y--){
     opt.value=y;
     yearList.appendChild(opt);
 }
-// 鑷姩濉厖鏃ユ湡1鈥?1
+// \u81ea\u52a8\u586b\u5145\u65e5\u671f1\u201131
 const dayList=document.getElementById('dayList');
 for(let d=1;d<=31;d++){
     const opt=document.createElement('option');
@@ -620,25 +621,26 @@ for(let d=1;d<=31;d++){
     dayList.appendChild(opt);
 }
 
-// 鏅€氳瘽鏈楄鍑芥暟
-// 鏈楄涓枃濮撳悕锛堝己鍒舵櫘閫氳瘽锛屽仠姝笂涓€鏉★級
+// \u666e\u901a\u8bdd\u6717\u8bfb\u51fd\u6570
+// \u6717\u8bfb\u4e2d\u6587\u59d3\u540d\uff08\u5f3a\u5236\u666e\u901a\u8bdd\uff0c\u505c\u6b62\u4e0a\u4e00\u6761\uff09
 function readChinese(text) {
     if(!text) return;
     const synth = window.speechSynthesis;
-    if(synth) synth.cancel(); // 鍋滄涓婁竴鏉℃湭璇诲畬鐨勮闊?
+    if(synth) synth.cancel(); // \u505c\u6b62\u4e0a\u4e00\u6761\u672a\u8bfb\u5b8c\u7684\u8bed\u97f3
+
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'zh-CN';
     utter.rate = 0.9;
     utter.pitch = 1.0;
     utter.volume = 1.0;
 
-    // 绛夊緟璇煶鍒楄〃鍔犺浇鍚庢煡鎵炬櫘閫氳瘽璇煶
+    // \u7b49\u5f85\u8bed\u97f3\u5217\u8868\u52a0\u8f7d\u540e\u67e5\u627e\u666e\u901a\u8bdd\u8bed\u97f3
     const loadVoices = () => {
         const voices = synth.getVoices();
-        // 浼樺厛閫夋嫨鏍囧噯鏅€氳瘽濂冲０
-        const zhVoice = voices.find(v => v.lang === 'zh-CN' && /濂硘female|mei/i.test(v.name)) ||
+        // \u4f18\u5148\u9009\u62e9\u6807\u51c6\u666e\u901a\u8bdd\u5973\u58f0
+        const zhVoice = voices.find(v => v.lang === 'zh-CN' && /\u5973|female|mei/i.test(v.name)) ||
                        voices.find(v => v.lang === 'zh-CN') ||
-                       voices.find(v => v.lang.startsWith('zh') && /涓瓅 chinese/i.test(v.name));
+                       voices.find(v => v.lang.startsWith('zh') && /\u4e2d| chinese/i.test(v.name));
         if(zhVoice) utter.voice = zhVoice;
         synth.speak(utter);
     };
@@ -651,7 +653,7 @@ function readChinese(text) {
             synth.onvoiceschanged = null;
             loadVoices();
         };
-        // 瓒呮椂淇濇姢锛?绉掑悗寮哄埗鎵ц
+        // \u8d85\u65f6\u4fdd\u62a4\uff1a1\u79d2\u540e\u5f3a\u5236\u6267\u884c
         setTimeout(() => {
             if(synth.speaking) return;
             synth.onvoiceschanged = null;
@@ -660,25 +662,25 @@ function readChinese(text) {
     }
 }
 
-// 椤甸潰鍔犺浇鏃堕鍔犺浇璇煶
+// \u9875\u9762\u52a0\u8f7d\u65f6\u9884\u52a0\u8f7d\u8bed\u97f3
 if(window.speechSynthesis) {
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 const OFFICIAL_SHARE_URL = 'https://mychinesename.co';
 const shareTextEN = "I received a meaningful Chinese name inspired by the I Ching and Book of Songs. Create yours: https://mychinesename.co";
 
-// 鍔ㄦ€佸垎浜礌鏉愬簱
+// \u52a8\u6001\u5206\u4eab\u7d20\u6750\u5e93
 const SHARE_TITLES = [
-    '瑙ｉ攣浣犵殑涓撳睘涓枃鍚?| Unlock Your Exclusive Chinese Name',
-    '钘忓湪璇楃粡閲岀殑涓滄柟鍚嶅瓧 | Oriental Names From The Book of Songs',
-    '瀹氬埗鏈夋枃鍖栧瘬鎰忕殑鍥介濮撳悕 | Custom Cultural Chinese Names',
-    '鎵撻€犱綘鐨勬捣澶栦腑寮忚韩浠芥爣璇?| Build Your Chinese Identity',
-    '浠庢杈為噷鍙栦竴涓笓灞為泤鍚?| An Elegant Name From Chu Ci'
+    '\u89e3\u9501\u4f60\u7684\u4e13\u5c5e\u4e2d\u6587\u540d | Unlock Your Exclusive Chinese Name',
+    '\u85cf\u5728\u8bd7\u7ecf\u91cc\u7684\u4e1c\u65b9\u540d\u5b57 | Oriental Names From The Book of Songs',
+    '\u5b9a\u5236\u6709\u6587\u5316\u5bd3\u610f\u7684\u56fd\u98ce\u59d3\u540d | Custom Cultural Chinese Names',
+    '\u6253\u9020\u4f60\u7684\u6d77\u5916\u4e2d\u5f0f\u8eab\u4efd\u6807\u8bc6 | Build Your Chinese Identity',
+    '\u4ece\u695a\u8f9e\u91cc\u53d6\u4e00\u4e2a\u4e13\u5c5e\u96c5\u540d | An Elegant Name From Chu Ci'
 ];
 const SHARE_DESCS = [
-    '浠ヤ簲琛屽畾瀛楋紝浠ュ彜绫嶆函婧愶紝AI涓轰綘鐢熸垚瀵撴剰娣卞帤鐨勪腑鏂囧悕锛屽垎浜嵆鍙鍙栦笓灞炰功娉曞ご鍍忋€俓nAI crafts meaningful Chinese names based on Five鈥慐lement & ancient texts. Share to get your exclusive calligraphy avatar.',
-    '璺ㄨ秺鏂囧寲鐨勫鍚嶇編瀛︼紝姣忎竴涓悕瀛楅兘鎵胯浇涓滄柟鏁呬簨锛岀幇鍦ㄥ垎浜厤璐归鍙栧畾鍒跺ご鍍忋€俓nCross鈥慶ultural name aesthetics with oriental stories. Share now for a free custom avatar.',
-    '涓嶆鏄悕瀛楋紝鏇存槸浣犵殑涓滄柟鏂囧寲鍚嶇墖锛屽垎浜В閿佷笓灞炴按澧ㄤ功娉曞ご鍍忋€俓nMore than a name, your oriental cultural card. Share to unlock ink鈥憌ash calligraphy avatar.'
+    '\u4ee5\u4e94\u884c\u5b9a\u5b57\uff0c\u4ee5\u53e4\u7c4d\u6eaf\u6e90\uff0cAI\u4e3a\u4f60\u751f\u6210\u5bd3\u610f\u6df1\u539a\u7684\u4e2d\u6587\u540d\uff0c\u5206\u4eab\u5373\u53ef\u9886\u53d6\u4e13\u5c5e\u4e66\u6cd5\u5934\u50cf\u3002\nAI crafts meaningful Chinese names based on Five\u2011Element & ancient texts. Share to get your exclusive calligraphy avatar.',
+    '\u8de8\u8d8a\u6587\u5316\u7684\u59d3\u540d\u7f8e\u5b66\uff0c\u6bcf\u4e00\u4e2a\u540d\u5b57\u90fd\u627f\u8f7d\u4e1c\u65b9\u6545\u4e8b\uff0c\u73b0\u5728\u5206\u4eab\u514d\u8d39\u9886\u53d6\u5b9a\u5236\u5934\u50cf\u3002\nCross\u2011cultural name aesthetics with oriental stories. Share now for a free custom avatar.',
+    '\u4e0d\u6b62\u662f\u540d\u5b57\uff0c\u66f4\u662f\u4f60\u7684\u4e1c\u65b9\u6587\u5316\u540d\u7247\uff0c\u5206\u4eab\u89e3\u9501\u4e13\u5c5e\u6c34\u58a8\u4e66\u6cd5\u5934\u50cf\u3002\nMore than a name, your oriental cultural card. Share to unlock ink\u2011wash calligraphy avatar.'
 ];
 function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function getShareText(){
@@ -688,7 +690,7 @@ function getShareUrl(){
     return encodeURIComponent(OFFICIAL_SHARE_URL);
 }
 
-// 鍒嗕韩鍑芥暟
+// \u5206\u4eab\u51fd\u6570
 function doShare(platform){
     const title = encodeURIComponent(rand(SHARE_TITLES));
     const desc = getShareText();
@@ -708,7 +710,7 @@ function doShare(platform){
     rewardShare(platform);
 }
 
-// 浠樿垂寮圭獥
+// \u4ed8\u8d39\u5f39\u7a97
 let paywallClosed = false;
 function showPaywall(){
     document.getElementById('paywallModal').classList.add('show');
@@ -754,13 +756,14 @@ async function rewardShare(platform){
 
 function renderPackageFeatures(features){
     return (features || []).map(item => {
-        const icon = item.icon || '鉁?;
+        const icon = item.icon || 'OK';
         const text = item.text || '';
         return `<li>${escapeHtml(icon)} ${escapeHtml(text)}</li>`;
     }).join('');
 }
 
-// 浠庡悗绔姞杞藉畾浠锋暟鎹苟鍔ㄦ€佹洿鏂板椁愬崱鐗?async function loadPricing(){
+// \u4ece\u540e\u7aef\u52a0\u8f7d\u5b9a\u4ef7\u6570\u636e\u5e76\u52a8\u6001\u66f4\u65b0\u5957\u9910\u5361\u7247
+async function loadPricing(){
     try {
         const res = await fetch(apiUrl('/api/pricing'));
         const data = await res.json();
@@ -769,7 +772,8 @@ function renderPackageFeatures(features){
             const pkgKey = btn.dataset.package;
             const pkg = packages[pkgKey];
             if(!pkg) return;
-            // 鎵惧埌鏈€杩戠殑card鐖跺厓绱犲苟鏇存柊浠锋牸鍖?            const card = btn.closest('.paywall-card') || btn.closest('.price-card');
+            // \u627e\u5230\u6700\u8fd1\u7684card\u7236\u5143\u7d20\u5e76\u66f4\u65b0\u4ef7\u683c\u533a
+            const card = btn.closest('.paywall-card') || btn.closest('.price-card');
             if(!card) return;
             const titleEl = card.querySelector('h3');
             if(titleEl && pkg.label) titleEl.textContent = pkg.label;
@@ -788,10 +792,11 @@ function renderPackageFeatures(features){
     } catch(e){ console.error('Failed to load pricing:', e); }
 }
 
-// PayPal鏀粯寮圭獥锛堜粠鍚庣鑾峰彇鏀粯閾炬帴锛屽惈IPN鍥炶皟鍦板潃锛?async function buyPackage(pkg){
+// PayPal\u652f\u4ed8\u5f39\u7a97\uff08\u4ece\u540e\u7aef\u83b7\u53d6\u652f\u4ed8\u94fe\u63a5\uff0c\u542bIPN\u56de\u8c03\u5730\u5740\uff09
+async function buyPackage(pkg){
     try {
         trackEvent('buy_click', { package: pkg });
-        // 鐩存帴浠?/api/pricing 鎷夊彇鏈€鏂板畾浠凤紝鍐嶈皟鏀粯璁㈠崟鎺ュ彛
+        // \u76f4\u63a5\u4ece /api/pricing \u62c9\u53d6\u6700\u65b0\u5b9a\u4ef7\uff0c\u518d\u8c03\u652f\u4ed8\u8ba2\u5355\u63a5\u53e3
         const pricingRes = await fetch(apiUrl('/api/pricing'));
         if(!pricingRes.ok) throw new Error('Pricing API error');
         const pricing = await pricingRes.json();
@@ -807,18 +812,19 @@ function renderPackageFeatures(features){
         if(orderData.paypalUrl){
             window.open(orderData.paypalUrl, '_blank', 'width=600,height=500');
         } else {
-            alert('鏀粯閾炬帴鐢熸垚澶辫触锛岃绋嶅悗閲嶈瘯 | Payment link generation failed');
+            alert('\u652f\u4ed8\u94fe\u63a5\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Payment link generation failed');
         }
     } catch(e){
         console.error('buyPackage error:', e);
-        alert('鏀粯鍔犺浇澶辫触锛岃绋嶅悗閲嶈瘯 | Payment failed, please try again');
+        alert('\u652f\u4ed8\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Payment failed, please try again');
     }
 }
 
-// 鍏嶈垂娆℃暟绠＄悊锛堜粠鏈嶅姟鍣ㄥ悓姝ワ級
+// \u514d\u8d39\u6b21\u6570\u7ba1\u7406\uff08\u4ece\u670d\u52a1\u5668\u540c\u6b65\uff09
 let currentQuota = 2;
-let localQuota = true; // true=鍏嶈垂鐢ㄦ埛鏈粯璐?
-// PayPal鎸夐挳鐐瑰嚮浜嬩欢缁戝畾锛堝鎵樻ā寮忥紝鍏煎鍔ㄦ€佸厓绱狅級
+let localQuota = true; // true=\u514d\u8d39\u7528\u6237\u672a\u4ed8\u8d39
+
+// PayPal\u6309\u94ae\u70b9\u51fb\u4e8b\u4ef6\u7ed1\u5b9a\uff08\u59d4\u6258\u6a21\u5f0f\uff0c\u517c\u5bb9\u52a8\u6001\u5143\u7d20\uff09
 document.addEventListener('click', function(e){
     const btn = e.target.closest('.paypal-btn');
     if(!btn) return;
@@ -827,12 +833,13 @@ document.addEventListener('click', function(e){
     buyPackage(pkg);
 });
 
-// 绛?DOM Ready 鍚庡啀鎵ц瀹氫环鍔犺浇锛堥伩鍏?paywall 鍏冪礌涓嶅瓨鍦ㄥ鑷?querySelector 杩斿洖 null锛?document.addEventListener('DOMContentLoaded', function(){
+// \u7b49 DOM Ready \u540e\u518d\u6267\u884c\u5b9a\u4ef7\u52a0\u8f7d\uff08\u907f\u514d paywall \u5143\u7d20\u4e0d\u5b58\u5728\u5bfc\u81f4 querySelector \u8fd4\u56de null\uff09
+document.addEventListener('DOMContentLoaded', function(){
     if(DEV_TEST_MODE){
         const badge = document.createElement('div');
         badge.className = 'dev-test-badge';
         badge.textContent = 'Developer Test Mode';
-        badge.title = '鐐瑰嚮鍏抽棴寮€鍙戣€呰嚜娴嬫ā寮?;
+        badge.title = '\u70b9\u51fb\u5173\u95ed\u5f00\u53d1\u8005\u81ea\u6d4b\u6a21\u5f0f';
         badge.onclick = function(){
             localStorage.removeItem('DEV_TEST_MODE');
             window.location.href = window.location.pathname;
@@ -862,11 +869,11 @@ async function syncQuota(){
 function updateQuotaUI(){
     const hint = document.getElementById('quotaHint');
     if(DEV_TEST_MODE){
-        hint.innerHTML = '寮€鍙戣€呰嚜娴嬫ā寮忥細涓嶆墸鍏嶈垂娆℃暟 | Developer test mode: free attempts are not used';
+        hint.innerHTML = '\u5f00\u53d1\u8005\u81ea\u6d4b\u6a21\u5f0f\uff1a\u4e0d\u6263\u514d\u8d39\u6b21\u6570 | Developer test mode: free attempts are not used';
         return;
     }
     if(currentQuota <= 0){
-        hint.innerHTML = '鉂?鍏嶈垂娆℃暟宸茬敤瀹?| No free attempts left 鈥?<a href="javascript:void(0)" onclick="showPaywall()">鍗囩骇浠樿垂濂楅</a>';
+        hint.innerHTML = '\u274c \u514d\u8d39\u6b21\u6570\u5df2\u7528\u5b8c | No free attempts left \u2014 <a href="javascript:void(0)" onclick="showPaywall()">\u5347\u7ea7\u4ed8\u8d39\u5957\u9910</a>';
     } else {
         hint.innerHTML = `Free attempts remaining: <span id="quotaCount">${currentQuota}</span>`;
     }
@@ -877,7 +884,7 @@ function addQuota(){
 }
 updateQuotaUI();
 
-// 杞箟HTML鐗规畩瀛楃锛堝叏灞€鍑芥暟锛屼緵avatar鍒囨崲绛夊満鏅鐢級
+// \u8f6c\u4e49HTML\u7279\u6b8a\u5b57\u7b26\uff08\u5168\u5c40\u51fd\u6570\uff0c\u4f9bavatar\u5207\u6362\u7b49\u573a\u666f\u590d\u7528\uff09
 function escapeHtml(str){
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -909,10 +916,10 @@ function parseGeneratedName(text){
         };
     }
 
-    const nameMatch = text.match(/銆愬畬鏁翠腑鏂囧鍚嶃€戯細([^\n銆怾+)/) || text.match(/"chineseName"\s*:\s*"([^"]+)"/);
-    const pinyinMatch = text.match(/銆愭嫾闊炽€戯細([^\n銆怾+)/) || text.match(/"pinyin"\s*:\s*"([^"]+)"/);
+    const nameMatch = text.match(/\u3010\u5b8c\u6574\u4e2d\u6587\u59d3\u540d\u3011\uff1a([^\n\u3010]+)/) || text.match(/"chineseName"\s*:\s*"([^"]+)"/);
+    const pinyinMatch = text.match(/\u3010\u62fc\u97f3\u3011\uff1a([^\n\u3010]+)/) || text.match(/"pinyin"\s*:\s*"([^"]+)"/);
     const pronunciationMatch = text.match(/"pronunciation"\s*:\s*"([^"]+)"/);
-    const meaningMatch = text.match(/銆愬瘬鎰忚В鏋愩€戯細([\s\S]+)/) || text.match(/"meaning"\s*:\s*"([^"]+)"/);
+    const meaningMatch = text.match(/\u3010\u5bd3\u610f\u89e3\u6790\u3011\uff1a([\s\S]+)/) || text.match(/"meaning"\s*:\s*"([^"]+)"/);
     return {
         fullName: nameMatch ? nameMatch[1].replace(/[^\u4e00-\u9fa5]/g, '') : '',
         pinyin: pinyinMatch ? pinyinMatch[1] : '',
@@ -944,8 +951,8 @@ function renderMeaningSections(result){
 
 function buildResultLines(result){
     const lines = [];
-    if(result.fullName) lines.push(`銆愬畬鏁翠腑鏂囧鍚嶃€戯細${result.fullName}`);
-    if(result.pinyin) lines.push(`銆愭嫾闊炽€戯細${result.pinyin}`);
+    if(result.fullName) lines.push(`\u3010\u5b8c\u6574\u4e2d\u6587\u59d3\u540d\u3011\uff1a${result.fullName}`);
+    if(result.pinyin) lines.push(`\u3010\u62fc\u97f3\u3011\uff1a${result.pinyin}`);
     if(result.meaning) {
         result.meaning.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
             lines.push(line);
@@ -966,12 +973,12 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             return;
         }
     }
-    // 闈炵┖鏍￠獙
+    // \u975e\u7a7a\u6821\u9a8c
     const englishName = document.getElementById('englishName').value.trim();
     const englishSurname = document.getElementById('englishSurname').value.trim();
     if(!englishName || !englishSurname){
         trackEvent('generate_failed', { reason: 'missing_name' });
-        document.getElementById('result').innerText = "璇疯緭鍏ヤ綘鐨勮嫳鏂囧悕鍜屽姘忥紒| Please enter your given name and englishSurname!";
+        document.getElementById('result').innerText = "\u8bf7\u8f93\u5165\u4f60\u7684\u82f1\u6587\u540d\u548c\u59d3\u6c0f\uff01| Please enter your given name and englishSurname!";
         return;
     }
 
@@ -1012,10 +1019,10 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         if(!res.ok){
             loading.style.display = 'none';
             if(res.status === 402 && text.includes('quota')){
-                showPaywall();  // 棰濆害鑰楀敖 鈫?寮逛粯璐瑰
+                showPaywall();  // \u989d\u5ea6\u8017\u5c3d \u2192 \u5f39\u4ed8\u8d39\u5899
             } else {
                 trackEvent('generate_failed', { status: res.status });
-                document.getElementById('result').innerText = '鐢熸垚澶辫触锛岃绋嶅悗閲嶈瘯 | Generation failed';
+                document.getElementById('result').innerText = '\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Generation failed';
             }
             return;
         }
@@ -1027,12 +1034,13 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const fullName = result.fullName;
         if(!fullName){
             trackEvent('generate_failed', { reason: 'invalid_result' });
-            document.getElementById('result').innerText = '鐢熸垚缁撴灉鏍煎紡寮傚父锛岃绋嶅悗閲嶈瘯 | Invalid generation result, please try again';
+            document.getElementById('result').innerText = '\u751f\u6210\u7ed3\u679c\u683c\u5f0f\u5f02\u5e38\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Invalid generation result, please try again';
             return;
         }
         trackEvent('generate_success', { devTest: DEV_TEST_MODE, hasSections: Array.isArray(result.sections) && result.sections.length > 0 });
 
-        // 鎻愬彇浜旇鍠滅敤锛堢敤浜庢樉绀哄湪澶村儚涓嬫柟锛?        const wuxingMatch = text.match(/銆愪簲琛屽枩鐢ㄣ€戯細(.+)/);
+        // \u63d0\u53d6\u4e94\u884c\u559c\u7528\uff08\u7528\u4e8e\u663e\u793a\u5728\u5934\u50cf\u4e0b\u65b9\uff09
+        const wuxingMatch = text.match(/\u3010\u4e94\u884c\u559c\u7528\u3011\uff1a(.+)/);
         const wuxingText = wuxingMatch ? wuxingMatch[1] : '';
 
         loading.style.display = 'none';
@@ -1063,8 +1071,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             subtitle: wuxingText
         });
         html += `<div class="avatar-showcase">
-    <div class="avatar-label">Shareable Chinese Name Card | 涓撳睘涓枃鍚嶅崱</div>
-    <div class="avatar-subtitle">Brush-calligraphy style, designed as a beautiful cultural keepsake for social sharing<br>姣涚瑪涔︽硶鍚嶅崱锛岄€傚悎淇濆瓨鍒嗕韩</div>
+    <div class="avatar-label">Shareable Chinese Name Card | \u4e13\u5c5e\u4e2d\u6587\u540d\u5361</div>
+    <div class="avatar-subtitle">Brush-calligraphy style, designed as a beautiful cultural keepsake for social sharing<br>\u6bdb\u7b14\u4e66\u6cd5\u540d\u5361\uff0c\u9002\u5408\u4fdd\u5b58\u5206\u4eab</div>
     <div class="avatar-svg-wrap" id="avatarSvgWrap">${avatarSvg}</div>
     <div class="avatar-actions">
         <button class="avatar-btn" onclick="regenerateAvatar('${escapeHtml(fullName)}')">New Style</button>
@@ -1086,12 +1094,13 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     }catch(err){
         loading.style.display = 'none';
         trackEvent('generate_failed', { reason: 'frontend_exception' });
-        document.getElementById('result').innerText = "鐢熸垚澶辫触锛岃绋嶅悗閲嶈瘯 | Generation failed, please try again later";
-        console.error("閿欒璇︽儏锛?,err);
+        document.getElementById('result').innerText = "\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Generation failed, please try again later";
+        console.error("\u9519\u8bef\u8be6\u60c5\uff1a",err);
     }
 });
 
-// 鍓嶇鐢熸垚涔︽硶澶村儚锛堝瀛椾綋澶氳儗鏅垏鎹紝鏃犻渶鍚庣锛?const avatarFonts = [
+// \u524d\u7aef\u751f\u6210\u4e66\u6cd5\u5934\u50cf\uff08\u591a\u5b57\u4f53\u591a\u80cc\u666f\u5207\u6362\uff0c\u65e0\u9700\u540e\u7aef\uff09
+const avatarFonts = [
     "'Zhi Mang Xing', 'Ma Shan Zheng', STXingkai, FZShuTi, KaiTi, cursive",
     "'Ma Shan Zheng', 'Zhi Mang Xing', STXingkai, FZShuTi, KaiTi, cursive",
     "STXingkai, 'Zhi Mang Xing', 'Ma Shan Zheng', FZShuTi, KaiTi, cursive",
@@ -1175,13 +1184,14 @@ function createChineseStyleAvatarSvg(name, options){
   <text x="${200*scale}" y="${344*scale}" font-size="${11*scale}" text-anchor="middle" fill="#9a6b2f">${safeSubtitle}</text>
   <g transform="translate(${310*scale} ${292*scale})">
     <rect width="${48*scale}" height="${48*scale}" fill="#9d2419" opacity="0.92" rx="${3*scale}"/>
-    <text x="${24*scale}" y="${19*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">闆?/text>
-    <text x="${24*scale}" y="${35*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">鍚?/text>
+    <text x="${24*scale}" y="${19*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">\u96c5</text>
+    <text x="${24*scale}" y="${35*scale}" font-size="${12*scale}" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">\u540d</text>
   </g>
 </svg>`;
 }
 
-// 鎹㈠瓧浣擄紙闅忔満鍒囨崲锛?function regenerateAvatar(name){
+// \u6362\u5b57\u4f53\uff08\u968f\u673a\u5207\u6362\uff09
+function regenerateAvatar(name){
     currentAvatarFontsIdx = (currentAvatarFontsIdx + 1) % avatarFonts.length;
     currentAvatarBgIdx = (currentAvatarBgIdx + 1) % avatarThemes.length;
     const font = avatarFonts[currentAvatarFontsIdx];
@@ -1192,7 +1202,7 @@ function createChineseStyleAvatarSvg(name, options){
     wrap.innerHTML = svg;
 }
 
-// 涓嬭浇褰撳墠灞曠ず鐨勫ご鍍廠VG
+// \u4e0b\u8f7d\u5f53\u524d\u5c55\u793a\u7684\u5934\u50cfSVG
 function downloadAvatarImg(name){
     const svg = document.querySelector('#avatarSvgWrap svg');
     if(!svg) return;
@@ -1205,16 +1215,19 @@ function downloadAvatarImg(name){
     URL.revokeObjectURL(url);
 }
 
-// 涓嬭浇涔︽硶澶村儚锛堟棫鍏煎鍑芥暟锛?function handleDownload(name){
+// \u4e0b\u8f7d\u4e66\u6cd5\u5934\u50cf\uff08\u65e7\u517c\u5bb9\u51fd\u6570\uff09
+function handleDownload(name){
     if(!name) return;
-    // 鍏嶈垂鐢ㄦ埛寮瑰嚭鎻愮ず锛岀姝㈢洿鎺ヤ笅杞?    if(localQuota){
-        alert('鍏嶈垂鐢ㄦ埛鏆傛椂鏃犳硶涓嬭浇涔︽硶澶村儚锛岃鍒嗕韩鍒扮ぞ浜ゅ钩鍙拌幏鍙栦笅杞借祫鏍硷紝鎴栧崌绾т粯璐瑰椁愯В閿侀珮娓呬笅杞芥潈闄愩€俓n\nFree users cannot download calligraphy avatars yet. Share to social media to unlock download access, or upgrade to a paid plan for HD download.');
+    // \u514d\u8d39\u7528\u6237\u5f39\u51fa\u63d0\u793a\uff0c\u7981\u6b62\u76f4\u63a5\u4e0b\u8f7d
+    if(localQuota){
+        alert('\u514d\u8d39\u7528\u6237\u6682\u65f6\u65e0\u6cd5\u4e0b\u8f7d\u4e66\u6cd5\u5934\u50cf\uff0c\u8bf7\u5206\u4eab\u5230\u793e\u4ea4\u5e73\u53f0\u83b7\u53d6\u4e0b\u8f7d\u8d44\u683c\uff0c\u6216\u5347\u7ea7\u4ed8\u8d39\u5957\u9910\u89e3\u9501\u9ad8\u6e05\u4e0b\u8f7d\u6743\u9650\u3002\n\nFree users cannot download calligraphy avatars yet. Share to social media to unlock download access, or upgrade to a paid plan for HD download.');
         return;
     }
     downloadAvatar(name, false);
 }
 
-// 涓嬭浇涔︽硶澶村儚锛堝尯鍒嗗鍔辩増鍜屼粯璐圭増锛?function downloadAvatar(name, isReward){
+// \u4e0b\u8f7d\u4e66\u6cd5\u5934\u50cf\uff08\u533a\u5206\u5956\u52b1\u7248\u548c\u4ed8\u8d39\u7248\uff09
+function downloadAvatar(name, isReward){
     if(!name) return;
     const svg = createChineseStyleAvatarSvg(name, {
         size: 1080,
@@ -1231,7 +1244,8 @@ function downloadAvatarImg(name){
     readChinese(name);
 }
 
-// 浠庡悗绔帴鍙ｄ笅杞戒功娉曞ご鍍?async function downloadAvatarFromServer(name){
+// \u4ece\u540e\u7aef\u63a5\u53e3\u4e0b\u8f7d\u4e66\u6cd5\u5934\u50cf
+async function downloadAvatarFromServer(name){
     if(!name) return;
     try {
         const url = `/api/avatar-svg?name=${encodeURIComponent(name)}`;
@@ -1241,11 +1255,11 @@ function downloadAvatarImg(name){
         const dlUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = dlUrl;
-        a.download = `${name}_涔︽硶澶村儚.svg`;
+        a.download = `${name}_\u4e66\u6cd5\u5934\u50cf.svg`;
         a.click();
         URL.revokeObjectURL(dlUrl);
     } catch(e){
-        alert('涓嬭浇澶辫触锛岃绋嶅悗閲嶈瘯');
+        alert('\u4e0b\u8f7d\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5');
     }
 }
 </script>
