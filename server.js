@@ -85,14 +85,15 @@ const SEO_LANDING_PAGES = {
     }
 };
 
-// 浠呭湪闈炴寮忕幆澧冭緭鍑哄惎鍔ㄦ棩蹇?const log = (...args) => { console.log(...args); };
+// Startup logging.
+const log = (...args) => { console.log(...args); };
 const logError = (...args) => { console.error(...args); };
 
-log("DeepSeek瀵嗛挜锛?, !!process.env.DEEPSEEK_API_KEY);
-log("PayPal妯″紡锛?, process.env.PAYPAL_MODE || 'sandbox');
-log("PayPal_CLIENT_ID锛?, !!process.env.PAYPAL_CLIENT_ID);
-log("PayPal_CLIENT_SECRET锛?, !!process.env.PAYPAL_CLIENT_SECRET);
-log("缃戠珯鍩熷悕锛?, DOMAIN);
+log("DeepSeek key configured:", !!process.env.DEEPSEEK_API_KEY);
+log("PayPal mode:", process.env.PAYPAL_MODE || 'sandbox');
+log("PayPal client id configured:", !!process.env.PAYPAL_CLIENT_ID);
+log("PayPal client secret configured:", !!process.env.PAYPAL_CLIENT_SECRET);
+log("Site domain:", DOMAIN);
 
 // ============================================================
 // CORS 閰嶇疆
@@ -170,7 +171,7 @@ function rateLimitMiddleware(req, res, next) {
     if(record.count > RATE_LIMIT_MAX) {
         ipBlocked.set(ip, now + 10 * 60 * 1000);
         ipCounts.delete(ip);
-        logError(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        logError('[rate-limit] request blocked');
         return res.status(429).json({ error: 'Too many requests, please try again later.' });
     }
 
@@ -181,7 +182,7 @@ function rateLimitMiddleware(req, res, next) {
 app.use((req, res, next) => {
     if(!IS_PROD) {
         const ip = getClientIp(req);
-        log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        log('[app] request processed');
     }
     next();
 });
@@ -368,7 +369,7 @@ function unlockPackage(userId, pkg, transactionId){
     });
     state[userId] = user;
     writeUserState(state);
-    log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+    log('[app] request processed');
     return true;
 }
 
@@ -804,7 +805,7 @@ app.post('/api/paypal-order', (req, res) => {
 // PayPal IPN锛堝畼鏂瑰紓姝ラ€氱煡 + 涓夊眰瀹夊叏鏍￠獙锛?// --------------------------------------------------------
 app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
     const ipn = req.body;
-    log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+    log('[app] request processed');
 
     if(!ipn.txn_id || !ipn.payment_status) {
         appendPaymentLog({ err: 'Missing required fields', ipn: JSON.stringify(ipn).substring(0,200) });
@@ -824,13 +825,13 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     const paypalEmail = process.env.PAYPAL_EMAIL || '';
     if(paypalEmail && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== paypalEmail.toLowerCase()) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
-        logError(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
     // 鈶?甯佺鏍￠獙锛堜粎鏀寔USD锛?    if(ipn.mc_currency !== 'USD') {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
-        logError(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
@@ -838,17 +839,17 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
     const expected = { basic:'9.90', premium:'19.90', ultimate:'29.90' };
     if(ipn.mc_gross !== expected[pkg]) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
-        logError(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
     // 閫氳繃鍏ㄩ儴鏍￠獙锛岃В閿佸椁?    try {
         unlockPackage(userId, pkg, ipn.txn_id);
         appendPaymentLog({ status: ipn.payment_status, txn: ipn.txn_id, userId, pkg, success: true });
-        log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        log('[app] request processed');
     } catch(err) {
         appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: err.message });
-        logError(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        logError('[rate-limit] request blocked');
     }
 
     res.send('ok');
@@ -870,7 +871,7 @@ app.post('/api/paypal-checkout', (req, res) => {
     user.quota = PACKAGE_ENTITLEMENTS[pkg]?.quota || 9999;
     state[userId] = user;
     writeUserState(state);
-    log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+    log('[app] request processed');
     res.json({ success: true });
 });
 
@@ -1018,7 +1019,7 @@ Return only valid JSON with this exact shape:
     }
 
     try {
-        log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        log('[app] request processed');
         const result = await callAI('deepseek');
         let normalized = normalizeNameResult(result);
         if(!normalized.chineseName) {
@@ -1178,6 +1179,6 @@ app.use((req, res) => {
 // 鍚姩
 // ============================================================
 app.listen(port, () => {
-    console.log(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+    console.log('[app] request processed');
     console.log(`Server is running on port ${port}`);
 });
