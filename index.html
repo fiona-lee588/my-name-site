@@ -388,20 +388,20 @@ input:focus,select:focus{
     <div class="header">
         <h1>Get a Meaningful Chinese Name</h1>
         <div class="en-title">Inspired by the I Ching, Book of Songs, and Hundred Family Surnames</div>
-        <div class="domain">mychinesename.co 路 涓浗浼犵粺鏂囧寲涓枃璧峰悕</div>
+        <div class="domain">mychinesename.co 路 Chinese cultural naming</div>
         <div class="tip">Not a random translation. A culturally meaningful name with pinyin, pronunciation, source, and bilingual explanation.</div>
-        <div class="en-tip">濮撳悕鏈夋簮 路 瀛椾腑鏈夋剰 路 Name with origin, sound, and story</div>
+        <div class="en-tip">Name with origin, sound, and story</div>
     </div>
     <div class="culture-desc">
         We create Chinese names for overseas users by matching your English surname to a Chinese surname, then selecting given-name characters through classical imagery, five-elements balance, and your personal meaning preference.
-        <div class="en">鍙栧悕涓嶆闊宠瘧锛屾洿閲嶅姘忋€佸瓧涔夈€佸嚭澶勪笌姘旇川銆?/div>
+        <div class="en">Not just phonetic translation. We consider surname, character meaning, classical source, and personal temperament.</div>
     </div>
     <div class="form-box">
         <div class="form-title">Create Your Chinese Name</div>
         <div class="form-title-en">Receive Chinese characters, pinyin, English pronunciation, meaning, and classical source.</div>
         <div class="form-row">
             <div class="form-item">
-                <label>Gender <span class="en">/ 鎬у埆</span></label>
+                <label>Gender</label>
                 <select id="gender">
                     <option>Male</option>
                     <option>Female</option>
@@ -409,7 +409,7 @@ input:focus,select:focus{
                 </select>
             </div>
             <div class="form-item">
-                <label>Name Style <span class="en">/ 鍚嶅瓧姘旇川</span></label>
+                <label>Name Style</label>
                 <select id="style">
                     <option>Gentle & Poetic</option>
                     <option>Grand & Confident</option>
@@ -420,17 +420,17 @@ input:focus,select:focus{
         </div>
         <div class="form-row">
             <div class="form-item">
-                <label>English Given Name <span class="en">/ 鍚?/span></label>
+                <label>English Given Name</label>
                 <input type="text" id="englishName" placeholder="Emma, James, Sophia...">
             </div>
             <div class="form-item">
-                <label>English Surname <span class="en">/ 濮?/span></label>
+                <label>English Surname</label>
                 <input type="text" id="englishSurname" placeholder="Smith, Johnson, Miller...">
             </div>
         </div>
 
         <div class="form-item full">
-            <label>Birth Date & Time <span class="en">/ 鐢熻景淇℃伅锛屽彲閫?/span></label>
+            <label>Birth Date & Time <span class="en">optional</span></label>
             <div class="birth-row">
                 <div class="birth-col">
                     <input list="yearList" id="birthYear" placeholder="Year">
@@ -450,25 +450,25 @@ input:focus,select:focus{
                 <div class="birth-col">
                     <input list="timeList" id="birthTime" placeholder="Time or Chinese hour">
                     <datalist id="timeList">
-                        <option>瀛愭椂 23:00鈥?1:00</option>
-                        <option>涓戞椂 01:00鈥?3:00</option>
-                        <option>瀵呮椂 03:00鈥?5:00</option>
-                        <option>鍗椂 05:00鈥?7:00</option>
-                        <option>杈版椂 07:00鈥?9:00</option>
-                        <option>宸虫椂 09:00鈥?1:00</option>
-                        <option>鍗堟椂 11:00鈥?3:00</option>
-                        <option>鏈椂 13:00鈥?5:00</option>
-                        <option>鐢虫椂 15:00鈥?7:00</option>
-                        <option>閰夋椂 17:00鈥?9:00</option>
-                        <option>鎴屾椂 19:00鈥?1:00</option>
-                        <option>浜ユ椂 21:00鈥?3:00</option>
+                        <option>Zi hour 23:00-01:00</option>
+                        <option>Chou hour 01:00-03:00</option>
+                        <option>Yin hour 03:00-05:00</option>
+                        <option>Mao hour 05:00-07:00</option>
+                        <option>Chen hour 07:00-09:00</option>
+                        <option>Si hour 09:00-11:00</option>
+                        <option>Wu hour 11:00-13:00</option>
+                        <option>Wei hour 13:00-15:00</option>
+                        <option>Shen hour 15:00-17:00</option>
+                        <option>You hour 17:00-19:00</option>
+                        <option>Xu hour 19:00-21:00</option>
+                        <option>Hai hour 21:00-23:00</option>
                     </datalist>
                 </div>
             </div>
         </div>
 
         <div class="form-item full">
-            <label>Meaning Preference <span class="en">/ 鏈熷緟瀵撴剰</span></label>
+            <label>Meaning Preference</label>
             <input type="text" id="meaning" placeholder="wisdom, grace, peace, success, confidence...">
         </div>
         <div class="loading" id="loading">Generating your meaningful Chinese name, please wait...</div>
@@ -482,141 +482,74 @@ input:focus,select:focus{
     </div>
     <div class="extra-box">
         <div class="extra-card">
-            <h3>馃専 鐑棬濮撳悕妗堜緥 | Popular Names</h3>
-            <div class="scroll-wrapper">
-                <div class="scroll-content">
-                    <div class="scroll-item">
-                        <div class="item-title">鑻忔竻鏅?Su Qingyan</div>
-                        <div class="item-en">Water鈥慦ood Element</div>
-                        <div class="item-desc">娓呮湕瀹夌劧锛屾俯濠夊椋?br>Gentle & peaceful like a breeze</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">鏅畨鐟?Jing Anjin</div>
-                        <div class="item-en">Wood鈥慚etal Element</div>
-                        <div class="item-desc">娓╂鼎濡傜帀锛岃唉鍜屽畨瀹?br>Mild as jade, modest & serene</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">鐭ラ仴 Zhi Yao</div>
-                        <div class="item-en">Fire鈥慒ire Element</div>
-                        <div class="item-desc">鑷湪璞佽揪锛岄€嶉仴璞佺劧<br>Free鈥憇pirited & open鈥憁inded</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">娌愯景 Mu Chen</div>
-                        <div class="item-en">Water鈥慦ood Element</div>
-                        <div class="item-desc">鏅ㄥ厜娲掕惤锛岀敓鏈虹泿鐒?br>Morning light with lively energy</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">鑻ラ湝 Ruo Shuang</div>
-                        <div class="item-en">Metal鈥慦ater Element</div>
-                        <div class="item-desc">娓呭喎楂樻磥锛屽闇滀箣绾?br>Pure & elegant as frost</div>
-                    </div>
-                </div>
-            </div>
+            <h3>Popular Name Examples</h3>
+            <div class="scroll-wrapper"><div class="scroll-content">
+                <div class="scroll-item"><div class="item-title">Su Qingyan</div><div class="item-en">Water-Wood Element</div><div class="item-desc">Gentle and peaceful like a breeze</div></div>
+                <div class="scroll-item"><div class="item-title">Jing Anjin</div><div class="item-en">Wood-Metal Element</div><div class="item-desc">Mild as jade, modest and serene</div></div>
+                <div class="scroll-item"><div class="item-title">Zhi Yao</div><div class="item-en">Fire-Fire Element</div><div class="item-desc">Free-spirited and open-minded</div></div>
+                <div class="scroll-item"><div class="item-title">Mu Chen</div><div class="item-en">Water-Wood Element</div><div class="item-desc">Morning light with lively energy</div></div>
+                <div class="scroll-item"><div class="item-title">Ruo Shuang</div><div class="item-en">Metal-Water Element</div><div class="item-desc">Pure and elegant as frost</div></div>
+            </div></div>
         </div>
         <div class="extra-card">
-            <h3>馃摉 璧峰悕鏂囧寲灏忕煡璇?| Culture Tips</h3>
-            <div class="scroll-wrapper">
-                <div class="scroll-content">
-                    <div class="scroll-item">
-                        <div class="item-title">鍏瓧浜旇</div>
-                        <div class="item-en">Eight鈥慍haracter & Five鈥慐lements</div>
-                        <div class="item-desc">鏍规嵁鐢熻景鍖归厤鍠滅敤绁烇紝璋冨拰鍛界悊浜旇<br>Match lucky elements by birth time & balance life energy</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">璇楃粡璧峰悕</div>
-                        <div class="item-en">Book of Songs Names</div>
-                        <div class="item-desc">鍙栬嚜涓婂彜椋庨泤璇楀彞锛屽悕鍑烘湁鍏?br>Derived from ancient elegant poems with literary heritage</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">妤氳緸娴极</div>
-                        <div class="item-en">Chu Ci Romance</div>
-                        <div class="item-desc">鎵裤€婃杈炪€嬫氮婕儏鎬€锛屽悕甯﹁瘲鎰?br>Inherit the romantic flair of Chu Ci poetry</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">鏄撶粡鍚夊崷</div>
-                        <div class="item-en">Yijing Auspicious Hexagrams</div>
-                        <div class="item-desc">鍊熴€婃槗缁忋€嬪悏鍗﹀瘬鎰忥紝瓒嬪悏閬垮嚩<br>Draw auspicious meanings for fortune & protection</div>
-                    </div>
-                    <div class="scroll-item">
-                        <div class="item-title">濮撴皬婧簮</div>
-                        <div class="item-en">Surname Origin Tracing</div>
-                        <div class="item-desc">杩芥牴濮撴皬鍘嗗彶锛屼紶鎵垮鏃忚鑴?br>Trace englishSurname history & inherit family heritage</div>
-                    </div>
-                </div>
-            </div>
+            <h3>Chinese Naming Culture Tips</h3>
+            <div class="scroll-wrapper"><div class="scroll-content">
+                <div class="scroll-item"><div class="item-title">Eight Characters & Five Elements</div><div class="item-en">Birth-time balance</div><div class="item-desc">Match lucky elements by birth time and balance life energy</div></div>
+                <div class="scroll-item"><div class="item-title">Book of Songs Names</div><div class="item-en">Classical poetry</div><div class="item-desc">Derived from ancient elegant poems with literary heritage</div></div>
+                <div class="scroll-item"><div class="item-title">Chu Ci Romance</div><div class="item-en">Poetic aspiration</div><div class="item-desc">Inherit the romantic flair of Chu Ci poetry</div></div>
+                <div class="scroll-item"><div class="item-title">I Ching Balance</div><div class="item-en">Harmony and timing</div><div class="item-desc">Draw auspicious meanings for balance and protection</div></div>
+                <div class="scroll-item"><div class="item-title">Surname Origin</div><div class="item-en">Hundred Family Surnames</div><div class="item-desc">Trace surname sound, image, and cultural heritage</div></div>
+            </div></div>
         </div>
     </div>
     <div class="price-box">
-        <div class="price-title">馃挵 鍗囩骇浠樿垂瀹氬埗濂楅 | Upgrade Paid Packages</div>
+        <div class="price-title">Upgrade Paid Packages</div>
         <div class="price-row">
             <div class="price-card">
-                <h3>鍩虹鐗?Basic</h3>
+                <h3>Basic</h3>
                 <div class="price">$9.9</div>
                 <ul>
-                    <li>鉁?3涓畾鍒跺鍚?| 3 Custom Names</li>
-                    <li>鉁?鍩虹浜旇瑙ｆ瀽 | Basic Five鈥慐lement Analysis</li>
-                    <li>鉁?1娆￠噸鐢熸垚 | 1 Regeneration</li>
-                    <li>鉂?鏃犳繁搴﹀彜绫嶆函婧?| No In鈥慸epth Ancient Book Source</li>
+                    <li>3 custom Chinese names</li>
+                    <li>Basic five-element analysis</li>
+                    <li>1 regeneration</li>
+                    <li>Chinese characters, pinyin, and English meaning</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="basic" data-price="9.9">Buy Now</button>
             </div>
             <div class="price-card hot">
-                <h3>灏婁韩鐗?Premium</h3>
+                <h3>Premium</h3>
                 <div class="price">$19.9</div>
                 <ul>
-                    <li>鉁?5涓笓灞炲鍚?| 5 Exclusive Names</li>
-                    <li>鉁?瀹屾暣鍏瓧浜旇瑙ｆ瀽 | Full Eight鈥慍haracter & Five鈥慐lement Analysis</li>
-                    <li>鉁?璇楃粡/妤氳緸鍑哄婧簮 | Book of Songs/Chu Ci Source Trace</li>
-                    <li>鉁?楂樻竻璧峰悕璇佷功 | HD Naming Certificate</li>
+                    <li>5 exclusive Chinese names</li>
+                    <li>Full birth-time and five-elements analysis</li>
+                    <li>Book of Songs and Chu Ci source trace</li>
+                    <li>Downloadable naming certificate</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="premium" data-price="19.9">Buy Now</button>
             </div>
             <div class="price-card">
-                <h3>鑷冲皧VIP Ultimate</h3>
+                <h3>Ultimate</h3>
                 <div class="price">$29.9</div>
                 <ul>
-                    <li>鉁?鏃犻檺娆＄敓鎴?| Unlimited Generations</li>
-                    <li>鉁?涓€瀵逛竴娣卞害瀹氬埗 | 1鈥憃n鈥? In鈥慸epth Customization</li>
-                    <li>鉁?缁堣韩濮撳悕妗ｆ | Lifetime Name File</li>
-                    <li>鉁?Personal use license with lifetime name record</li>
+                    <li>Unlimited name generations for your project</li>
+                    <li>In-depth cultural customization</li>
+                    <li>Lifetime name record storage</li>
+                    <li>Priority support for payment or generation issues</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="ultimate" data-price="29.9">Buy Now</button>
             </div>
         </div>
-        <div style="text-align:center;margin-top:15px;font-size:14px;color:#886655;line-height:1.8">
-            Secure PayPal checkout 路 Personal naming report 路 Privacy respected 路 Contact support if anything goes wrong
-        </div>
-        <div style="text-align:center;margin-top:8px;font-size:13px;color:#997755;line-height:1.8">
-            Your purchase is intended for your own naming project. If payment or generation fails, contact us for manual help or a fair refund review.
-        </div>
+        <div style="text-align:center;margin-top:15px;font-size:14px;color:#886655;line-height:1.8">Secure PayPal checkout 路 Personal naming report 路 Privacy respected 路 Contact support if anything goes wrong</div>
+        <div style="text-align:center;margin-top:8px;font-size:13px;color:#997755;line-height:1.8">Your purchase is intended for your own naming project. If payment or generation fails, contact us for manual help or a fair refund review.</div>
     </div>
     <div class="footer">
         <div class="footer-row">
-            <div class="footer-col">
-                <h4>鍏充簬鎴戜滑 | About Us</h4>
-                <a href="/brand-intro">鍝佺墝浠嬬粛 | Brand Intro</a>
-                <a href="/contact-us">鑱旂郴鎴戜滑 | Contact Us</a>
-            </div>
-            <div class="footer-col">
-                <h4>鏈嶅姟鏉℃ | Terms</h4>
-                <a href="/terms">浣跨敤鏉℃ | Terms of Use</a>
-                <a href="/privacy">闅愮鏀跨瓥 | Privacy Policy</a>
-            </div>
-            <div class="footer-col">
-                <h4>甯姪涓績 | Help</h4>
-                <a href="/faq">甯歌闂 | FAQ</a>
-                <a href="/payment-guide">鏀粯璇存槑 | Payment Guide</a>
-            </div>
-            <div class="footer-col">
-                <h4>鍏虫敞鎴戜滑 | Follow Us</h4>
-                <a href="https://facebook.com" target="_blank">Facebook</a>
-                <a href="https://instagram.com" target="_blank">Instagram</a>
-                <a href="https://tiktok.com" target="_blank">TikTok</a>
-            </div>
+            <div class="footer-col"><h4>About Us</h4><a href="/brand-intro">Brand Intro</a><a href="/contact-us">Contact Us</a></div>
+            <div class="footer-col"><h4>Terms</h4><a href="/terms">Terms of Use</a><a href="/privacy">Privacy Policy</a></div>
+            <div class="footer-col"><h4>Help</h4><a href="/faq">FAQ</a><a href="/payment-guide">Payment Guide</a></div>
+            <div class="footer-col"><h4>Follow Us</h4><a href="https://facebook.com" target="_blank">Facebook</a><a href="https://instagram.com" target="_blank">Instagram</a><a href="https://tiktok.com" target="_blank">TikTok</a></div>
         </div>
-        <div class="copyright">
-            漏 2025 My Chinese Name | Creator Studio 路 All Rights Reserved 路 mychinesename.co
-        </div>
+        <div class="copyright">漏 2026 My Chinese Name | Creator Studio 路 All Rights Reserved 路 mychinesename.co</div>
     </div>
     <div class="help-float">?</div>
 </div>
@@ -637,56 +570,25 @@ input:focus,select:focus{
     </a>
 </div>
 
-<!-- 浠樿垂寮圭獥 -->
+<!-- Payment modal -->
 <div class="paywall-modal" id="paywallModal">
     <div class="paywall-content">
-        <button class="paywall-close" onclick="closePaywall()">鉁?/button>
-        <div class="paywall-title">馃挵 鍗囩骇浠樿垂瀹氬埗濂楅 | Upgrade Paid Packages</div>
+        <button class="paywall-close" onclick="closePaywall()">x</button>
+        <div class="paywall-title">Upgrade Paid Packages</div>
         <div class="paywall-row">
             <div class="paywall-card">
-                <h3>鍩虹鐗?Basic</h3>
-                <div class="price-wrap">
-                    <span class="price-original">$19.9</span>
-                    <span class="price-current">$9.9</span>
-                    <span class="price-badge">闄愭椂鐗规儬</span>
-                </div>
-                <ul>
-                    <li>鉁?3缁勫畾鍒跺鍚?| 3 Sets of Custom Names</li>
-                    <li>鉁?鍩虹浜旇瑙ｆ瀽 | Basic Five鈥慐lement Analysis</li>
-                    <li>鉁?涓嶆弧鎰忓彲閲嶇敓鎴?娆?| 1 Regeneration if Unsatisfied</li>
-                    <li>鉂?鏃犲畬鏁村吀鏁呮繁搴︽函婧?| No Full In鈥慸epth Cultural Allusion Analysis</li>
-                </ul>
+                <h3>Basic</h3><div class="price-wrap"><span class="price-original">$19.9</span><span class="price-current">$9.9</span><span class="price-badge">Starter</span></div>
+                <ul><li>3 custom Chinese name options</li><li>Basic five-element analysis</li><li>1 regeneration if the direction feels wrong</li><li>Chinese characters, pinyin, and English meaning</li></ul>
                 <button class="buy-btn paypal-btn" data-package="basic" data-price="9.9">Buy Now</button>
             </div>
             <div class="paywall-card hot">
-                <h3>灏婁韩鐗?Premium</h3>
-                <div class="price-wrap">
-                    <span class="price-original">$39.9</span>
-                    <span class="price-current">$19.9</span>
-                    <span class="price-badge">鏈€鍙楁杩?/span>
-                </div>
-                <ul>
-                    <li>鉁?5缁勪笓灞炲鍚?| 5 Sets of Exclusive Names</li>
-                    <li>鉁?瀹屾暣鍏瓧浜旇瑙ｆ瀽 | Full Eight鈥慍haracter & Five鈥慐lement Analysis</li>
-                    <li>鉁?璇楃粡/妤氳緸瀹屾暣鍏告晠婧簮 | Full Source Trace from Book of Songs & Chu Ci</li>
-                    <li>鉁?楂樻竻鍙笅杞借捣鍚嶈瘉涔?| HD Downloadable Naming Certificate</li>
-                    <li>鉁?鍗曟AI涔︽硶澶村儚鐢熸垚 | 1 AI Calligraphy Avatar Generation</li>
-                </ul>
+                <h3>Premium</h3><div class="price-wrap"><span class="price-original">$39.9</span><span class="price-current">$19.9</span><span class="price-badge">Most Popular</span></div>
+                <ul><li>5 exclusive Chinese name options</li><li>Full birth-time and five-elements analysis</li><li>Book of Songs / Chu Ci source explanation</li><li>Downloadable naming certificate</li><li>1 calligraphy-style name card</li></ul>
                 <button class="buy-btn paypal-btn" data-package="premium" data-price="19.9">Buy Now</button>
             </div>
             <div class="paywall-card">
-                <h3>鑷冲皧VIP Ultimate</h3>
-                <div class="price-wrap">
-                    <span class="price-original">$59.9</span>
-                    <span class="price-current">$29.9</span>
-                    <span class="price-badge">缁堟瀬鐗规儬</span>
-                </div>
-                <ul>
-                    <li>鉁?涓嶉檺娆℃暟璧峰悕鐢熸垚 | Unlimited Name Generations</li>
-                    <li>鉁?涓€瀵逛竴娣卞害鏂囧寲瀹氬埗 | 1鈥憃n鈥? In鈥慸epth Cultural Customization</li>
-                    <li>鉁?缁堣韩濮撳悕妗ｆ淇濆瓨 | Lifetime Name Record Storage</li>
-                    <li>鉁?Priority support for payment or generation issues</li>
-                </ul>
+                <h3>Ultimate</h3><div class="price-wrap"><span class="price-original">$59.9</span><span class="price-current">$29.9</span><span class="price-badge">Full Service</span></div>
+                <ul><li>Unlimited name generations for your project</li><li>In-depth cultural customization</li><li>Lifetime name record storage</li><li>Priority support for payment or generation issues</li></ul>
                 <button class="buy-btn paypal-btn" data-package="ultimate" data-price="29.9">Buy Now</button>
             </div>
         </div>
@@ -966,7 +868,7 @@ function updateQuotaUI(){
     if(currentQuota <= 0){
         hint.innerHTML = '鉂?鍏嶈垂娆℃暟宸茬敤瀹?| No free attempts left 鈥?<a href="javascript:void(0)" onclick="showPaywall()">鍗囩骇浠樿垂濂楅</a>';
     } else {
-        hint.innerHTML = `鍓╀綑鍏嶈垂娆℃暟 | Free Attempts: <span id="quotaCount">${currentQuota}</span>`;
+        hint.innerHTML = `Free attempts remaining: <span id="quotaCount">${currentQuota}</span>`;
     }
 }
 function addQuota(){
@@ -1136,16 +1038,16 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         loading.style.display = 'none';
 
         let html = `<div class="result-name-block">
-    <div class="result-name">${escapeHtml(fullName)} <span class="speaker-btn" onclick="readChinese('${escapeHtml(fullName)}')">馃攰</span></div>
+    <div class="result-name">${escapeHtml(fullName)} <button class="speaker-btn" onclick="readChinese('${escapeHtml(fullName)}')" type="button">Play</button></div>
     <div class="result-subtitle">A cultural gift: your Chinese name with sound, meaning, and classical source.</div>
 </div>`;
         html += `<div class="bilingual-block">`;
-        html += `<div class="bi-line"><span class="bi-cn">涓枃濮撳悕锛?{escapeHtml(fullName)}</span><span class="bi-en">Chinese name: ${escapeHtml(fullName)}</span></div>`;
+        html += `<div class="bi-line"><span class="bi-en">Chinese name: ${escapeHtml(fullName)}</span></div>`;
         if(result.pinyin){
-            html += `<div class="bi-line"><span class="bi-cn">鎷奸煶锛?{escapeHtml(result.pinyin)}</span><span class="bi-en">Pinyin: ${escapeHtml(result.pinyin)}</span></div>`;
+            html += `<div class="bi-line"><span class="bi-en">Pinyin: ${escapeHtml(result.pinyin)}</span></div>`;
         }
         if(result.pronunciation){
-            html += `<div class="bi-line"><span class="bi-cn">鑻辨枃鍙戦煶鎻愮ず锛?{escapeHtml(result.pronunciation)}</span><span class="bi-en">Pronunciation guide: ${escapeHtml(result.pronunciation)}</span></div>`;
+            html += `<div class="bi-line"><span class="bi-en">Pronunciation guide: ${escapeHtml(result.pronunciation)}</span></div>`;
         }
         html += renderMeaningSections(result);
         html += `</div>`;
