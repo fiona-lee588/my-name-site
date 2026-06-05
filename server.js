@@ -1,5 +1,6 @@
 require('dotenv').config();
-// My Chinese Name - 涓枃璧峰悕鏈嶅姟鍚庣 API锛屾敮鎸?DeepSeek 鍗曞紩鎿庤捣鍚?
+// My Chinese Name - \u4e2d\u6587\u8d77\u540d\u670d\u52a1\u540e\u7aef API\uff0c\u652f\u6301 DeepSeek \u5355\u5f15\u64ce\u8d77\u540d
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -13,7 +14,8 @@ app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 
 // ============================================================
-// 鐜閰嶇疆锛堝叏閮ㄤ粠 .env 璇诲彇锛岀姝㈢‖缂栫爜锛?// ============================================================
+// \u73af\u5883\u914d\u7f6e\uff08\u5168\u90e8\u4ece .env \u8bfb\u53d6\uff0c\u7981\u6b62\u786c\u7f16\u7801\uff09
+// ============================================================
 const IS_PROD     = process.env.NODE_ENV === 'production';
 const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : 'http://localhost:3000');
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
@@ -50,7 +52,7 @@ const SEO_LANDING_PAGES = {
     '/book-of-songs-chinese-names': {
         title: 'Book of Songs Chinese Names with Poetic Meanings',
         h1: 'Book of Songs Chinese Names',
-        intro: 'Explore Chinese names inspired by the elegance of the Book of Songs, one of China鈥檚 oldest poetic classics.',
+        intro: 'Explore Chinese names inspired by the elegance of the Book of Songs, one of China\u2019s oldest poetic classics.',
         focus: 'For users who want a name with literary depth, softness, and cultural memory.'
     },
     '/chinese-name-meaning': {
@@ -96,7 +98,7 @@ log("PayPal client secret configured:", !!process.env.PAYPAL_CLIENT_SECRET);
 log("Site domain:", DOMAIN);
 
 // ============================================================
-// CORS 閰嶇疆
+// CORS \u914d\u7f6e
 // ============================================================
 app.use(cors({
     origin: CORS_ORIGIN,
@@ -108,13 +110,13 @@ app.use((req, res, next) => {
     res.charset = 'utf-8';
     next();
 });
-// helmet() 宸茬Щ闄?CSP
+// helmet() \u5df2\u79fb\u9664 CSP
 // app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // ============================================================
-// API 鍏ㄥ眬闄愭祦锛?api 璺緞锛?0绉掑唴鏈€澶?0娆★級
+// API \u5168\u5c40\u9650\u6d41\uff08/api \u8def\u5f84\uff0c60\u79d2\u5185\u6700\u591a60\u6b21\uff09
 // ============================================================
 const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
@@ -126,15 +128,18 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 
 // ============================================================
-// 瀹夊叏涓棿浠讹細IP 闄愭祦 + 棰戠巼闄愬埗锛堢簿缁嗗寲锛?// ============================================================
+// \u5b89\u5168\u4e2d\u95f4\u4ef6\uff1aIP \u9650\u6d41 + \u9891\u7387\u9650\u5236\uff08\u7cbe\u7ec6\u5316\uff09
+// ============================================================
 
-// IP 璇锋眰璁℃暟锛堝唴瀛樹腑绠€鍗曡鏁帮紝鐢熶骇鐜寤鸿鐢?Redis锛?const ipCounts = new Map();          // IP -> { count, resetAt }
+// IP \u8bf7\u6c42\u8ba1\u6570\uff08\u5185\u5b58\u4e2d\u7b80\u5355\u8ba1\u6570\uff0c\u751f\u4ea7\u73af\u5883\u5efa\u8bae\u7528 Redis\uff09
+const ipCounts = new Map();          // IP -> { count, resetAt }
 const ipBlocked = new Map();          // IP -> unblockAt
 
-// 璧峰悕API涓撳睘闄愭祦锛氭瘡涓狪P姣忓垎閽熸渶澶?N 娆?const RATE_LIMIT_WINDOW_MS = 60 * 1000;  // 1鍒嗛挓绐楀彛
-const RATE_LIMIT_MAX = IS_PROD ? 5 : 20;   // 姣忕獥鍙ｆ渶澶ц姹傛暟锛堟寮忕幆澧?娆★紝寮€鍙戠幆澧?0娆★級
+// \u8d77\u540dAPI\u4e13\u5c5e\u9650\u6d41\uff1a\u6bcf\u4e2aIP\u6bcf\u5206\u949f\u6700\u591a N \u6b21
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;  // 1\u5206\u949f\u7a97\u53e3
+const RATE_LIMIT_MAX = IS_PROD ? 5 : 20;   // \u6bcf\u7a97\u53e3\u6700\u5927\u8bf7\u6c42\u6570\uff08\u6b63\u5f0f\u73af\u58835\u6b21\uff0c\u5f00\u53d1\u73af\u588320\u6b21\uff09
 
-// 娓呯悊杩囨湡璁板綍鐨勫畾鏃跺櫒锛堟瘡5鍒嗛挓娓呯悊涓€娆★級
+// \u6e05\u7406\u8fc7\u671f\u8bb0\u5f55\u7684\u5b9a\u65f6\u5668\uff08\u6bcf5\u5206\u949f\u6e05\u7406\u4e00\u6b21\uff09
 setInterval(() => {
     const now = Date.now();
     for(const [ip, data] of ipCounts) {
@@ -154,7 +159,7 @@ function rateLimitMiddleware(req, res, next) {
     const ip = getClientIp(req);
     const now = Date.now();
 
-    // 琚复鏃舵嫤鎴殑IP
+    // \u88ab\u4e34\u65f6\u62e6\u622a\u7684IP
     if(ipBlocked.has(ip) && ipBlocked.get(ip) > now) {
         return res.status(429).json({ error: 'Too many requests, please try again later.' });
     }
@@ -167,7 +172,7 @@ function rateLimitMiddleware(req, res, next) {
     }
     ipCounts.set(ip, record);
 
-    // 瓒呰繃闃堝€煎垯涓存椂灏佺10鍒嗛挓
+    // \u8d85\u8fc7\u9608\u503c\u5219\u4e34\u65f6\u5c01\u798110\u5206\u949f
     if(record.count > RATE_LIMIT_MAX) {
         ipBlocked.set(ip, now + 10 * 60 * 1000);
         ipCounts.delete(ip);
@@ -178,7 +183,7 @@ function rateLimitMiddleware(req, res, next) {
     next();
 }
 
-// 閫氱敤璇锋眰鏃ュ織锛堜粎闈炴寮忕幆澧冿級
+// \u901a\u7528\u8bf7\u6c42\u65e5\u5fd7\uff08\u4ec5\u975e\u6b63\u5f0f\u73af\u5883\uff09
 app.use((req, res, next) => {
     if(!IS_PROD) {
         const ip = getClientIp(req);
@@ -188,8 +193,10 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// PayPal 閰嶇疆锛堜粠 .env 璇诲彇锛?// ============================================================
-// PayPal REST API 閰嶇疆锛堜粠 .env 璇诲彇锛宭ive/sandbox 鑷姩鍒囨崲锛?// ============================================================
+// PayPal \u914d\u7f6e\uff08\u4ece .env \u8bfb\u53d6\uff09
+// ============================================================
+// PayPal REST API \u914d\u7f6e\uff08\u4ece .env \u8bfb\u53d6\uff0clive/sandbox \u81ea\u52a8\u5207\u6362\uff09
+// ============================================================
 paypal.configure({
     mode: process.env.PAYPAL_MODE || 'sandbox',
     client_id: process.env.PAYPAL_CLIENT_ID,
@@ -197,7 +204,7 @@ paypal.configure({
 });
 
 // ============================================================
-// 濂楅鏉冪泭琛紙鍏ㄩ儴浠庡悗绔鍙栵紝鍓嶇绂佹纭紪鐮侊級
+// \u5957\u9910\u6743\u76ca\u8868\uff08\u5168\u90e8\u4ece\u540e\u7aef\u8bfb\u53d6\uff0c\u524d\u7aef\u7981\u6b62\u786c\u7f16\u7801\uff09
 // ============================================================
 const PACKAGE_ENTITLEMENTS = {
     basic:    { quota: 3,    wuxingLevel: 'basic', culturalDepth: false, certificate: false, avatarGeneration: 0,  regeneration: 1  },
@@ -206,14 +213,15 @@ const PACKAGE_ENTITLEMENTS = {
 };
 
 // ============================================================
-// 鏂囦欢璺緞
+// \u6587\u4ef6\u8def\u5f84
 // ============================================================
 const USER_STATE_FILE = path.join(__dirname, 'user-state.json');
 const PAYMENT_LOG_FILE = path.join(__dirname, 'payment-log.json');
 const ANALYTICS_LOG_FILE = path.join(__dirname, 'analytics-log.json');
 
 // ============================================================
-// 鐘舵€佽鍐?// ============================================================
+// \u72b6\u6001\u8bfb\u5199
+// ============================================================
 function readUserState(){
     try {
         if(!fs.existsSync(USER_STATE_FILE)) return {};
@@ -222,7 +230,8 @@ function readUserState(){
 }
 
 // ============================================================
-// 杈撳叆娓呮礂锛堜繚鐣欎腑鏂囥€丄SCII鍙瀛楃锛屽幓闄ゆ帶鍒跺瓧绗﹀拰鐗规畩绗﹀彿锛?// ============================================================
+// \u8f93\u5165\u6e05\u6d17\uff08\u4fdd\u7559\u4e2d\u6587\u3001ASCII\u53ef\u89c1\u5b57\u7b26\uff0c\u53bb\u9664\u63a7\u5236\u5b57\u7b26\u548c\u7279\u6b8a\u7b26\u53f7\uff09
+// ============================================================
 function cleanStr(str){
     if(typeof str !== 'string') return str;
     return str.replace(/[\x00-\x1F\x7F]/g, '').trim();
@@ -349,7 +358,7 @@ function isAdminAuthed(req){
 }
 
 // ============================================================
-// 鐢ㄦ埛ID + 瑙ｉ攣
+// \u7528\u6237ID + \u89e3\u9501
 // ============================================================
 function getUserId(req){
     return req.headers['x-user-id']
@@ -426,27 +435,27 @@ function extractJsonObject(text){
 
 function buildFallbackName({ givenName, surname, gender, style, meaning, birthText }){
     const surnameMap = [
-        { re:/^(smith|smyth)$/i, cn:'娌?, pinyin:'Shen', reason:'chosen for its soft sh sound and refined literary feeling' },
-        { re:/^(johnson|jones|james)$/i, cn:'姹?, pinyin:'Jiang', reason:'chosen for a clear j sound and the image of a broad river' },
-        { re:/^(brown|bruno)$/i, cn:'鐧?, pinyin:'Bai', reason:'chosen by contrast for brightness, purity, and an elegant classical surname' },
-        { re:/^(miller|miles|mitchell|michael)$/i, cn:'绫?, pinyin:'Mi', reason:'chosen for its close m sound and warm everyday cultural image' },
-        { re:/^(davis|thomas|taylor)$/i, cn:'鍞?, pinyin:'Tang', reason:'chosen for its dignified sound and Tang dynasty cultural resonance' },
-        { re:/^(wilson|williams|walker)$/i, cn:'榄?, pinyin:'Wei', reason:'chosen for its w sound and noble historical presence' },
-        { re:/^(lee|li|lewis)$/i, cn:'鏉?, pinyin:'Li', reason:'chosen for its direct sound match and deep Baijiaxing heritage' },
-        { re:/^(martin|moore|morgan)$/i, cn:'绌?, pinyin:'Mu', reason:'chosen for its calm m sound and meaning of sincerity and harmony' }
+        { re:/^(smith|smyth)$/i, cn:'\u6c88', pinyin:'Shen', reason:'chosen for its soft sh sound and refined literary feeling' },
+        { re:/^(johnson|jones|james)$/i, cn:'\u6c5f', pinyin:'Jiang', reason:'chosen for a clear j sound and the image of a broad river' },
+        { re:/^(brown|bruno)$/i, cn:'\u767d', pinyin:'Bai', reason:'chosen by contrast for brightness, purity, and an elegant classical surname' },
+        { re:/^(miller|miles|mitchell|michael)$/i, cn:'\u7c73', pinyin:'Mi', reason:'chosen for its close m sound and warm everyday cultural image' },
+        { re:/^(davis|thomas|taylor)$/i, cn:'\u5510', pinyin:'Tang', reason:'chosen for its dignified sound and Tang dynasty cultural resonance' },
+        { re:/^(wilson|williams|walker)$/i, cn:'\u9b4f', pinyin:'Wei', reason:'chosen for its w sound and noble historical presence' },
+        { re:/^(lee|li|lewis)$/i, cn:'\u674e', pinyin:'Li', reason:'chosen for its direct sound match and deep Baijiaxing heritage' },
+        { re:/^(martin|moore|morgan)$/i, cn:'\u7a46', pinyin:'Mu', reason:'chosen for its calm m sound and meaning of sincerity and harmony' }
     ];
     const matched = surnameMap.find(item => item.re.test(surname || '')) || {
-        cn:'鏋?, pinyin:'Lin', reason:'chosen for a natural, graceful image that feels accessible across cultures'
+        cn:'\u6797', pinyin:'Lin', reason:'chosen for a natural, graceful image that feels accessible across cultures'
     };
     const profile = `${meaning || ''} ${style || ''}`;
-    const wantsWisdom = /wisdom|wise|intelligence|learn|knowledge|鑱獆鏅?i.test(profile);
-    const wantsPeace = /peace|calm|gentle|grace|serene|瀹墊瀹亅闆?i.test(profile);
-    const wantsBright = /bright|success|future|hope|light|prosper|鎴恷鍏墊鏄?i.test(profile);
+    const wantsWisdom = /wisdom|wise|intelligence|learn|knowledge|\u806a|\u667a/i.test(profile);
+    const wantsPeace = /peace|calm|gentle|grace|serene|\u5b89|\u5b81|\u96c5/i.test(profile);
+    const wantsBright = /bright|success|future|hope|light|prosper|\u6210|\u5149|\u660e/i.test(profile);
     const feminine = /female|girl|woman/i.test(gender || '');
-    const given = wantsWisdom ? { cn:'鐭ラ煹', pinyin:'Zhi Yun', gloss:'wisdom with poetic rhythm' }
-        : wantsBright ? { cn: feminine ? '鏄庤垝' : '鏄庤繙', pinyin: feminine ? 'Ming Shu' : 'Ming Yuan', gloss: feminine ? 'clear light and ease' : 'bright vision and far-reaching promise' }
-        : wantsPeace ? { cn: feminine ? '瀹夐泤' : '瀹夊拰', pinyin: feminine ? 'An Ya' : 'An He', gloss: feminine ? 'peaceful elegance' : 'peace and harmony' }
-        : { cn: feminine ? '娓呭畞' : '鎬€鐟?, pinyin: feminine ? 'Qing Ning' : 'Huai Jin', gloss: feminine ? 'clarity and serenity' : 'holding inner jade-like virtue' };
+    const given = wantsWisdom ? { cn:'\u77e5\u97f5', pinyin:'Zhi Yun', gloss:'wisdom with poetic rhythm' }
+        : wantsBright ? { cn: feminine ? '\u660e\u8212' : '\u660e\u8fdc', pinyin: feminine ? 'Ming Shu' : 'Ming Yuan', gloss: feminine ? 'clear light and ease' : 'bright vision and far-reaching promise' }
+        : wantsPeace ? { cn: feminine ? '\u5b89\u96c5' : '\u5b89\u548c', pinyin: feminine ? 'An Ya' : 'An He', gloss: feminine ? 'peaceful elegance' : 'peace and harmony' }
+        : { cn: feminine ? '\u6e05\u5b81' : '\u6000\u747e', pinyin: feminine ? 'Qing Ning' : 'Huai Jin', gloss: feminine ? 'clarity and serenity' : 'holding inner jade-like virtue' };
     const fullName = `${matched.cn}${given.cn}`;
     const fullPinyin = `${matched.pinyin} ${given.pinyin}`;
     return {
@@ -456,27 +465,27 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
         meaning: `${fullName} means ${given.gloss}, selected as a culturally meaningful Chinese name rather than a random translation.`,
         sections: [
             {
-                titleCn:'濮撴皬瑙ｉ噴',
+                titleCn:'\u59d3\u6c0f\u89e3\u91ca',
                 titleEn:'Surname Explanation',
-                cn:`${matched.cn}濮撲緷鎹嫳鏂囧姘?${surname || 'your surname'} 鐨勮闊冲拰姘旇川鍖归厤鐧惧濮擄紝鍏奸【娴峰鐢ㄦ埛鍙戦煶涓庝腑鏂囧姘忎紶缁熴€俙,
+                cn:`${matched.cn}\u59d3\u4f9d\u636e\u82f1\u6587\u59d3\u6c0f ${surname || 'your surname'} \u7684\u8bfb\u97f3\u548c\u6c14\u8d28\u5339\u914d\u767e\u5bb6\u59d3\uff0c\u517c\u987e\u6d77\u5916\u7528\u6237\u53d1\u97f3\u4e0e\u4e2d\u6587\u59d3\u6c0f\u4f20\u7edf\u3002`,
                 en:`The surname ${matched.cn} (${matched.pinyin}) is matched from the Hundred Family Surnames because it is ${matched.reason}.`
             },
             {
-                titleCn:'鍚嶅瓧瑙ｉ噴',
+                titleCn:'\u540d\u5b57\u89e3\u91ca',
                 titleEn:'Given Name Explanation',
-                cn:`${given.cn}鍛煎簲浣犲笇鏈涘憟鐜扮殑${meaning || '缇庡ソ瀵撴剰'}锛屽己璋冨悕瀛楃殑姘旇川銆佸彲璇绘€у拰闀挎湡浣跨敤鎰熴€俙,
+                cn:`${given.cn}\u547c\u5e94\u4f60\u5e0c\u671b\u5448\u73b0\u7684${meaning || '\u7f8e\u597d\u5bd3\u610f'}\uff0c\u5f3a\u8c03\u540d\u5b57\u7684\u6c14\u8d28\u3001\u53ef\u8bfb\u6027\u548c\u957f\u671f\u4f7f\u7528\u611f\u3002`,
                 en:`The given name ${given.cn} (${given.pinyin}) expresses ${given.gloss}, aligned with your preferred meaning and style.`
             },
             {
-                titleCn:'鍙ょ睄鍑哄',
+                titleCn:'\u53e4\u7c4d\u51fa\u5904',
                 titleEn:'Classical Source',
-                cn:'鍚嶅瓧鎰忚薄鍙傝€冦€婅瘲缁忋€嬬殑娓╁帤闆呮銆併€婃杈炪€嬬殑娓呮湕蹇楀悜锛屽苟浠ャ€婃槗缁忋€嬮噸瑙嗗钩琛′笌鍙樺寲鐨勬€濇兂浣滄暣浣撳彇鍚戙€?,
+                cn:'\u540d\u5b57\u610f\u8c61\u53c2\u8003\u300a\u8bd7\u7ecf\u300b\u7684\u6e29\u539a\u96c5\u6b63\u3001\u300a\u695a\u8f9e\u300b\u7684\u6e05\u6717\u5fd7\u5411\uff0c\u5e76\u4ee5\u300a\u6613\u7ecf\u300b\u91cd\u89c6\u5e73\u8861\u4e0e\u53d8\u5316\u7684\u601d\u60f3\u4f5c\u6574\u4f53\u53d6\u5411\u3002',
                 en:'The imagery is inspired by the elegance of the Book of Songs, the aspiration of Chu Ci, and the I Ching idea of balance and timely change.'
             },
             {
-                titleCn:'鏁翠綋瀵撴剰',
+                titleCn:'\u6574\u4f53\u5bd3\u610f',
                 titleEn:'Overall Meaning',
-                cn:`缁撳悎鍑虹敓淇℃伅${birthText || '涓庝釜浜哄亸濂?}锛岃繖涓悕瀛楀憟鐜板惈钃勩€佸彲淇°€侀€傚悎璺ㄦ枃鍖栧満鏅娇鐢ㄧ殑涓滄柟姘旇川銆俙,
+                cn:`\u7ed3\u5408\u51fa\u751f\u4fe1\u606f${birthText || '\u4e0e\u4e2a\u4eba\u504f\u597d'}\uff0c\u8fd9\u4e2a\u540d\u5b57\u5448\u73b0\u542b\u84c4\u3001\u53ef\u4fe1\u3001\u9002\u5408\u8de8\u6587\u5316\u573a\u666f\u4f7f\u7528\u7684\u4e1c\u65b9\u6c14\u8d28\u3002`,
                 en:`Considering ${birthText || 'your profile'}, this name feels refined, memorable, and suitable for long-term cross-cultural use.`
             }
         ]
@@ -487,11 +496,11 @@ function normalizeNameResult(raw){
     const parsed = raw && typeof raw === 'object' ? raw : (extractJsonObject(raw) || {});
     const rawText = typeof raw === 'string' ? raw : JSON.stringify(parsed);
     const chineseName = cleanStr(parsed.chineseName || parsed.name || parsed.fullName || '') ||
-        ((rawText || '').match(/銆愬畬鏁翠腑鏂囧鍚嶃€戯細([^\n銆怾+)/)?.[1] || '').replace(/[^\u4e00-\u9fa5]/g, '');
+        ((rawText || '').match(/\u3010\u5b8c\u6574\u4e2d\u6587\u59d3\u540d\u3011\uff1a([^\n\u3010]+)/)?.[1] || '').replace(/[^\u4e00-\u9fa5]/g, '');
     const pinyin = cleanStr(parsed.pinyin || '') ||
-        ((rawText || '').match(/銆愭嫾闊炽€戯細([^\n銆怾+)/)?.[1] || '');
+        ((rawText || '').match(/\u3010\u62fc\u97f3\u3011\uff1a([^\n\u3010]+)/)?.[1] || '');
     const meaning = cleanStr(parsed.meaning || parsed.explanation || parsed.description || '') ||
-        ((rawText || '').match(/銆愬瘬鎰忚В鏋愩€戯細([\s\S]+)/)?.[1] || '');
+        ((rawText || '').match(/\u3010\u5bd3\u610f\u89e3\u6790\u3011\uff1a([\s\S]+)/)?.[1] || '');
     const sections = Array.isArray(parsed.sections)
         ? parsed.sections.map(section => ({
             titleCn: cleanStr(section.titleCn || section.title || ''),
@@ -556,7 +565,7 @@ ul{padding-left:20px}
 </style>
 </head>
 <body><main class="wrap">
-<div class="eyebrow">My Chinese Name 路 涓浗浼犵粺鏂囧寲涓枃璧峰悕</div>
+<div class="eyebrow">My Chinese Name \u00b7 \u4e2d\u56fd\u4f20\u7edf\u6587\u5316\u4e2d\u6587\u8d77\u540d</div>
 <h1>${htmlEscape(page.h1)}</h1>
 <p class="lead">${htmlEscape(page.intro)}</p>
 <div class="panel">
@@ -566,14 +575,14 @@ ul{padding-left:20px}
 <li>Name characters inspired by the I Ching, Book of Songs, Chu Ci, and five-elements balance.</li>
 <li>Each result includes Chinese characters, pinyin, pronunciation guidance, English meaning, and cultural source.</li>
 </ul>
-<p class="han">鍚嶄互杞介亾锛屽瓧涓湁鍏夈€?/p>
+<p class="han">\u540d\u4ee5\u8f7d\u9053\uff0c\u5b57\u4e2d\u6709\u5149\u3002</p>
 <a class="cta" href="/">Generate My Chinese Name</a>
 </div>
 </main></body></html>`;
 }
 
 // ============================================================
-// API璺敱
+// API\u8def\u7531
 // ============================================================
 
 app.get('/robots.txt', (req, res) => {
@@ -609,10 +618,10 @@ app.get('/api/pricing', (req, res) => {
                 label: 'Basic',
                 badge: 'Starter',
                 features: [
-                    { icon: '鉁?, text: '3 custom Chinese name options' },
-                    { icon: '鉁?, text: 'Basic five-elements interpretation' },
-                    { icon: '鉁?, text: '1 regeneration if the direction feels wrong' },
-                    { icon: '鉁?, text: 'Chinese characters, pinyin, and English meaning' }
+                    { icon: '\u2705', text: '3 custom Chinese name options' },
+                    { icon: '\u2705', text: 'Basic five-elements interpretation' },
+                    { icon: '\u2705', text: '1 regeneration if the direction feels wrong' },
+                    { icon: '\u2705', text: 'Chinese characters, pinyin, and English meaning' }
                 ]
             },
             premium: {
@@ -621,11 +630,11 @@ app.get('/api/pricing', (req, res) => {
                 label: 'Premium',
                 badge: 'Most Popular',
                 features: [
-                    { icon: '鉁?, text: '5 exclusive Chinese name options' },
-                    { icon: '鉁?, text: 'Full birth-time and five-elements interpretation' },
-                    { icon: '鉁?, text: 'Book of Songs / Chu Ci source explanation' },
-                    { icon: '鉁?, text: 'Downloadable naming certificate' },
-                    { icon: '鉁?, text: '1 calligraphy-style name card' }
+                    { icon: '\u2705', text: '5 exclusive Chinese name options' },
+                    { icon: '\u2705', text: 'Full birth-time and five-elements interpretation' },
+                    { icon: '\u2705', text: 'Book of Songs / Chu Ci source explanation' },
+                    { icon: '\u2705', text: 'Downloadable naming certificate' },
+                    { icon: '\u2705', text: '1 calligraphy-style name card' }
                 ]
             },
             ultimate: {
@@ -634,10 +643,10 @@ app.get('/api/pricing', (req, res) => {
                 label: 'Ultimate',
                 badge: 'Full Service',
                 features: [
-                    { icon: '鉁?, text: 'Unlimited name generations for your project' },
-                    { icon: '鉁?, text: 'In-depth cultural customization' },
-                    { icon: '鉁?, text: 'Lifetime name record storage' },
-                    { icon: '鉁?, text: 'Priority support for payment or generation issues' }
+                    { icon: '\u2705', text: 'Unlimited name generations for your project' },
+                    { icon: '\u2705', text: 'In-depth cultural customization' },
+                    { icon: '\u2705', text: 'Lifetime name record storage' },
+                    { icon: '\u2705', text: 'Priority support for payment or generation issues' }
                 ]
             }
         }
@@ -650,14 +659,14 @@ function renderAdminDashboard(req){
     const payments = readPaymentLog().slice(-80).reverse();
     const card = (label, value, sub = '') => `<div class="card"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${sub}</div></div>`;
     const eventLabel = {
-        page_view: '椤甸潰璁块棶',
-        generate_click: '鐐瑰嚮鐢熸垚',
-        generate_success: '鐢熸垚鎴愬姛',
-        generate_failed: '鐢熸垚澶辫触',
-        paywall_show: '浠樿垂寮圭獥',
-        buy_click: '璐拱鐐瑰嚮',
-        share_click: '鍒嗕韩鐐瑰嚮',
-        share_reward: '鍒嗕韩濂栧姳'
+        page_view: '\u9875\u9762\u8bbf\u95ee',
+        generate_click: '\u70b9\u51fb\u751f\u6210',
+        generate_success: '\u751f\u6210\u6210\u529f',
+        generate_failed: '\u751f\u6210\u5931\u8d25',
+        paywall_show: '\u4ed8\u8d39\u5f39\u7a97',
+        buy_click: '\u8d2d\u4e70\u70b9\u51fb',
+        share_click: '\u5206\u4eab\u70b9\u51fb',
+        share_reward: '\u5206\u4eab\u5956\u52b1'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
@@ -680,12 +689,12 @@ function renderAdminDashboard(req){
     </tr>`).join('');
     const paymentRows = payments.map(item => `<tr>
         <td>${htmlEscape(item._ts || '')}</td><td>${htmlEscape(item.txn || '')}</td><td>${htmlEscape(item.pkg || '')}</td>
-        <td>${htmlEscape(item.userId || '')}</td><td>${htmlEscape(item.status || '')}</td><td>${htmlEscape(item.err || (item.success ? '鎴愬姛' : ''))}</td>
+        <td>${htmlEscape(item.userId || '')}</td><td>${htmlEscape(item.status || '')}</td><td>${htmlEscape(item.err || (item.success ? '\u6210\u529f' : ''))}</td>
     </tr>`).join('');
 
     return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>杩愯惀鍚庡彴 | My Chinese Name</title>
+    <title>\u8fd0\u8425\u540e\u53f0 | My Chinese Name</title>
     <style>
     body{margin:0;background:#f7f2e9;color:#443322;font-family:Arial,"Noto Serif SC",serif}
     .wrap{max-width:1180px;margin:0 auto;padding:26px 18px 60px}
@@ -699,27 +708,27 @@ function renderAdminDashboard(req){
     .logout{color:#8c2318;text-decoration:none;border:1px solid #c9a96e;border-radius:6px;padding:7px 12px;background:#fffbf5}
     @media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
     </style></head><body><div class="wrap">
-    <div class="top"><div><h1>杩愯惀鍚庡彴</h1><div class="muted">My Chinese Name Analytics Dashboard 路 ${htmlEscape(new Date().toLocaleString())}</div></div><a class="logout" href="${ADMIN_PATH}?logout=1">閫€鍑?/a></div>
+    <div class="top"><div><h1>\u8fd0\u8425\u540e\u53f0</h1><div class="muted">My Chinese Name Analytics Dashboard \u00b7 ${htmlEscape(new Date().toLocaleString())}</div></div><a class="logout" href="${ADMIN_PATH}?logout=1">\u9000\u51fa</a></div>
     <div class="grid">
-      ${card('浠婃棩璁块棶', analytics.todayCounts.page_view || 0, 'page_view today')}
-      ${card('鎬昏闂?, analytics.counts.page_view || 0, 'page_view total')}
-      ${card('鐢熸垚鎴愬姛', analytics.counts.generate_success || 0, `浠婃棩 ${analytics.todayCounts.generate_success || 0}`)}
-      ${card('鐢熸垚澶辫触', analytics.counts.generate_failed || 0, `浠婃棩 ${analytics.todayCounts.generate_failed || 0}`)}
-      ${card('鐐瑰嚮鐢熸垚', analytics.counts.generate_click || 0, `浠婃棩 ${analytics.todayCounts.generate_click || 0}`)}
-      ${card('浠樿垂寮圭獥', analytics.counts.paywall_show || 0, `浠婃棩 ${analytics.todayCounts.paywall_show || 0}`)}
-      ${card('璐拱鐐瑰嚮', analytics.counts.buy_click || 0, `浠婃棩 ${analytics.todayCounts.buy_click || 0}`)}
-      ${card('鍒嗕韩鐐瑰嚮', analytics.counts.share_click || 0, `浠婃棩 ${analytics.todayCounts.share_click || 0}`)}
+      ${card('\u4eca\u65e5\u8bbf\u95ee', analytics.todayCounts.page_view || 0, 'page_view today')}
+      ${card('\u603b\u8bbf\u95ee', analytics.counts.page_view || 0, 'page_view total')}
+      ${card('\u751f\u6210\u6210\u529f', analytics.counts.generate_success || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_success || 0}`)}
+      ${card('\u751f\u6210\u5931\u8d25', analytics.counts.generate_failed || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_failed || 0}`)}
+      ${card('\u70b9\u51fb\u751f\u6210', analytics.counts.generate_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_click || 0}`)}
+      ${card('\u4ed8\u8d39\u5f39\u7a97', analytics.counts.paywall_show || 0, `\u4eca\u65e5 ${analytics.todayCounts.paywall_show || 0}`)}
+      ${card('\u8d2d\u4e70\u70b9\u51fb', analytics.counts.buy_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.buy_click || 0}`)}
+      ${card('\u5206\u4eab\u70b9\u51fb', analytics.counts.share_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.share_click || 0}`)}
     </div>
-    <section><h2>鏈€杩?7 澶╄秼鍔?/h2><table><thead><tr><th>鏃ユ湡</th><th>璁块棶</th><th>鐐瑰嚮鐢熸垚</th><th>鐢熸垚鎴愬姛</th><th>鐢熸垚澶辫触</th><th>浠樿垂寮圭獥</th><th>璐拱鐐瑰嚮</th><th>鍒嗕韩鐐瑰嚮</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
-    <section><h2>鏈€杩戜簨浠?/h2><table><thead><tr><th>鏃堕棿</th><th>浜嬩欢</th><th>鐢ㄦ埛</th><th>IP</th><th>淇℃伅</th></tr></thead><tbody>${recentRows || '<tr><td colspan="5">鏆傛棤鏁版嵁</td></tr>'}</tbody></table></section>
-    <section><h2>鐢ㄦ埛棰濆害</h2><table><thead><tr><th>鐢ㄦ埛ID/IP</th><th>濂楅</th><th>鍓╀綑棰濆害</th><th>浜旇绛夌骇</th><th>浜ゆ槗鍙?/th><th>鏀粯鏃堕棿</th></tr></thead><tbody>${userRows || '<tr><td colspan="6">鏆傛棤鏁版嵁</td></tr>'}</tbody></table></section>
-    <section><h2>鏀粯鏃ュ織</h2><table><thead><tr><th>鏃堕棿</th><th>浜ゆ槗鍙?/th><th>濂楅</th><th>鐢ㄦ埛</th><th>鐘舵€?/th><th>缁撴灉/閿欒</th></tr></thead><tbody>${paymentRows || '<tr><td colspan="6">鏆傛棤鏁版嵁</td></tr>'}</tbody></table></section>
+    <section><h2>\u6700\u8fd1 7 \u5929\u8d8b\u52bf</h2><table><thead><tr><th>\u65e5\u671f</th><th>\u8bbf\u95ee</th><th>\u70b9\u51fb\u751f\u6210</th><th>\u751f\u6210\u6210\u529f</th><th>\u751f\u6210\u5931\u8d25</th><th>\u4ed8\u8d39\u5f39\u7a97</th><th>\u8d2d\u4e70\u70b9\u51fb</th><th>\u5206\u4eab\u70b9\u51fb</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
+    <section><h2>\u6700\u8fd1\u4e8b\u4ef6</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4e8b\u4ef6</th><th>\u7528\u6237</th><th>IP</th><th>\u4fe1\u606f</th></tr></thead><tbody>${recentRows || '<tr><td colspan="5">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
+    <section><h2>\u7528\u6237\u989d\u5ea6</h2><table><thead><tr><th>\u7528\u6237ID/IP</th><th>\u5957\u9910</th><th>\u5269\u4f59\u989d\u5ea6</th><th>\u4e94\u884c\u7b49\u7ea7</th><th>\u4ea4\u6613\u53f7</th><th>\u652f\u4ed8\u65f6\u95f4</th></tr></thead><tbody>${userRows || '<tr><td colspan="6">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
+    <section><h2>\u652f\u4ed8\u65e5\u5fd7</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4ea4\u6613\u53f7</th><th>\u5957\u9910</th><th>\u7528\u6237</th><th>\u72b6\u6001</th><th>\u7ed3\u679c/\u9519\u8bef</th></tr></thead><tbody>${paymentRows || '<tr><td colspan="6">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
     </div></body></html>`;
 }
 
 function renderAdminLogin(error = ''){
     return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>鍚庡彴鐧诲綍</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f2e9;color:#443322;font-family:Arial,"Noto Serif SC",serif}.box{width:min(420px,92vw);background:#fffbf5;border:1px solid #e2d0b8;border-radius:10px;padding:26px;box-shadow:0 8px 28px rgba(139,90,43,.15)}h1{margin:0 0 18px;color:#8c2318;font-size:24px}input{width:100%;padding:12px;border:1px solid #d8c6b0;border-radius:6px;font-size:16px}button{width:100%;margin-top:14px;padding:12px;border:0;border-radius:6px;background:#8c2318;color:#fff;font-size:16px;cursor:pointer}.err{color:#b42a2a;margin:10px 0;font-size:13px}.hint{color:#997755;font-size:13px;line-height:1.6}</style></head><body><form class="box" method="post" action="${ADMIN_PATH}"><h1>杩愯惀鍚庡彴鐧诲綍</h1>${error ? `<div class="err">${htmlEscape(error)}</div>` : ''}<input type="password" name="password" placeholder="璇疯緭鍏ュ悗鍙板瘑鐮? autofocus><button type="submit">鐧诲綍</button><div class="hint">鐢ㄤ簬鏌ョ湅璁块棶鐢ㄩ噺銆佺敓鎴愭鏁般€佺敤鎴烽搴﹀拰鏀粯鏃ュ織銆?/div></form></body></html>`;
+    <title>\u540e\u53f0\u767b\u5f55</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f2e9;color:#443322;font-family:Arial,"Noto Serif SC",serif}.box{width:min(420px,92vw);background:#fffbf5;border:1px solid #e2d0b8;border-radius:10px;padding:26px;box-shadow:0 8px 28px rgba(139,90,43,.15)}h1{margin:0 0 18px;color:#8c2318;font-size:24px}input{width:100%;padding:12px;border:1px solid #d8c6b0;border-radius:6px;font-size:16px}button{width:100%;margin-top:14px;padding:12px;border:0;border-radius:6px;background:#8c2318;color:#fff;font-size:16px;cursor:pointer}.err{color:#b42a2a;margin:10px 0;font-size:13px}.hint{color:#997755;font-size:13px;line-height:1.6}</style></head><body><form class="box" method="post" action="${ADMIN_PATH}"><h1>\u8fd0\u8425\u540e\u53f0\u767b\u5f55</h1>${error ? `<div class="err">${htmlEscape(error)}</div>` : ''}<input type="password" name="password" placeholder="\u8bf7\u8f93\u5165\u540e\u53f0\u5bc6\u7801" autofocus><button type="submit">\u767b\u5f55</button><div class="hint">\u7528\u4e8e\u67e5\u770b\u8bbf\u95ee\u7528\u91cf\u3001\u751f\u6210\u6b21\u6570\u3001\u7528\u6237\u989d\u5ea6\u548c\u652f\u4ed8\u65e5\u5fd7\u3002</div></form></body></html>`;
 }
 
 app.get(ADMIN_PATH, (req, res) => {
@@ -735,7 +744,7 @@ app.get(ADMIN_PATH, (req, res) => {
 app.post(ADMIN_PATH, (req, res) => {
     if(!ADMIN_PASSWORD) return res.status(503).send(renderAdminLogin('ADMIN_PASSWORD is not configured on the server.'));
     if(String(req.body.password || '') !== ADMIN_PASSWORD) {
-        return res.status(401).send(renderAdminLogin('瀵嗙爜涓嶆纭?));
+        return res.status(401).send(renderAdminLogin('\u5bc6\u7801\u4e0d\u6b63\u786e'));
     }
     res.setHeader('Set-Cookie', `admin_auth=${encodeURIComponent(adminToken())}; HttpOnly; Path=/; Max-Age=${60 * 60 * 8}; SameSite=Lax`);
     res.redirect(ADMIN_PATH);
@@ -765,7 +774,7 @@ app.post('/api/share-reward', (req, res) => {
 });
 
 // --------------------------------------------------------
-// PayPal 鏀粯璇锋眰锛圧EST API 姝ｅ紡鐗堬級
+// PayPal \u652f\u4ed8\u8bf7\u6c42\uff08REST API \u6b63\u5f0f\u7248\uff09
 // --------------------------------------------------------
 app.post('/api/paypal-order', (req, res) => {
     const pkg = cleanStr(req.body.package) || cleanStr(req.body.pkg);
@@ -802,7 +811,8 @@ app.post('/api/paypal-order', (req, res) => {
 });
 
 // --------------------------------------------------------
-// PayPal IPN锛堝畼鏂瑰紓姝ラ€氱煡 + 涓夊眰瀹夊叏鏍￠獙锛?// --------------------------------------------------------
+// PayPal IPN\uff08\u5b98\u65b9\u5f02\u6b65\u901a\u77e5 + \u4e09\u5c42\u5b89\u5168\u6821\u9a8c\uff09
+// --------------------------------------------------------
 app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
     const ipn = req.body;
     log('[app] request processed');
@@ -817,33 +827,35 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
         return res.send('ok');
     }
 
-    // 瑙ｆ瀽濂楅锛圧EST API 閫氳繃 custom 瀛楁浼犻€掞級
+    // \u89e3\u6790\u5957\u9910\uff08REST API \u901a\u8fc7 custom \u5b57\u6bb5\u4f20\u9012\uff09
     const pkg = ipn.custom || 'basic';
     const userId = ipn.custom || getUserId(req);
 
-    // === 涓夊眰瀹夊叏鏍￠獙锛圛PN 寮傛閫氱煡鏍￠獙锛宔mail 浠?.env 璇诲彇锛?==
+    // === \u4e09\u5c42\u5b89\u5168\u6821\u9a8c\uff08IPN \u5f02\u6b65\u901a\u77e5\u6821\u9a8c\uff0cemail \u4ece .env \u8bfb\u53d6\uff09===
     const paypalEmail = process.env.PAYPAL_EMAIL || '';
     if(paypalEmail && ipn.receiver_email && ipn.receiver_email.toLowerCase() !== paypalEmail.toLowerCase()) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790` });
         logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
-    // 鈶?甯佺鏍￠獙锛堜粎鏀寔USD锛?    if(ipn.mc_currency !== 'USD') {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
+    // \u2461 \u5e01\u79cd\u6821\u9a8c\uff08\u4ec5\u652f\u6301USD\uff09
+    if(ipn.mc_currency !== 'USD') {
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790` });
         logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
-    // 鈶?閲戦鏍￠獙
+    // \u2462 \u91d1\u989d\u6821\u9a8c
     const expected = { basic:'9.90', premium:'19.90', ultimate:'29.90' };
     if(ipn.mc_gross !== expected[pkg]) {
-        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` });
+        appendPaymentLog({ txn: ipn.txn_id, userId, pkg, err: `\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790` });
         logError('[rate-limit] request blocked');
         return res.send('ok');
     }
 
-    // 閫氳繃鍏ㄩ儴鏍￠獙锛岃В閿佸椁?    try {
+    // \u901a\u8fc7\u5168\u90e8\u6821\u9a8c\uff0c\u89e3\u9501\u5957\u9910
+    try {
         unlockPackage(userId, pkg, ipn.txn_id);
         appendPaymentLog({ status: ipn.payment_status, txn: ipn.txn_id, userId, pkg, success: true });
         log('[app] request processed');
@@ -856,7 +868,7 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
 });
 
 // --------------------------------------------------------
-// PayPal 鍚屾鍥炶皟
+// PayPal \u540c\u6b65\u56de\u8c03
 // --------------------------------------------------------
 app.post('/api/paypal-checkout', (req, res) => {
     const transactionId = cleanStr(req.body.transactionId);
@@ -876,28 +888,29 @@ app.post('/api/paypal-checkout', (req, res) => {
 });
 
 // --------------------------------------------------------
-// 寮傚父璁㈠崟鏃ュ織鏌ヨ
+// \u5f02\u5e38\u8ba2\u5355\u65e5\u5fd7\u67e5\u8be2
 // --------------------------------------------------------
 app.get('/admin-payment-log', (req, res) => {
     fs.readFile(PAYMENT_LOG_FILE, 'utf8', (err, data) => {
-        if(err) return res.send('鏆傛棤鏀粯鏃ュ織');
+        if(err) return res.send('\u6682\u65e0\u652f\u4ed8\u65e5\u5fd7');
         const logs = JSON.parse(data);
-        const html = `浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽` + logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
-        <td>${l._ts||''}</td><td>${l.txn||''}</td><td>${l.pkg||''}</td><td>${l.userId||''}</td><td>${l.status||''}</td><td>${l.err||(l.success?'鉁呮垚鍔?:'鉂屽け璐?)}</td>
+        const html = `\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790` + logs.map(l => `<tr style="background:${l.success?'#f0fff0':'#fff0f0'}">
+        <td>${l._ts||''}</td><td>${l.txn||''}</td><td>${l.pkg||''}</td><td>${l.userId||''}</td><td>${l.status||''}</td><td>${l.err||(l.success?'\u2705\u6210\u529f':'\u274c\u5931\u8d25')}</td>
         </tr>`).join('');
         res.send(html);
     });
 });
 
 // ============================================================
-// 璧峰悕API锛圖eepSeek 鍞竴鎺ュ彛锛?// 鍙?rateLimitMiddleware 淇濇姢
+// \u8d77\u540dAPI\uff08DeepSeek \u552f\u4e00\u63a5\u53e3\uff09
+// \u53d7 rateLimitMiddleware \u4fdd\u62a4
 // ============================================================
 app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const { englishName, englishSurname, gender, birthYear, birthMonth, birthDay, birthTime, style, meaning } = req.body;
-    // 鍏煎鍓嶇鏃у瓧娈靛悕 givenName鈫抏nglishName, surname鈫抏nglishSurname
+    // \u517c\u5bb9\u524d\u7aef\u65e7\u5b57\u6bb5\u540d givenName\u2192englishName, surname\u2192englishSurname
     const givenName = cleanStr(req.body.givenName) || cleanStr(englishName);
     const surname = cleanStr(req.body.surname) || cleanStr(englishSurname);
-    // 鍏煎 birthDate 鎷嗚В涓?birthYear/Month/Day
+    // \u517c\u5bb9 birthDate \u62c6\u89e3\u4e3a birthYear/Month/Day
     const bd = cleanStr(req.body.birthDate) || '';
     const by = cleanStr(req.body.birthYear) || (bd.match(/^(\d{4})/)?.[1]) || cleanStr(birthYear) || '';
     const bm = cleanStr(req.body.birthMonth) || (bd.match(/[-/](\d{1,2})/)?.[1]) || cleanStr(birthMonth) || '';
@@ -905,27 +918,29 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const finalEnglishName = givenName;
     const finalEnglishSurname = surname;
     const finalGender = cleanStr(gender);
-    // 鎬у埆鎻愬彇锛氬師濮嬪€间笉璧癱leanStr锛岀洿鎺ヨ瘑鍒嫳鏂嘙ale/Female/涓€?    const rawGender = gender || '';
+    // \u6027\u522b\u63d0\u53d6\uff1a\u539f\u59cb\u503c\u4e0d\u8d70cleanStr\uff0c\u76f4\u63a5\u8bc6\u522b\u82f1\u6587Male/Female/\u4e2d\u6027
+    const rawGender = gender || '';
     const genderDisplay = rawGender.toLowerCase().includes('female') ? 'Female' :
-                        rawGender.toLowerCase().includes('male') ? 'Male' : '涓€?;
+                        rawGender.toLowerCase().includes('male') ? 'Male' : '\u4e2d\u6027';
     const finalStyle = cleanStr(style);
     const finalMeaning = cleanStr(meaning);
 
-    // 鍩虹杈撳叆鏍￠獙锛坋nglishName/surname 蹇呭～锛宮eaning/style/gender 鍙┖锛?    if (!finalEnglishName || !finalEnglishSurname) {
+    // \u57fa\u7840\u8f93\u5165\u6821\u9a8c\uff08englishName/surname \u5fc5\u586b\uff0cmeaning/style/gender \u53ef\u7a7a\uff09
+    if (!finalEnglishName || !finalEnglishSurname) {
         return res.status(400).json({ error: 'englishName and englishSurname are required' });
     }
     if (typeof finalEnglishName !== 'string' || typeof finalEnglishSurname !== 'string' ||
         finalEnglishName.length > 50 || finalEnglishSurname.length > 50) {
         return res.status(400).json({ error: 'Invalid name length' });
     }
-    // gender 鍙┖锛涜瘑鍒嫳鏂?Male/Female锛屽叾浣欎负涓€?Neutral
+    // gender \u53ef\u7a7a\uff1b\u8bc6\u522b\u82f1\u6587 Male/Female\uff0c\u5176\u4f59\u4e3a\u4e2d\u6027 Neutral
     if (rawGender.trim().length > 0) {
         const g = rawGender.toLowerCase();
         if (!g.includes('male') && !g.includes('female')) {
             return res.status(400).json({ error: 'gender must be Male/Female' });
         }
     }
-    // meaning/style 鍧囧彲閫夛紝绌哄€间笉鎷︽埅
+    // meaning/style \u5747\u53ef\u9009\uff0c\u7a7a\u503c\u4e0d\u62e6\u622a
 
     const userId = getUserId(req);
     const status = getUserStatus(userId);
@@ -933,7 +948,8 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
 
     const shouldUseFreeQuota = !devTest && (status.package === 'free' || !status.package);
 
-    // 鍏嶈垂鐢ㄦ埛鍏堟牎楠岄厤棰濓紝鐢熸垚鎴愬姛鍚庡啀鎵ｅ噺锛岄伩鍏岮I澶辫触涔熸秷鑰楁鏁般€?    if(shouldUseFreeQuota) {
+    // \u514d\u8d39\u7528\u6237\u5148\u6821\u9a8c\u914d\u989d\uff0c\u751f\u6210\u6210\u529f\u540e\u518d\u6263\u51cf\uff0c\u907f\u514dAI\u5931\u8d25\u4e5f\u6d88\u8017\u6b21\u6570\u3002
+    if(shouldUseFreeQuota) {
         if((status.quota || 0) <= 0) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
@@ -958,15 +974,15 @@ Meaning preference: ${finalMeaning || 'grace, wisdom, harmony'}
 
 Return only valid JSON with this exact shape:
 {
-  "chineseName": "涓枃濮撳悕",
+  "chineseName": "\u4e2d\u6587\u59d3\u540d",
   "pinyin": "Pinyin with tone-friendly spacing",
   "pronunciation": "Simple English pronunciation guide",
   "meaning": "One-sentence English summary",
   "sections": [
-    {"titleCn":"濮撴皬瑙ｉ噴","titleEn":"Surname Explanation","cn":"涓枃璇存槑","en":"English explanation"},
-    {"titleCn":"鍚嶅瓧瑙ｉ噴","titleEn":"Given Name Explanation","cn":"涓枃璇存槑","en":"English explanation"},
-    {"titleCn":"鍙ょ睄鍑哄","titleEn":"Classical Source","cn":"涓枃璇存槑","en":"English explanation"},
-    {"titleCn":"鏁翠綋瀵撴剰","titleEn":"Overall Meaning","cn":"涓枃璇存槑","en":"English explanation"}
+    {"titleCn":"\u59d3\u6c0f\u89e3\u91ca","titleEn":"Surname Explanation","cn":"\u4e2d\u6587\u8bf4\u660e","en":"English explanation"},
+    {"titleCn":"\u540d\u5b57\u89e3\u91ca","titleEn":"Given Name Explanation","cn":"\u4e2d\u6587\u8bf4\u660e","en":"English explanation"},
+    {"titleCn":"\u53e4\u7c4d\u51fa\u5904","titleEn":"Classical Source","cn":"\u4e2d\u6587\u8bf4\u660e","en":"English explanation"},
+    {"titleCn":"\u6574\u4f53\u5bd3\u610f","titleEn":"Overall Meaning","cn":"\u4e2d\u6587\u8bf4\u660e","en":"English explanation"}
   ]
 }`;
 
@@ -1055,7 +1071,8 @@ Return only valid JSON with this exact shape:
 });
 
 // ============================================================
-// 鐣欒█鏉?// ============================================================
+// \u7559\u8a00\u677f
+// ============================================================
 app.post('/api/submit-message', (req, res) => {
     const name = cleanStr(req.body.name) || 'anonymous';
     const email = cleanStr(req.body.email) || '';
@@ -1063,19 +1080,19 @@ app.post('/api/submit-message', (req, res) => {
     const time = new Date().toLocaleString();
     const content = `[${time}] ${name}(${email}): ${message}\n`;
     fs.appendFile('messages.txt', content, err => {
-        res.send(err ? "鐣欒█鎻愪氦澶辫触" : "鐣欒█鎻愪氦鎴愬姛锛屾劅璋㈠弽棣堬紒");
+        res.send(err ? "\u7559\u8a00\u63d0\u4ea4\u5931\u8d25" : "\u7559\u8a00\u63d0\u4ea4\u6210\u529f\uff0c\u611f\u8c22\u53cd\u9988\uff01");
     });
 });
 
 app.get('/admin-messages', (req, res) => {
     fs.readFile('messages.txt', 'utf8', (err, data) => {
-        if(err) res.send("鏆傛棤鐣欒█");
-        else res.send(`浣犳槸闈㈠悜娴峰鐢ㄦ埛鐨勪腑鏂囪捣鍚嶅笀,鏍规嵁鎬у埆,椋庢牸鐢熸垚鍚嶅瓧,杈撳嚭鏍煎紡:涓枃鍚?鎷奸煶+鑻辨枃閲婁箟+瀵撴剰瑙ｆ瀽`);
+        if(err) res.send("\u6682\u65e0\u7559\u8a00");
+        else res.send(`\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790`);
     });
 });
 
 // ============================================================
-// 椤甸潰璺敱
+// \u9875\u9762\u8def\u7531
 // ============================================================
 app.get('/brand-intro',      (req, res) => res.sendFile(path.join(__dirname, 'brand-intro.html')));
 app.get('/contact-us',        (req, res) => res.sendFile(path.join(__dirname, 'contact-us.html')));
@@ -1085,10 +1102,10 @@ app.get('/faq',               (req, res) => res.sendFile(path.join(__dirname, 'f
 app.get('/payment-guide',     (req, res) => res.sendFile(path.join(__dirname, 'payment-guide.html')));
 
 // ============================================================
-// 涔︽硶澶村儚锛堝悗绔覆鏌撳厹搴曪級
+// \u4e66\u6cd5\u5934\u50cf\uff08\u540e\u7aef\u6e32\u67d3\u515c\u5e95\uff09
 // ============================================================
 app.get('/api/avatar-svg', (req, res) => {
-    const name = (req.query.name || '鏉庢槑').replace(/[^涓€-榫/g, '').substring(0, 6);
+    const name = (req.query.name || '\u674e\u660e').replace(/[^\u4e00-\u9fa5]/g, '').substring(0, 6);
     const fonts = [
         "Ma Shan Zheng, STXingkai, FZShuTi, STFangsong, KaiTi, cursive",
         "STXingkai, Ma Shan Zheng, FZShuTi, KaiTi, cursive",
@@ -1142,18 +1159,18 @@ app.get('/api/avatar-svg', (req, res) => {
   <text x="200" y="318" font-size="12" text-anchor="middle" fill="#8c2318" font-family="Georgia, 'Times New Roman', serif" letter-spacing="1.2">mychinesename.co</text>
   <g transform="translate(310 292)">
     <rect width="48" height="48" fill="#9d2419" opacity="0.92" rx="3"/>
-    <text x="24" y="19" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">闆?/text>
-    <text x="24" y="35" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">鍚?/text>
+    <text x="24" y="19" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">\u96c5</text>
+    <text x="24" y="35" font-size="12" text-anchor="middle" fill="#f8ead2" font-family="STXingkai, KaiTi, serif">\u540d</text>
   </g>
 </svg>`;
     res.type('image/svg+xml').send(svg);
 });
 
 // ============================================================
-// 閿欒澶勭悊涓棿浠讹紙姝ｅ紡鐜灞忚斀鎶ラ敊鏍堬級
+// \u9519\u8bef\u5904\u7406\u4e2d\u95f4\u4ef6\uff08\u6b63\u5f0f\u73af\u5883\u5c4f\u853d\u62a5\u9519\u6808\uff09
 // ============================================================
 app.use((err, req, res, next) => {
-    // 鎹曡幏 JSON 瑙ｆ瀽閿欒
+    // \u6355\u83b7 JSON \u89e3\u6790\u9519\u8bef
     if (err && (err.type === 'entity.parse.failed' || err instanceof SyntaxError)) {
         return res.status(400).json({ error: 'Invalid JSON payload' });
     }
@@ -1164,19 +1181,19 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 闈欐€佹枃浠舵湇鍔★紙favicon.ico 绛夛級
+// \u9759\u6001\u6587\u4ef6\u670d\u52a1\uff08favicon.ico \u7b49\uff09
 // ============================================================
 app.use(express.static(path.join(__dirname, "./")));
 
 // ============================================================
-// 404 鍏ㄥ眬澶勭悊锛堥潤鎬佹枃浠朵箣鍚庯級
+// 404 \u5168\u5c40\u5904\u7406\uff08\u9759\u6001\u6587\u4ef6\u4e4b\u540e\uff09
 // ============================================================
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
 });
 
 // ============================================================
-// 鍚姩
+// \u542f\u52a8
 // ============================================================
 app.listen(port, () => {
     console.log('[app] request processed');
