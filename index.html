@@ -147,7 +147,10 @@ input:focus,select:focus{
 .share-buttons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}
 .share-btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;color:#fff;font-size:13px;font-family:inherit;transition:opacity 0.2s}
 .share-btn:hover{opacity:0.85}
-.fb{background:#1877f2}.ig{background:#e4405f}.x{background:#000}.wa{background:#25d366}.li{background:#0077b5}
+.share-link-tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.share-tool-btn{padding:7px 12px;border:1px solid var(--c-primary);border-radius:6px;background:#fffaf2;color:var(--c-primary);cursor:pointer;font-family:inherit;font-size:13px}
+.share-tool-btn:hover{background:#f6ead8}
+.fb{background:#1877f2}.ig{background:#e4405f}.x{background:#000}.wa,.wx{background:#25d366}.li{background:#0077b5}
 .download-btn{
     padding:10px 22px;
     background:#d4af37;
@@ -605,6 +608,22 @@ const API_BASE = window.API_BASE || (
         ? ''
         : 'https://mychinesename-api.onrender.com'
 );
+const USER_ID_KEY = 'MY_CHINESE_NAME_USER_ID';
+function getBrowserUserId(){
+    let id = localStorage.getItem(USER_ID_KEY);
+    if(!id){
+        const rand = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2);
+        id = 'u_' + rand.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 48);
+        localStorage.setItem(USER_ID_KEY, id);
+    }
+    return id;
+}
+const BROWSER_USER_ID = getBrowserUserId();
+function apiHeaders(extra){
+    const headers = Object.assign({}, extra || {});
+    if(window.location.protocol !== 'file:') headers['x-user-id'] = BROWSER_USER_ID;
+    return headers;
+}
 const DEV_TEST_HOST = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const DEV_TEST_QUERY = new URLSearchParams(window.location.search).get('devtest') === '1';
 if(DEV_TEST_HOST && DEV_TEST_QUERY) {
@@ -672,6 +691,9 @@ if(window.speechSynthesis) {
 }
 const OFFICIAL_SHARE_URL = 'https://mychinesename.co';
 const shareTextEN = "I received a meaningful Chinese name inspired by the I Ching and Book of Songs. Create yours: https://mychinesename.co";
+let currentSharePageUrl = '';
+let currentShareImageUrl = '';
+let currentSharePublishPromise = null;
 
 // \u52a8\u6001\u5206\u4eab\u7d20\u6750\u5e93
 const SHARE_TITLES = [
@@ -694,23 +716,225 @@ function getShareUrl(){
     return encodeURIComponent(OFFICIAL_SHARE_URL);
 }
 
+function getPlainShareText(){
+    const url = currentSharePageUrl || OFFICIAL_SHARE_URL;
+    return rand(SHARE_TITLES) + '\n\n' + rand(SHARE_DESCS) + '\n\n' + url;
+}
+
+function getPlatformShareUrl(platform, text){
+    const title = encodeURIComponent(rand(SHARE_TITLES));
+    const desc = encodeURIComponent(text || shareTextEN);
+    const shareUrl = encodeURIComponent(currentSharePageUrl || OFFICIAL_SHARE_URL);
+    const urls = {
+        wx: 'https://api.whatsapp.com/send?text=' + desc + '%20' + shareUrl,
+        fb: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&quote=' + desc,
+        x: 'https://twitter.com/intent/tweet?text=' + desc + '&url=' + shareUrl,
+        li: 'https://www.linkedin.com/shareArticle?mini=true&url=' + shareUrl + '&title=' + title + '&summary=' + desc
+    };
+    return urls[platform] || OFFICIAL_SHARE_URL;
+}
+
+function getCurrentAvatarSvgText(){
+    const svg = document.querySelector('#avatarSvgWrap svg');
+    return svg ? svg.outerHTML : '';
+}
+
+function svgTextToPngFile(svgText, fileName){
+    return new Promise((resolve, reject) => {
+        const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || 1080;
+                canvas.height = img.naturalHeight || 1080;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                canvas.toBlob(pngBlob => {
+                    if(!pngBlob) {
+                        reject(new Error('png_failed'));
+                        return;
+                    }
+                    resolve(new File([pngBlob], fileName, { type: 'image/png' }));
+                }, 'image/png');
+            } catch(e) {
+                URL.revokeObjectURL(url);
+                reject(e);
+            }
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('image_load_failed'));
+        };
+        img.src = url;
+    });
+}
+
+function svgTextToPngDataUrl(svgText){
+    return new Promise((resolve) => {
+        const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || 1080;
+                canvas.height = img.naturalHeight || 1080;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                resolve(canvas.toDataURL('image/png'));
+            } catch(e) {
+                URL.revokeObjectURL(url);
+                resolve('');
+            }
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve('');
+        };
+        img.src = url;
+    });
+}
+
+async function copyShareText(text){
+    try {
+        if(navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+    } catch(e) {}
+    return false;
+}
+
+function buildShareSummary(result){
+    const parts = [];
+    if(result?.pinyin) parts.push('Pinyin: ' + result.pinyin);
+    if(Array.isArray(result?.sections)) {
+        result.sections.forEach(section => {
+            if(section.en) parts.push(section.en);
+        });
+    }
+    if(result?.meaning) parts.push(result.meaning);
+    const summary = parts.join(' ').replace(/\s+/g, ' ').trim();
+    return summary.slice(0, 260) || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
+}
+
+function publishShareCard(name, svgText, result){
+    currentSharePageUrl = '';
+    currentShareImageUrl = '';
+    currentSharePublishPromise = svgTextToPngDataUrl(svgText).then(pngData => fetch(apiUrl('/api/share-card'), {
+        method: 'POST',
+        headers: apiHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+            name,
+            pinyin: result?.pinyin || '',
+            summary: buildShareSummary(result),
+            svg: svgText,
+            pngData
+        })
+    })).then(res => res.ok ? res.json() : null)
+      .then(data => {
+          if(data?.success && data.url) {
+              currentSharePageUrl = data.url;
+              currentShareImageUrl = data.imageUrl || '';
+              const linkEl = document.getElementById('sharePageLink');
+              if(linkEl) {
+                  linkEl.href = currentSharePageUrl;
+                  linkEl.textContent = currentSharePageUrl;
+              }
+          }
+          return data;
+      }).catch(() => null);
+    return currentSharePublishPromise;
+}
+
+async function ensureSharePageReady(){
+    if(currentSharePublishPromise && !currentSharePageUrl) {
+        await currentSharePublishPromise;
+    }
+    return currentSharePageUrl || OFFICIAL_SHARE_URL;
+}
+
+function downloadCurrentAvatarCopy(name){
+    const svgText = getCurrentAvatarSvgText();
+    if(!svgText) return false;
+    const blob = new Blob([svgText], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (name || 'chinese_name') + '_name_card.svg';
+    a.click();
+    URL.revokeObjectURL(url);
+    return true;
+}
+
+async function downloadCurrentAvatarPng(name){
+    const svgText = getCurrentAvatarSvgText();
+    if(!svgText) return false;
+    try {
+        const file = await svgTextToPngFile(svgText, (name || 'chinese_name') + '_name_card.png');
+        const url = URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(url);
+        return true;
+    } catch(e) {
+        return downloadCurrentAvatarCopy(name);
+    }
+}
+
+async function copyCurrentShareLink(){
+    await ensureSharePageReady();
+    const url = currentSharePageUrl || OFFICIAL_SHARE_URL;
+    const ok = await copyShareText(url);
+    alert(ok ? 'Share link copied.' : 'Share link: ' + url);
+}
+
+async function shareCurrentNameCard(platform, name){
+    await ensureSharePageReady();
+    const text = getPlainShareText();
+    const svgText = getCurrentAvatarSvgText();
+
+    if(svgText && navigator.share) {
+        try {
+            const file = await svgTextToPngFile(svgText, (name || 'chinese_name') + '_name_card.png');
+            if(!navigator.canShare || navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'My Chinese Name',
+                    text,
+                    url: currentSharePageUrl || OFFICIAL_SHARE_URL,
+                    files: [file]
+                });
+                rewardShare(platform);
+                return;
+            }
+        } catch(e) {
+            if(e && e.name === 'AbortError') return;
+        }
+    }
+
+    if(svgText) {
+        downloadCurrentAvatarCopy(name);
+        await copyShareText(text);
+        alert('Your name card has been saved. The share text has been copied when supported. Please upload the saved card in the social app.');
+    }
+    window.open(getPlatformShareUrl(platform, text), '_blank');
+    rewardShare(platform);
+}
+
 // \u5206\u4eab\u51fd\u6570
 function doShare(platform){
-    const title = encodeURIComponent(rand(SHARE_TITLES));
-    const desc = getShareText();
-    const shareUrl = encodeURIComponent(OFFICIAL_SHARE_URL);
-    const urls={
-        wx:'https://api.whatsapp.com/send?text='+title+'%20'+desc+'%20'+shareUrl,
-        fb:'https://www.facebook.com/sharer/sharer.php?u='+shareUrl+'&quote='+desc,
-        x:'https://twitter.com/intent/tweet?text='+title+' '+desc+'&url='+shareUrl,
-        li:'https://www.linkedin.com/shareArticle?mini=true&url='+shareUrl+'&title='+title+'&summary='+desc
-    };
-    if(platform==='wx'){
-        window.open(urls[platform],'_blank');
-        rewardShare(platform);
+    const svgText = getCurrentAvatarSvgText();
+    if(svgText) {
+        shareCurrentNameCard(platform, 'chinese_name');
         return;
     }
-    window.open(urls[platform],'_blank');
+    window.open(getPlatformShareUrl(platform, getPlainShareText()),'_blank');
     rewardShare(platform);
 }
 
@@ -733,7 +957,7 @@ function trackEvent(event, meta){
     try {
         fetch(apiUrl('/api/track'), {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: apiHeaders({'Content-Type':'application/json'}),
             body: JSON.stringify({ event, meta: meta || {} }),
             keepalive: true
         }).catch(() => {});
@@ -745,7 +969,7 @@ async function rewardShare(platform){
     try {
         const res = await fetch(apiUrl('/api/share-reward'), {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: apiHeaders({'Content-Type':'application/json'}),
             body: JSON.stringify({ platform })
         });
         const data = await res.json();
@@ -809,7 +1033,7 @@ async function buyPackage(pkg){
 
         const orderRes = await fetch(apiUrl('/api/paypal-order'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: apiHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ package: pkg })
         });
         const orderData = await orderRes.json();
@@ -862,7 +1086,7 @@ async function syncQuota(){
         return;
     }
     try {
-        const res = await fetch(apiUrl('/api/quota'));
+        const res = await fetch(apiUrl('/api/quota'), { headers: apiHeaders() });
         const data = await res.json();
         currentQuota = data.quota || 0;
     } catch {
@@ -1004,7 +1228,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const res = await fetch(apiUrl('/api/generate-name'), {
             method: 'POST',
             headers: {
-                'Content-Type':'application/json',
+                ...apiHeaders({'Content-Type':'application/json'}),
                 ...(DEV_TEST_MODE ? {'x-dev-test':'true'} : {})
             },
             body: JSON.stringify({
@@ -1049,8 +1273,9 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
         loading.style.display = 'none';
 
+        const safeFullName = escapeHtml(fullName);
         let html = `<div class="result-name-block">
-    <div class="result-name">${escapeHtml(fullName)} <button class="speaker-btn" onclick="readChinese('${escapeHtml(fullName)}')" type="button">Play</button></div>
+    <div class="result-name">${safeFullName} <button class="speaker-btn" onclick="readChinese('${safeFullName}')" type="button" aria-label="Play Chinese pronunciation" title="Play Chinese pronunciation">&#128266;</button></div>
     <div class="result-subtitle">A cultural gift: your Chinese name with sound, meaning, and classical source.</div>
 </div>`;
         html += `<div class="bilingual-block">`;
@@ -1079,8 +1304,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     <div class="avatar-subtitle">Brush-calligraphy style, designed as a beautiful cultural keepsake for social sharing<br>\u6bdb\u7b14\u4e66\u6cd5\u540d\u5361\uff0c\u9002\u5408\u4fdd\u5b58\u5206\u4eab</div>
     <div class="avatar-svg-wrap" id="avatarSvgWrap">${avatarSvg}</div>
     <div class="avatar-actions">
-        <button class="avatar-btn" onclick="regenerateAvatar('${escapeHtml(fullName)}')">New Style</button>
-        <button class="avatar-btn" onclick="downloadAvatarImg('${escapeHtml(fullName)}')">Save Card</button>
+        <button class="avatar-btn" onclick="regenerateAvatar('${safeFullName}')">New Style</button>
+        <button class="avatar-btn" onclick="downloadAvatarImg('${safeFullName}')">Save Card</button>
     </div>
 </div>`;
 
@@ -1088,13 +1313,19 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     <h4>Share Your Cultural Name Gift</h4>
     <p>Save or share your Chinese name card. Sharing also unlocks one extra regeneration credit.</p>
     <div class="share-buttons">
-        <button class="share-btn wx" onclick="window.open('https://api.whatsapp.com/send?text=${encodeURIComponent(shareTextEN)}')">WhatsApp</button>
-        <button class="share-btn fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(OFFICIAL_SHARE_URL)+'&quote=${encodeURIComponent(shareTextEN)}')">Facebook</button>
-        <button class="share-btn x" onclick="window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextEN)}&url='+encodeURIComponent(OFFICIAL_SHARE_URL))">X</button>
-        <button class="share-btn li" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent(OFFICIAL_SHARE_URL)+'&title=${encodeURIComponent(shareTextEN)}')">LinkedIn</button>
+        <button class="share-btn wx" onclick="shareCurrentNameCard('wx','${safeFullName}')">WhatsApp</button>
+        <button class="share-btn fb" onclick="shareCurrentNameCard('fb','${safeFullName}')">Facebook</button>
+        <button class="share-btn x" onclick="shareCurrentNameCard('x','${safeFullName}')">X</button>
+        <button class="share-btn li" onclick="shareCurrentNameCard('li','${safeFullName}')">LinkedIn</button>
     </div>
+    <div class="share-link-tools">
+        <button class="share-tool-btn" onclick="copyCurrentShareLink()">Copy Share Link</button>
+        <button class="share-tool-btn" onclick="downloadCurrentAvatarPng('${safeFullName}')">Save PNG Card</button>
+    </div>
+    <a id="sharePageLink" href="${OFFICIAL_SHARE_URL}" target="_blank" rel="noopener" style="display:block;margin-top:10px;font-size:12px;color:#886655;word-break:break-all">${OFFICIAL_SHARE_URL}</a>
 </div>`;
         document.getElementById('result').innerHTML = html;
+        publishShareCard(fullName, avatarSvg, result);
     }catch(err){
         loading.style.display = 'none';
         trackEvent('generate_failed', { reason: 'frontend_exception' });
