@@ -48,6 +48,7 @@ function apiHeaders(extra){ return Object.assign({ 'x-user-id': getBrowserUserId
     const params = new URLSearchParams(window.location.search);
     const pkg = params.get('package') || '';
     const tx = params.get('paymentId') || params.get('tx') || params.get('token') || '';
+    const payerId = params.get('PayerID') || params.get('payerId') || '';
     const status = document.getElementById('unlock-status');
 
     if(pkg) {
@@ -62,7 +63,7 @@ function apiHeaders(extra){ return Object.assign({ 'x-user-id': getBrowserUserId
         const res = await fetch(apiUrl('/api/paypal-checkout'), {
             method: 'POST',
             headers: apiHeaders({'Content-Type':'application/json'}),
-            body: JSON.stringify({ package: pkg, transactionId: tx || 'paypal-live' })
+            body: JSON.stringify({ package: pkg, transactionId: tx, payerId })
         });
         status.textContent = res.ok
             ? 'Access unlocked. You can return to the homepage now.'
