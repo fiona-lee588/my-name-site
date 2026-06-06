@@ -21,6 +21,7 @@ const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 const OFFICIAL_DOMAIN = (process.env.PUBLIC_SITE_URL || process.env.DOMAIN || 'https://mychinesename.co').replace(/\/+$/, '');
+const SHARE_DOMAIN = (process.env.SHARE_DOMAIN || process.env.API_PUBLIC_URL || (IS_PROD ? 'https://mychinesename-api.onrender.com' : OFFICIAL_DOMAIN)).replace(/\/+$/, '');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const ADMIN_PATH = '/admin-dashboard-2026';
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PASSWORD || 'local-admin-session';
@@ -368,8 +369,8 @@ function createShareId(){
 }
 
 function renderSharePage(id, card){
-    const canonical = `${OFFICIAL_DOMAIN}/share/${id}`;
-    const imageUrl = card.png ? `${OFFICIAL_DOMAIN}/share-card/${id}.png` : `${OFFICIAL_DOMAIN}/share-card/${id}.svg`;
+    const canonical = `${SHARE_DOMAIN}/share/${id}`;
+    const imageUrl = card.png ? `${SHARE_DOMAIN}/share-card/${id}.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`;
     const name = card.name || 'My Chinese Name';
     const title = `${name} - Meaningful Chinese Name Card`;
     const desc = card.summary || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
@@ -704,8 +705,8 @@ app.post('/api/share-card', (req, res) => {
     res.json({
         success: true,
         id,
-        url: `${OFFICIAL_DOMAIN}/share/${id}`,
-        imageUrl: `${OFFICIAL_DOMAIN}/share-card/${id}${png ? '.png' : '.svg'}`
+        url: `${SHARE_DOMAIN}/share/${id}`,
+        imageUrl: `${SHARE_DOMAIN}/share-card/${id}${png ? '.png' : '.svg'}`
     });
 });
 
