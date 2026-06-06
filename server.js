@@ -220,6 +220,7 @@ const USER_STATE_FILE = path.join(__dirname, 'user-state.json');
 const PAYMENT_LOG_FILE = path.join(__dirname, 'payment-log.json');
 const ANALYTICS_LOG_FILE = path.join(__dirname, 'analytics-log.json');
 const SHARE_CARD_FILE = path.join(__dirname, 'share-cards.json');
+const PAYPAL_ORDER_FILE = path.join(__dirname, 'paypal-orders.json');
 
 // ============================================================
 // \u72b6\u6001\u8bfb\u5199
@@ -249,6 +250,36 @@ function readPaymentLog(){
     } catch { return []; }
 }
 function writePaymentLog(logs){ fs.writeFileSync(PAYMENT_LOG_FILE, JSON.stringify(logs, null, 2)); }
+
+function readPayPalOrders(){
+    try {
+        if(!fs.existsSync(PAYPAL_ORDER_FILE)) return {};
+        return JSON.parse(fs.readFileSync(PAYPAL_ORDER_FILE, 'utf8'));
+    } catch { return {}; }
+}
+
+function writePayPalOrders(orders){
+    fs.writeFileSync(PAYPAL_ORDER_FILE, JSON.stringify(orders, null, 2));
+}
+
+function savePayPalOrder(paymentId, order){
+    if(!paymentId) return;
+    const orders = readPayPalOrders();
+    orders[paymentId] = { ...order, createdAt: new Date().toISOString() };
+    writePayPalOrders(orders);
+}
+
+function parsePayPalCustom(custom){
+    const value = cleanStr(custom || '');
+    if(!value) return {};
+    try {
+        const parsed = JSON.parse(value);
+        return { pkg: cleanStr(parsed.pkg), userId: cleanStr(parsed.userId) };
+    } catch {}
+    const parts = value.split('|');
+    if(parts.length >= 2) return { pkg: cleanStr(parts[0]), userId: cleanStr(parts.slice(1).join('|')) };
+    return { pkg: value };
+}
 function appendPaymentLog(entry){
     const logs = readPaymentLog();
     logs.push({ ...entry, _ts: new Date().toISOString() });
@@ -913,6 +944,8 @@ app.post('/api/paypal-order', (req, res) => {
     const pkgNames = { basic:'Basic Plan', premium:'Premium Plan', ultimate:'Ultimate VIP' };
     const amount = amounts[pkg];
     const domain = process.env.DOMAIN || 'http://localhost:3000';
+    const userId = getUserId(req);
+    const custom = `${pkg}|${userId}`;
 
     const payment = {
         intent: 'sale',
@@ -924,7 +957,7 @@ app.post('/api/paypal-order', (req, res) => {
         transactions: [{
             amount: { total: amount, currency: 'USD' },
             description: `MyChineseName - ${pkgNames[pkg]} ($ ${amount})`,
-            custom: pkg
+            custom
         }]
     };
 
@@ -935,7 +968,9 @@ app.post('/api/paypal-order', (req, res) => {
         }
         const approvalUrl = result.links.find(l => l.rel === 'approval_url');
         if(!approvalUrl) return res.status(500).json({ error: 'No approval URL' });
-        res.json({ paypalUrl: approvalUrl.href });
+        savePayPalOrder(result.id, { pkg, userId, amount, currency: 'USD', status: 'created' });
+        appendPaymentLog({ status: 'created', txn: result.id, userId, pkg });
+        res.json({ paypalUrl: approvalUrl.href, paymentId: result.id });
     });
 });
 
@@ -956,9 +991,12 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
         return res.send('ok');
     }
 
-    // \u89e3\u6790\u5957\u9910\uff08REST API \u901a\u8fc7 custom \u5b57\u6bb5\u4f20\u9012\uff09
-    const pkg = ipn.custom || 'basic';
-    const userId = ipn.custom || getUserId(req);
+    // \u89e3\u6790\u5957\u9910\u548c\u7528\u6237ID\uff08REST API \u901a\u8fc7 custom \u5b57\u6bb5\u4f20\u9012\uff09
+    const custom = parsePayPalCustom(ipn.custom);
+    const orders = readPayPalOrders();
+    const pendingOrder = orders[ipn.parent_txn_id] || orders[ipn.txn_id] || {};
+    const pkg = custom.pkg || pendingOrder.pkg || 'basic';
+    const userId = custom.userId || pendingOrder.userId || getUserId(req);
 
     // === \u4e09\u5c42\u5b89\u5168\u6821\u9a8c\uff08IPN \u5f02\u6b65\u901a\u77e5\u6821\u9a8c\uff0cemail \u4ece .env \u8bfb\u53d6\uff09===
     const paypalEmail = process.env.PAYPAL_EMAIL || '';
@@ -1001,19 +1039,59 @@ app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req,
 // --------------------------------------------------------
 app.post('/api/paypal-checkout', (req, res) => {
     const transactionId = cleanStr(req.body.transactionId);
+    const payerId = cleanStr(req.body.payerId || req.body.PayerID);
     const pkg = cleanStr(req.body.package) || cleanStr(req.body.pkg);
     const reqUserId = cleanStr(req.body.userId);
     if(!transactionId) return res.status(400).json({ success: false });
-    const userId = reqUserId || getUserId(req);
-    const state = readUserState();
-    const user = state[userId] || { quota: 2, package: 'free' };
-    user.package = pkg || user.package;
-    user.transactionId = transactionId;
-    user.quota = PACKAGE_ENTITLEMENTS[pkg]?.quota || 9999;
-    state[userId] = user;
-    writeUserState(state);
-    log('[app] request processed');
-    res.json({ success: true });
+    const orders = readPayPalOrders();
+    const pendingOrder = orders[transactionId] || {};
+    const finalPkg = pkg || pendingOrder.pkg;
+    const userId = reqUserId || pendingOrder.userId || getUserId(req);
+    if(!finalPkg || !PACKAGE_ENTITLEMENTS[finalPkg]) {
+        appendPaymentLog({ txn: transactionId, userId, pkg: finalPkg || '', err: 'Unknown package on checkout' });
+        return res.status(400).json({ success: false, error: 'Unknown package' });
+    }
+
+    const finishUnlock = (verifiedTransactionId, source) => {
+        unlockPackage(userId, finalPkg, verifiedTransactionId || transactionId);
+        orders[transactionId] = {
+            ...pendingOrder,
+            pkg: finalPkg,
+            userId,
+            status: 'completed',
+            source,
+            completedAt: new Date().toISOString()
+        };
+        writePayPalOrders(orders);
+        appendPaymentLog({ status: 'completed', txn: verifiedTransactionId || transactionId, userId, pkg: finalPkg, source, success: true });
+        log('[app] request processed');
+        res.json({ success: true });
+    };
+
+    if(!payerId) {
+        appendPaymentLog({ txn: transactionId, userId, pkg: finalPkg, err: 'Missing PayerID on checkout return' });
+        return res.status(400).json({ success: false, error: 'Missing PayerID' });
+    }
+
+    paypal.payment.execute(transactionId, { payer_id: payerId }, (error, payment) => {
+        if(error) {
+            const message = error.response?.message || error.message || 'PayPal execute failed';
+            appendPaymentLog({ txn: transactionId, userId, pkg: finalPkg, err: message });
+            return res.status(400).json({ success: false, error: message });
+        }
+        const txn = payment.transactions?.[0] || {};
+        const sale = txn.related_resources?.[0]?.sale || {};
+        const paypalCustom = parsePayPalCustom(txn.custom);
+        const verifiedPkg = paypalCustom.pkg || finalPkg;
+        const amount = String(txn.amount?.total || '');
+        const currency = String(txn.amount?.currency || '');
+        const expected = { basic:'9.90', premium:'19.90', ultimate:'29.90' };
+        if(verifiedPkg !== finalPkg || currency !== 'USD' || Number(amount).toFixed(2) !== expected[finalPkg]) {
+            appendPaymentLog({ txn: transactionId, userId, pkg: finalPkg, err: 'PayPal amount/package verification failed' });
+            return res.status(400).json({ success: false, error: 'Payment verification failed' });
+        }
+        finishUnlock(sale.id || payment.id || transactionId, 'paypal_execute');
+    });
 });
 
 // --------------------------------------------------------
