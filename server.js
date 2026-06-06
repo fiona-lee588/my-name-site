@@ -103,7 +103,7 @@ log("Site domain:", DOMAIN);
 app.use(cors({
     origin: CORS_ORIGIN,
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'x-user-id', 'x-dev-test'],
     credentials: true
 }));
 app.use((req, res, next) => {
@@ -112,7 +112,7 @@ app.use((req, res, next) => {
 });
 // helmet() \u5df2\u79fb\u9664 CSP
 // app.use(helmet());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '768kb' }));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // ============================================================
@@ -218,6 +218,7 @@ const PACKAGE_ENTITLEMENTS = {
 const USER_STATE_FILE = path.join(__dirname, 'user-state.json');
 const PAYMENT_LOG_FILE = path.join(__dirname, 'payment-log.json');
 const ANALYTICS_LOG_FILE = path.join(__dirname, 'analytics-log.json');
+const SHARE_CARD_FILE = path.join(__dirname, 'share-cards.json');
 
 // ============================================================
 // \u72b6\u6001\u8bfb\u5199
@@ -269,7 +270,7 @@ function writeAnalyticsLog(logs){
 function appendAnalyticsEvent(req, event, meta = {}){
     const allowed = new Set([
         'page_view', 'generate_click', 'generate_success', 'generate_failed',
-        'paywall_show', 'buy_click', 'share_click', 'share_reward'
+        'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created'
     ]);
     if(!allowed.has(event)) return { ok: false };
     const logs = readAnalyticsLog();
@@ -336,6 +337,79 @@ function htmlEscape(value){
         .replace(/"/g, '&quot;');
 }
 
+function readShareCards(){
+    try {
+        if(!fs.existsSync(SHARE_CARD_FILE)) return {};
+        return JSON.parse(fs.readFileSync(SHARE_CARD_FILE, 'utf8'));
+    } catch { return {}; }
+}
+
+function writeShareCards(cards){
+    fs.writeFileSync(SHARE_CARD_FILE, JSON.stringify(cards, null, 2));
+}
+
+function cleanShareSvg(svg){
+    const text = String(svg || '').trim();
+    if(!text || text.length > 160000) return '';
+    if(!/^<svg[\s>]/i.test(text) || !/<\/svg>$/i.test(text)) return '';
+    if(/<script|onload=|onerror=|javascript:/i.test(text)) return '';
+    return text;
+}
+
+function cleanPngDataUrl(value){
+    const text = String(value || '').trim();
+    const match = text.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/);
+    if(!match || match[1].length > 650000) return '';
+    return match[1];
+}
+
+function createShareId(){
+    return crypto.randomBytes(8).toString('hex');
+}
+
+function renderSharePage(id, card){
+    const canonical = `${OFFICIAL_DOMAIN}/share/${id}`;
+    const imageUrl = card.png ? `${OFFICIAL_DOMAIN}/share-card/${id}.png` : `${OFFICIAL_DOMAIN}/share-card/${id}.svg`;
+    const name = card.name || 'My Chinese Name';
+    const title = `${name} - Meaningful Chinese Name Card`;
+    const desc = card.summary || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
+    return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${htmlEscape(title)}</title>
+<meta name="description" content="${htmlEscape(desc)}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${htmlEscape(title)}">
+<meta property="og:description" content="${htmlEscape(desc)}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="${imageUrl}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${htmlEscape(title)}">
+<meta name="twitter:description" content="${htmlEscape(desc)}">
+<meta name="twitter:image" content="${imageUrl}">
+<style>
+body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Roman",serif;line-height:1.65}
+.wrap{max-width:900px;margin:0 auto;padding:36px 18px;text-align:center}
+.card{max-width:min(560px,92vw);margin:0 auto 22px}
+.card svg{width:100%;height:auto;display:block}
+h1{margin:10px 0;color:#8c2318;font-size:clamp(32px,6vw,56px)}
+.pinyin{color:#775533;font-size:18px}
+.summary{max-width:680px;margin:18px auto;font-size:18px}
+.cta{display:inline-block;margin-top:12px;padding:12px 18px;border-radius:6px;background:#8c2318;color:#fff;text-decoration:none}
+</style>
+</head>
+<body><main class="wrap">
+<div class="card">${card.svg}</div>
+<h1>${htmlEscape(name)}</h1>
+${card.pinyin ? `<div class="pinyin">${htmlEscape(card.pinyin)}</div>` : ''}
+<p class="summary">${htmlEscape(desc)}</p>
+<a class="cta" href="${OFFICIAL_DOMAIN}/">Create Your Chinese Name</a>
+</main></body></html>`;
+}
+
 function adminToken(){
     return crypto
         .createHash('sha256')
@@ -361,8 +435,9 @@ function isAdminAuthed(req){
 // \u7528\u6237ID + \u89e3\u9501
 // ============================================================
 function getUserId(req){
-    return req.headers['x-user-id']
-        || (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
+    const headerUserId = cleanStr(req.headers['x-user-id'] || '');
+    if(/^[A-Za-z0-9_-]{12,80}$/.test(headerUserId)) return headerUserId;
+    return (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
 }
 
 function unlockPackage(userId, pkg, transactionId){
@@ -605,6 +680,58 @@ Object.entries(SEO_LANDING_PAGES).forEach(([pathname, page]) => {
     app.get(pathname, (req, res) => res.send(renderSeoLandingPage(pathname, page)));
 });
 
+app.post('/api/share-card', (req, res) => {
+    const svg = cleanShareSvg(req.body?.svg);
+    const png = cleanPngDataUrl(req.body?.pngData);
+    const name = cleanStr(req.body?.name || '').slice(0, 24);
+    const pinyin = cleanStr(req.body?.pinyin || '').slice(0, 80);
+    const summary = cleanStr(req.body?.summary || '').slice(0, 280);
+    if(!svg || !name) return res.status(400).json({ success: false, error: 'Invalid share card' });
+
+    const cards = readShareCards();
+    const id = createShareId();
+    cards[id] = {
+        name,
+        pinyin,
+        summary,
+        svg,
+        png,
+        createdAt: new Date().toISOString(),
+        userId: getUserId(req)
+    };
+    writeShareCards(cards);
+    appendAnalyticsEvent(req, 'share_card_created', { id });
+    res.json({
+        success: true,
+        id,
+        url: `${OFFICIAL_DOMAIN}/share/${id}`,
+        imageUrl: `${OFFICIAL_DOMAIN}/share-card/${id}${png ? '.png' : '.svg'}`
+    });
+});
+
+app.get('/share-card/:id.svg', (req, res) => {
+    const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
+    const card = readShareCards()[id];
+    if(!card) return res.status(404).send('Not found');
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.type('image/svg+xml').send(card.svg);
+});
+
+app.get('/share-card/:id.png', (req, res) => {
+    const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
+    const card = readShareCards()[id];
+    if(!card || !card.png) return res.status(404).send('Not found');
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.type('image/png').send(Buffer.from(card.png, 'base64'));
+});
+
+app.get('/share/:id', (req, res) => {
+    const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
+    const card = readShareCards()[id];
+    if(!card) return res.redirect('/');
+    res.send(renderSharePage(id, card));
+});
+
 app.get('/api/quota', (req, res) => {
     res.json(getUserStatus(getUserId(req)));
 });
@@ -666,7 +793,8 @@ function renderAdminDashboard(req){
         paywall_show: '\u4ed8\u8d39\u5f39\u7a97',
         buy_click: '\u8d2d\u4e70\u70b9\u51fb',
         share_click: '\u5206\u4eab\u70b9\u51fb',
-        share_reward: '\u5206\u4eab\u5956\u52b1'
+        share_reward: '\u5206\u4eab\u5956\u52b1',
+        share_card_created: '\u5206\u4eab\u9875\u751f\u6210'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
