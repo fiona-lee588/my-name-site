@@ -492,7 +492,12 @@ function unlockPackage(userId, pkg, transactionId){
 function getUserStatus(userId){
     const state = readUserState();
     const user = state[userId] || { quota: 2, package: 'free' };
-    return { quota: user.quota ?? 2, package: user.package || 'free', wuxingLevel: user.wuxingLevel || 'basic' };
+    return {
+        quota: user.quota ?? 2,
+        package: user.package || 'free',
+        wuxingLevel: user.wuxingLevel || 'basic',
+        shareRewardClaimed: !!user.shareRewardClaimed
+    };
 }
 
 function useQuota(userId){
@@ -507,11 +512,22 @@ function useQuota(userId){
 
 function addShareReward(userId){
     const state = readUserState();
-    const user = state[userId] || { quota: 2 };
-    user.quota = (user.quota || 0) + 1;
+    const user = state[userId] || { quota: 2, package: 'free' };
+    if(user.shareRewardClaimed) {
+        return { success: true, alreadyClaimed: true, quota: user.quota ?? 2, package: user.package || 'free' };
+    }
+    if((user.package || 'free') !== 'free') {
+        user.shareRewardClaimed = true;
+        state[userId] = user;
+        writeUserState(state);
+        return { success: true, alreadyClaimed: true, quota: user.quota ?? 0, package: user.package || 'free' };
+    }
+    user.quota = Math.min((user.quota ?? 2) + 1, 3);
+    user.package = 'free';
+    user.shareRewardClaimed = true;
     state[userId] = user;
     writeUserState(state);
-    return { success: true, quota: user.quota };
+    return { success: true, rewardAdded: true, quota: user.quota, package: user.package };
 }
 
 function isLocalDevTest(req){
@@ -928,8 +944,11 @@ app.post('/api/track', (req, res) => {
 });
 
 app.post('/api/share-reward', (req, res) => {
+    if(req.body?.hasCard !== true) {
+        return res.status(400).json({ success: false, error: 'Share reward requires a generated name card' });
+    }
     const result = addShareReward(getUserId(req));
-    appendAnalyticsEvent(req, 'share_reward', { quota: result.quota });
+    appendAnalyticsEvent(req, 'share_reward', { quota: result.quota, alreadyClaimed: !!result.alreadyClaimed, rewardAdded: !!result.rewardAdded });
     res.json(result);
 });
 
