@@ -150,6 +150,8 @@ input:focus,select:focus{
 .share-link-tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .share-tool-btn{padding:7px 12px;border:1px solid var(--c-primary);border-radius:6px;background:#fffaf2;color:var(--c-primary);cursor:pointer;font-family:inherit;font-size:13px}
 .share-tool-btn:hover{background:#f6ead8}
+.share-note{font-size:12px;color:#886655;margin-top:8px;line-height:1.55}
+.share-status{font-size:12px;color:#2f7d4f;margin-top:8px;min-height:18px}
 .fb{background:#1877f2}.ig{background:#e4405f}.x{background:#000}.wa,.wx{background:#25d366}.li{background:#0077b5}
 .download-btn{
     padding:10px 22px;
@@ -694,6 +696,8 @@ const shareTextEN = "I received a meaningful Chinese name inspired by the I Chin
 let currentSharePageUrl = '';
 let currentShareImageUrl = '';
 let currentSharePublishPromise = null;
+let currentPackage = 'free';
+let shareRewardClaimed = false;
 
 // \u52a8\u6001\u5206\u4eab\u7d20\u6750\u5e93
 const SHARE_TITLES = [
@@ -895,7 +899,43 @@ async function copyCurrentShareLink(){
     alert(ok ? 'Share link copied.' : 'Share link: ' + url);
 }
 
-async function shareCurrentNameCard(platform, name){
+async function claimShareReward(platform){
+    if(shareRewardClaimed) {
+        const status = document.getElementById('shareRewardStatus');
+        if(status) status.textContent = 'Share reward already claimed.';
+        return;
+    }
+    const hasCard = !!getCurrentAvatarSvgText() && !!currentSharePageUrl;
+    if(!hasCard) return;
+    trackEvent('share_click', { platform });
+    try {
+        const res = await fetch(apiUrl('/api/share-reward'), {
+            method: 'POST',
+            headers: apiHeaders({'Content-Type':'application/json'}),
+            body: JSON.stringify({ platform, hasCard: true })
+        });
+        const data = await res.json();
+        if(data?.quota !== undefined) {
+            currentQuota = data.quota;
+            currentPackage = data.package || currentPackage || 'free';
+            shareRewardClaimed = !!data.alreadyClaimed || !!data.rewardAdded || shareRewardClaimed;
+            updateQuotaUI();
+        }
+        const status = document.getElementById('shareRewardStatus');
+        if(status) status.textContent = data?.rewardAdded ? 'Bonus unlocked: +1 generation credit.' : 'Share reward already claimed.';
+    } catch(e) {
+        console.error('share reward failed:', e);
+    }
+}
+
+async function openPlatformShare(platform, name){
+    await ensureSharePageReady();
+    const text = getPlainShareText();
+    window.open(getPlatformShareUrl(platform, text), '_blank');
+    claimShareReward(platform);
+}
+
+async function shareImageWithSystem(platform, name){
     await ensureSharePageReady();
     const text = getPlainShareText();
     const svgText = getCurrentAvatarSvgText();
@@ -910,7 +950,7 @@ async function shareCurrentNameCard(platform, name){
                     url: currentSharePageUrl || OFFICIAL_SHARE_URL,
                     files: [file]
                 });
-                rewardShare(platform);
+                claimShareReward(platform);
                 return;
             }
         } catch(e) {
@@ -919,23 +959,16 @@ async function shareCurrentNameCard(platform, name){
     }
 
     if(svgText) {
-        downloadCurrentAvatarCopy(name);
+        await downloadCurrentAvatarPng(name);
         await copyShareText(text);
-        alert('Your name card has been saved. The share text has been copied when supported. Please upload the saved card in the social app.');
+        alert('Your PNG name card has been saved. The share text has been copied when supported. Please upload the saved image in the social app.');
     }
-    window.open(getPlatformShareUrl(platform, text), '_blank');
-    rewardShare(platform);
+    claimShareReward(platform);
 }
 
 // \u5206\u4eab\u51fd\u6570
 function doShare(platform){
-    const svgText = getCurrentAvatarSvgText();
-    if(svgText) {
-        shareCurrentNameCard(platform, 'chinese_name');
-        return;
-    }
     window.open(getPlatformShareUrl(platform, getPlainShareText()),'_blank');
-    rewardShare(platform);
 }
 
 // \u4ed8\u8d39\u5f39\u7a97
@@ -962,24 +995,6 @@ function trackEvent(event, meta){
             keepalive: true
         }).catch(() => {});
     } catch(e) {}
-}
-
-async function rewardShare(platform){
-    trackEvent('share_click', { platform });
-    try {
-        const res = await fetch(apiUrl('/api/share-reward'), {
-            method: 'POST',
-            headers: apiHeaders({'Content-Type':'application/json'}),
-            body: JSON.stringify({ platform })
-        });
-        const data = await res.json();
-        if(data?.quota !== undefined) {
-            currentQuota = data.quota;
-            updateQuotaUI();
-        }
-    } catch(e) {
-        console.error('share reward failed:', e);
-    }
 }
 
 function renderPackageFeatures(features){
@@ -1089,8 +1104,11 @@ async function syncQuota(){
         const res = await fetch(apiUrl('/api/quota'), { headers: apiHeaders() });
         const data = await res.json();
         currentQuota = data.quota || 0;
+        currentPackage = data.package || 'free';
+        shareRewardClaimed = !!data.shareRewardClaimed;
     } catch {
         currentQuota = 0;
+        currentPackage = 'free';
     }
     updateQuotaUI();
 }
@@ -1100,7 +1118,13 @@ function updateQuotaUI(){
         hint.innerHTML = '\u5f00\u53d1\u8005\u81ea\u6d4b\u6a21\u5f0f\uff1a\u4e0d\u6263\u514d\u8d39\u6b21\u6570 | Developer test mode: free attempts are not used';
         return;
     }
-    if(currentQuota <= 0){
+    const pkg = currentPackage || 'free';
+    if(pkg === 'ultimate'){
+        hint.innerHTML = 'Ultimate access active';
+    } else if(pkg !== 'free'){
+        const label = pkg.charAt(0).toUpperCase() + pkg.slice(1);
+        hint.innerHTML = `${label} credits remaining: <span id="quotaCount">${currentQuota}</span>`;
+    } else if(currentQuota <= 0){
         hint.innerHTML = '\u274c \u514d\u8d39\u6b21\u6570\u5df2\u7528\u5b8c | No free attempts left \u2014 <a href="javascript:void(0)" onclick="showPaywall()">\u5347\u7ea7\u4ed8\u8d39\u5957\u9910</a>';
     } else {
         hint.innerHTML = `Free attempts remaining: <span id="quotaCount">${currentQuota}</span>`;
@@ -1305,26 +1329,30 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     <div class="avatar-svg-wrap" id="avatarSvgWrap">${avatarSvg}</div>
     <div class="avatar-actions">
         <button class="avatar-btn" onclick="regenerateAvatar('${safeFullName}')">New Style</button>
-        <button class="avatar-btn" onclick="downloadAvatarImg('${safeFullName}')">Save Card</button>
+        <button class="avatar-btn" onclick="downloadCurrentAvatarPng('${safeFullName}')">Save Image</button>
+        <button class="avatar-btn" onclick="shareImageWithSystem('system','${safeFullName}')">Share Image</button>
     </div>
 </div>`;
 
         html += `<div class="share-box">
     <h4>Share Your Cultural Name Gift</h4>
-    <p>Save or share your Chinese name card. Sharing also unlocks one extra regeneration credit.</p>
+    <p>Share your public name-card link. The first successful share unlocks one extra generation credit.</p>
     <div class="share-buttons">
-        <button class="share-btn wx" onclick="shareCurrentNameCard('wx','${safeFullName}')">WhatsApp</button>
-        <button class="share-btn fb" onclick="shareCurrentNameCard('fb','${safeFullName}')">Facebook</button>
-        <button class="share-btn x" onclick="shareCurrentNameCard('x','${safeFullName}')">X</button>
-        <button class="share-btn li" onclick="shareCurrentNameCard('li','${safeFullName}')">LinkedIn</button>
+        <button class="share-btn wx" onclick="openPlatformShare('wx','${safeFullName}')">WhatsApp</button>
+        <button class="share-btn fb" onclick="openPlatformShare('fb','${safeFullName}')">Facebook</button>
+        <button class="share-btn x" onclick="openPlatformShare('x','${safeFullName}')">X</button>
+        <button class="share-btn li" onclick="openPlatformShare('li','${safeFullName}')">LinkedIn</button>
     </div>
     <div class="share-link-tools">
         <button class="share-tool-btn" onclick="copyCurrentShareLink()">Copy Share Link</button>
-        <button class="share-tool-btn" onclick="downloadCurrentAvatarPng('${safeFullName}')">Save PNG Card</button>
+        <button class="share-tool-btn" onclick="downloadCurrentAvatarPng('${safeFullName}')">Save PNG</button>
     </div>
+    <div class="share-note">For image posting, use Save Image or Share Image above.</div>
+    <div class="share-status" id="shareRewardStatus"></div>
     <a id="sharePageLink" href="${OFFICIAL_SHARE_URL}" target="_blank" rel="noopener" style="display:block;margin-top:10px;font-size:12px;color:#886655;word-break:break-all">${OFFICIAL_SHARE_URL}</a>
 </div>`;
         document.getElementById('result').innerHTML = html;
+        document.getElementById('generateBtn').textContent = 'Generate Another Name';
         publishShareCard(fullName, avatarSvg, result);
     }catch(err){
         loading.style.display = 'none';
