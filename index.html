@@ -695,6 +695,7 @@ const OFFICIAL_SHARE_URL = 'https://mychinesename.co';
 const shareTextEN = "I received a meaningful Chinese name inspired by the I Ching and Book of Songs. Create yours: https://mychinesename.co";
 let currentSharePageUrl = '';
 let currentShareImageUrl = '';
+let currentShareSquareImageUrl = '';
 let currentSharePublishPromise = null;
 let currentPackage = 'free';
 let shareRewardClaimed = false;
@@ -747,7 +748,120 @@ function getCurrentAvatarSvgText(){
     return svg ? svg.outerHTML : '';
 }
 
-function svgTextToPngFile(svgText, fileName){
+function drawImageContain(ctx, img, x, y, width, height){
+    const iw = img.naturalWidth || img.width || width;
+    const ih = img.naturalHeight || img.height || height;
+    const scale = Math.min(width / iw, height / ih);
+    const drawW = iw * scale;
+    const drawH = ih * scale;
+    ctx.drawImage(img, x + (width - drawW) / 2, y + (height - drawH) / 2, drawW, drawH);
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+    const words = String(text || '').split(/\s+/).filter(Boolean);
+    let line = '';
+    let lines = 0;
+    for(const word of words) {
+        const test = line ? line + ' ' + word : word;
+        if(ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, y);
+            y += lineHeight;
+            lines++;
+            line = word;
+            if(lines >= maxLines) return y;
+        } else {
+            line = test;
+        }
+    }
+    if(line && lines < maxLines) {
+        ctx.fillText(line, x, y);
+        y += lineHeight;
+    }
+    return y;
+}
+
+function svgTextToImage(svgText){
+    return new Promise((resolve, reject) => {
+        const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('image_load_failed'));
+        };
+        img.src = url;
+    });
+}
+
+async function svgTextToSquarePngDataUrl(svgText){
+    const img = await svgTextToImage(svgText);
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#f7f2e9';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawImageContain(ctx, img, 36, 36, 1008, 1008);
+    return canvas.toDataURL('image/png');
+}
+
+async function svgTextToPreviewPngDataUrl(svgText, name, result){
+    const img = await svgTextToImage(svgText);
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 1200, 630);
+    grad.addColorStop(0, '#fffaf0');
+    grad.addColorStop(1, '#efe0c3');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1200, 630);
+    ctx.fillStyle = 'rgba(140,35,24,0.08)';
+    ctx.beginPath();
+    ctx.ellipse(360, 310, 250, 170, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff7e8';
+    ctx.strokeStyle = '#d8c6b0';
+    ctx.lineWidth = 2;
+    if(ctx.roundRect) ctx.roundRect(60, 64, 510, 510, 24);
+    else ctx.rect(60, 64, 510, 510);
+    ctx.fill();
+    ctx.stroke();
+    drawImageContain(ctx, img, 86, 90, 458, 458);
+
+    const pinyin = result?.pinyin || '';
+    const summary = buildShareSummary(result);
+    ctx.fillStyle = '#8c2318';
+    ctx.font = '34px Georgia, "Times New Roman", serif';
+    ctx.fillText('My Chinese Name', 640, 116);
+    ctx.fillStyle = '#17130f';
+    ctx.font = 'bold 54px "Microsoft YaHei", Arial, sans-serif';
+    wrapCanvasText(ctx, `${name} - Meaningful Chinese Name Card`, 640, 196, 480, 62, 2);
+    ctx.fillStyle = '#735d45';
+    ctx.font = '28px Georgia, "Times New Roman", serif';
+    if(pinyin) ctx.fillText('Pinyin: ' + pinyin, 640, 332);
+    ctx.fillStyle = '#4d5c66';
+    ctx.font = '25px Georgia, "Times New Roman", serif';
+    wrapCanvasText(ctx, summary, 640, 386, 470, 34, 3);
+    ctx.fillStyle = '#8c2318';
+    ctx.font = '23px Georgia, "Times New Roman", serif';
+    ctx.fillText('mychinesename.co', 640, 556);
+    return canvas.toDataURL('image/png');
+}
+
+async function svgTextToPngFile(svgText, fileName){
+    const dataUrl = await svgTextToSquarePngDataUrl(svgText);
+    const bytes = atob(dataUrl.split(',')[1] || '');
+    const arr = new Uint8Array(bytes.length);
+    for(let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new File([arr], fileName, { type: 'image/png' });
+}
+
+function legacySvgTextToPngFile(svgText, fileName){
     return new Promise((resolve, reject) => {
         const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
@@ -833,7 +947,13 @@ function buildShareSummary(result){
 function publishShareCard(name, svgText, result){
     currentSharePageUrl = '';
     currentShareImageUrl = '';
-    currentSharePublishPromise = svgTextToPngDataUrl(svgText).then(pngData => fetch(apiUrl('/api/share-card'), {
+    currentShareSquareImageUrl = '';
+    const status = document.getElementById('shareRewardStatus');
+    if(status) status.textContent = 'Preparing share images...';
+    currentSharePublishPromise = Promise.all([
+        svgTextToPreviewPngDataUrl(svgText, name, result),
+        svgTextToSquarePngDataUrl(svgText)
+    ]).then(([previewPng, squarePng]) => fetch(apiUrl('/api/share-card'), {
         method: 'POST',
         headers: apiHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
@@ -841,21 +961,32 @@ function publishShareCard(name, svgText, result){
             pinyin: result?.pinyin || '',
             summary: buildShareSummary(result),
             svg: svgText,
-            pngData
+            previewPng,
+            squarePng
         })
     })).then(res => res.ok ? res.json() : null)
       .then(data => {
           if(data?.success && data.url) {
               currentSharePageUrl = data.url;
               currentShareImageUrl = data.imageUrl || '';
+              currentShareSquareImageUrl = data.squareImageUrl || '';
               const linkEl = document.getElementById('sharePageLink');
               if(linkEl) {
                   linkEl.href = currentSharePageUrl;
                   linkEl.textContent = currentSharePageUrl;
               }
+              const status = document.getElementById('shareRewardStatus');
+              if(status) status.textContent = 'Share card is ready.';
+          } else {
+              const status = document.getElementById('shareRewardStatus');
+              if(status) status.textContent = 'Share images could not be prepared. Please try New Style or Save Image.';
           }
           return data;
-      }).catch(() => null);
+      }).catch(() => {
+          const status = document.getElementById('shareRewardStatus');
+          if(status) status.textContent = 'Share images could not be prepared. Please try New Style or Save Image.';
+          return null;
+      });
     return currentSharePublishPromise;
 }
 
@@ -863,7 +994,7 @@ async function ensureSharePageReady(){
     if(currentSharePublishPromise && !currentSharePageUrl) {
         await currentSharePublishPromise;
     }
-    return currentSharePageUrl || OFFICIAL_SHARE_URL;
+    return currentSharePageUrl || '';
 }
 
 function downloadCurrentAvatarCopy(name){
@@ -898,7 +1029,11 @@ async function downloadCurrentAvatarPng(name){
 
 async function copyCurrentShareLink(){
     await ensureSharePageReady();
-    const url = currentSharePageUrl || OFFICIAL_SHARE_URL;
+    const url = currentSharePageUrl;
+    if(!url) {
+        alert('Share card is still preparing. Please try again in a moment.');
+        return;
+    }
     const ok = await copyShareText(url);
     alert(ok ? 'Share link copied.' : 'Share link: ' + url);
 }
@@ -933,14 +1068,22 @@ async function claimShareReward(platform){
 }
 
 async function openPlatformShare(platform, name){
-    await ensureSharePageReady();
+    const readyUrl = await ensureSharePageReady();
+    if(!readyUrl) {
+        alert('Share card is still preparing. Please try again in a moment.');
+        return;
+    }
     const text = platform === 'x' ? getShareCaption() : getPlainShareText();
     window.open(getPlatformShareUrl(platform, text), '_blank');
     claimShareReward(platform);
 }
 
 async function shareImageWithSystem(platform, name){
-    await ensureSharePageReady();
+    const readyUrl = await ensureSharePageReady();
+    if(!readyUrl) {
+        alert('Share card is still preparing. Please try again in a moment.');
+        return;
+    }
     const text = getPlainShareText();
     const svgText = getCurrentAvatarSvgText();
 
@@ -971,9 +1114,15 @@ async function shareImageWithSystem(platform, name){
 }
 
 // \u5206\u4eab\u51fd\u6570
-function doShare(platform){
+async function doShare(platform){
+    const readyUrl = await ensureSharePageReady();
+    if(!readyUrl) {
+        alert('Generate a name card first, then share it.');
+        return;
+    }
     const text = platform === 'x' ? getShareCaption() : getPlainShareText();
     window.open(getPlatformShareUrl(platform, text),'_blank');
+    claimShareReward(platform);
 }
 
 // \u4ed8\u8d39\u5f39\u7a97

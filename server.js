@@ -322,7 +322,7 @@ function appendContactMessage(entry){
 function appendAnalyticsEvent(req, event, meta = {}){
     const allowed = new Set([
         'page_view', 'generate_click', 'generate_success', 'generate_failed',
-        'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created'
+        'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created', 'share_card_failed'
     ]);
     if(!allowed.has(event)) return { ok: false };
     const logs = readAnalyticsLog();
@@ -408,10 +408,10 @@ function cleanShareSvg(svg){
     return text;
 }
 
-function cleanPngDataUrl(value){
+function cleanPngDataUrl(value, maxLength = 2600000){
     const text = String(value || '').trim();
     const match = text.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/);
-    if(!match || match[1].length > 650000) return '';
+    if(!match || match[1].length > maxLength) return '';
     return match[1];
 }
 
@@ -421,7 +421,8 @@ function createShareId(){
 
 function renderSharePage(id, card){
     const canonical = `${SHARE_DOMAIN}/share/${id}`;
-    const imageUrl = card.png ? `${SHARE_DOMAIN}/share-card/${id}.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`;
+    const hasPng = !!(card.previewPng || card.png);
+    const imageUrl = hasPng ? `${SHARE_DOMAIN}/share-card/${id}.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`;
     const name = card.name || 'My Chinese Name';
     const title = `${name} - Meaningful Chinese Name Card`;
     const desc = card.summary || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
@@ -438,10 +439,15 @@ function renderSharePage(id, card){
 <meta property="og:description" content="${htmlEscape(desc)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${imageUrl}">
+<meta property="og:image:secure_url" content="${imageUrl}">
+<meta property="og:image:type" content="${hasPng ? 'image/png' : 'image/svg+xml'}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${htmlEscape(title)}">
 <meta name="twitter:description" content="${htmlEscape(desc)}">
 <meta name="twitter:image" content="${imageUrl}">
+<meta name="twitter:image:alt" content="${htmlEscape(name)} calligraphy name card">
 <style>
 body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Roman",serif;line-height:1.65}
 .wrap{max-width:900px;margin:0 auto;padding:36px 18px;text-align:center}
@@ -750,11 +756,20 @@ Object.entries(SEO_LANDING_PAGES).forEach(([pathname, page]) => {
 
 app.post('/api/share-card', (req, res) => {
     const svg = cleanShareSvg(req.body?.svg);
-    const png = cleanPngDataUrl(req.body?.pngData);
+    const previewPng = cleanPngDataUrl(req.body?.previewPng);
+    const squarePng = cleanPngDataUrl(req.body?.squarePng);
     const name = cleanStr(req.body?.name || '').slice(0, 24);
     const pinyin = cleanStr(req.body?.pinyin || '').slice(0, 80);
     const summary = cleanStr(req.body?.summary || '').slice(0, 280);
-    if(!svg || !name) return res.status(400).json({ success: false, error: 'Invalid share card' });
+    if(!svg || !name || !previewPng || !squarePng) {
+        appendAnalyticsEvent(req, 'share_card_failed', {
+            hasSvg: !!svg,
+            hasName: !!name,
+            hasPreviewPng: !!previewPng,
+            hasSquarePng: !!squarePng
+        });
+        return res.status(400).json({ success: false, error: 'Invalid share card images' });
+    }
 
     const cards = readShareCards();
     const id = createShareId();
@@ -763,7 +778,8 @@ app.post('/api/share-card', (req, res) => {
         pinyin,
         summary,
         svg,
-        png,
+        previewPng,
+        squarePng,
         createdAt: new Date().toISOString(),
         userId: getUserId(req)
     };
@@ -773,7 +789,8 @@ app.post('/api/share-card', (req, res) => {
         success: true,
         id,
         url: `${SHARE_DOMAIN}/share/${id}`,
-        imageUrl: `${SHARE_DOMAIN}/share-card/${id}${png ? '.png' : '.svg'}`
+        imageUrl: `${SHARE_DOMAIN}/share-card/${id}.png`,
+        squareImageUrl: `${SHARE_DOMAIN}/share-card/${id}-square.png`
     });
 });
 
@@ -788,9 +805,19 @@ app.get('/share-card/:id.svg', (req, res) => {
 app.get('/share-card/:id.png', (req, res) => {
     const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
     const card = readShareCards()[id];
-    if(!card || !card.png) return res.status(404).send('Not found');
+    const png = card?.previewPng || card?.png;
+    if(!card || !png) return res.status(404).send('Not found');
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    res.type('image/png').send(Buffer.from(card.png, 'base64'));
+    res.type('image/png').send(Buffer.from(png, 'base64'));
+});
+
+app.get('/share-card/:id-square.png', (req, res) => {
+    const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
+    const card = readShareCards()[id];
+    const png = card?.squarePng || card?.png;
+    if(!card || !png) return res.status(404).send('Not found');
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.type('image/png').send(Buffer.from(png, 'base64'));
 });
 
 app.get('/share/:id', (req, res) => {
@@ -863,7 +890,8 @@ function renderAdminDashboard(req){
         buy_click: '\u8d2d\u4e70\u70b9\u51fb',
         share_click: '\u5206\u4eab\u70b9\u51fb',
         share_reward: '\u5206\u4eab\u5956\u52b1',
-        share_card_created: '\u5206\u4eab\u9875\u751f\u6210'
+        share_card_created: '\u5206\u4eab\u9875\u751f\u6210',
+        share_card_failed: '\u5206\u4eab\u9875\u751f\u6210\u5931\u8d25'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
