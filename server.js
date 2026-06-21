@@ -1136,6 +1136,57 @@ app.get('/api/dev-test-status', (req, res) => {
     });
 });
 
+async function probeNameEngine(){
+    if(!process.env.DEEPSEEK_API_KEY) {
+        return { configured: false, ok: false, error: 'DEEPSEEK_API_KEY is not configured' };
+    }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+        const resp = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            signal: controller.signal,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { role: 'system', content: 'Return JSON only.' },
+                    { role: 'user', content: 'Return {"ok":true}.' }
+                ],
+                max_tokens: 20,
+                temperature: 0,
+                response_format: { type: 'json_object' }
+            })
+        });
+        clearTimeout(timeout);
+        const body = await resp.json().catch(() => ({}));
+        return {
+            configured: true,
+            ok: resp.ok && !!body.choices?.[0]?.message?.content,
+            status: resp.status,
+            error: resp.ok ? '' : (body.error?.message || body.error || 'DeepSeek probe failed')
+        };
+    } catch(err) {
+        clearTimeout(timeout);
+        return { configured: true, ok: false, error: err.message || 'DeepSeek probe failed' };
+    }
+}
+
+app.get('/api/admin/name-engine-status', async (req, res) => {
+    if(!isAdminAuthed(req)) return res.status(401).json({ error: 'admin auth required' });
+    const probe = req.query.probe === '1';
+    const status = {
+        nodeEnv: process.env.NODE_ENV || '',
+        deepseekKeyConfigured: !!process.env.DEEPSEEK_API_KEY,
+        deepseekKeyLooksValid: /^sk-[A-Za-z0-9_-]{20,}$/.test(process.env.DEEPSEEK_API_KEY || '')
+    };
+    if(probe) status.probe = await probeNameEngine();
+    res.json(status);
+});
+
 app.post('/api/track', (req, res) => {
     const event = cleanStr(req.body.event || '');
     const meta = req.body.meta && typeof req.body.meta === 'object' ? req.body.meta : {};
