@@ -221,6 +221,7 @@ const PAYMENT_LOG_FILE = path.join(__dirname, 'payment-log.json');
 const ANALYTICS_LOG_FILE = path.join(__dirname, 'analytics-log.json');
 const SHARE_CARD_FILE = path.join(__dirname, 'share-cards.json');
 const PAYPAL_ORDER_FILE = path.join(__dirname, 'paypal-orders.json');
+const CONTACT_MESSAGES_FILE = path.join(__dirname, 'contact-messages.json');
 
 // ============================================================
 // \u72b6\u6001\u8bfb\u5199
@@ -297,6 +298,25 @@ function readAnalyticsLog(){
 
 function writeAnalyticsLog(logs){
     fs.writeFileSync(ANALYTICS_LOG_FILE, JSON.stringify(logs, null, 2));
+}
+
+function readContactMessages(){
+    try {
+        if(!fs.existsSync(CONTACT_MESSAGES_FILE)) return [];
+        const data = JSON.parse(fs.readFileSync(CONTACT_MESSAGES_FILE, 'utf8'));
+        return Array.isArray(data) ? data : [];
+    } catch { return []; }
+}
+
+function writeContactMessages(messages){
+    fs.writeFileSync(CONTACT_MESSAGES_FILE, JSON.stringify(messages, null, 2));
+}
+
+function appendContactMessage(entry){
+    const messages = readContactMessages();
+    messages.push({ ...entry, _ts: new Date().toISOString() });
+    if(messages.length > 500) messages.splice(0, messages.length - 500);
+    writeContactMessages(messages);
 }
 
 function appendAnalyticsEvent(req, event, meta = {}){
@@ -832,6 +852,7 @@ function renderAdminDashboard(req){
     const analytics = summarizeAnalytics();
     const users = readUserState();
     const payments = readPaymentLog().slice(-80).reverse();
+    const contactMessages = readContactMessages().slice(-80).reverse();
     const card = (label, value, sub = '') => `<div class="card"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${sub}</div></div>`;
     const eventLabel = {
         page_view: '\u9875\u9762\u8bbf\u95ee',
@@ -867,6 +888,13 @@ function renderAdminDashboard(req){
         <td>${htmlEscape(item._ts || '')}</td><td>${htmlEscape(item.txn || '')}</td><td>${htmlEscape(item.pkg || '')}</td>
         <td>${htmlEscape(item.userId || '')}</td><td>${htmlEscape(item.status || '')}</td><td>${htmlEscape(item.err || (item.success ? '\u6210\u529f' : ''))}</td>
     </tr>`).join('');
+    const contactRows = contactMessages.map(item => `<tr>
+        <td>${htmlEscape(item._ts || '')}</td>
+        <td>${htmlEscape(item.name || '')}</td>
+        <td>${htmlEscape(item.email || '')}</td>
+        <td>${htmlEscape(item.ip || '')}</td>
+        <td>${htmlEscape(item.message || '')}</td>
+    </tr>`).join('');
 
     return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -897,6 +925,7 @@ function renderAdminDashboard(req){
     </div>
     <section><h2>\u6700\u8fd1 7 \u5929\u8d8b\u52bf</h2><table><thead><tr><th>\u65e5\u671f</th><th>\u8bbf\u95ee</th><th>\u70b9\u51fb\u751f\u6210</th><th>\u751f\u6210\u6210\u529f</th><th>\u751f\u6210\u5931\u8d25</th><th>\u4ed8\u8d39\u5f39\u7a97</th><th>\u8d2d\u4e70\u70b9\u51fb</th><th>\u5206\u4eab\u70b9\u51fb</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
     <section><h2>\u6700\u8fd1\u4e8b\u4ef6</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4e8b\u4ef6</th><th>\u7528\u6237</th><th>IP</th><th>\u4fe1\u606f</th></tr></thead><tbody>${recentRows || '<tr><td colspan="5">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
+    <section><h2>\u8054\u7cfb\u6211\u4eec\u7559\u8a00</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u59d3\u540d</th><th>\u90ae\u7bb1</th><th>IP</th><th>\u7559\u8a00\u5185\u5bb9</th></tr></thead><tbody>${contactRows || '<tr><td colspan="5">\u6682\u65e0\u7559\u8a00</td></tr>'}</tbody></table></section>
     <section><h2>\u7528\u6237\u989d\u5ea6</h2><table><thead><tr><th>\u7528\u6237ID/IP</th><th>\u5957\u9910</th><th>\u5269\u4f59\u989d\u5ea6</th><th>\u4e94\u884c\u7b49\u7ea7</th><th>\u4ea4\u6613\u53f7</th><th>\u652f\u4ed8\u65f6\u95f4</th></tr></thead><tbody>${userRows || '<tr><td colspan="6">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
     <section><h2>\u652f\u4ed8\u65e5\u5fd7</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4ea4\u6613\u53f7</th><th>\u5957\u9910</th><th>\u7528\u6237</th><th>\u72b6\u6001</th><th>\u7ed3\u679c/\u9519\u8bef</th></tr></thead><tbody>${paymentRows || '<tr><td colspan="6">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
     </div></body></html>`;
@@ -1305,16 +1334,29 @@ app.post('/api/submit-message', (req, res) => {
     const message = cleanStr(req.body.message) || '';
     const time = new Date().toLocaleString();
     const content = `[${time}] ${name}(${email}): ${message}\n`;
+    try {
+        appendContactMessage({
+            name,
+            email,
+            message,
+            ip: getClientIp(req),
+            ua: (req.headers['user-agent'] || '').substring(0, 180),
+            path: req.headers.referer || '/contact-us'
+        });
+    } catch(err) {
+        logError('[contact-message] failed to save structured message:', err.message);
+    }
     fs.appendFile('messages.txt', content, err => {
         res.send(err ? "\u7559\u8a00\u63d0\u4ea4\u5931\u8d25" : "\u7559\u8a00\u63d0\u4ea4\u6210\u529f\uff0c\u611f\u8c22\u53cd\u9988\uff01");
     });
 });
 
 app.get('/admin-messages', (req, res) => {
-    fs.readFile('messages.txt', 'utf8', (err, data) => {
-        if(err) res.send("\u6682\u65e0\u7559\u8a00");
-        else res.send(`\u4f60\u662f\u9762\u5411\u6d77\u5916\u7528\u6237\u7684\u4e2d\u6587\u8d77\u540d\u5e08,\u6839\u636e\u6027\u522b,\u98ce\u683c\u751f\u6210\u540d\u5b57,\u8f93\u51fa\u683c\u5f0f:\u4e2d\u6587\u540d+\u62fc\u97f3+\u82f1\u6587\u91ca\u4e49+\u5bd3\u610f\u89e3\u6790`);
-    });
+    if(!isAdminAuthed(req)) return res.redirect(ADMIN_PATH);
+    const rows = readContactMessages().slice(-120).reverse().map(item =>
+        `[${item._ts || ''}] ${item.name || ''} (${item.email || ''}) ${item.message || ''}`
+    ).join('\n');
+    res.type('text/plain').send(rows || "\u6682\u65e0\u7559\u8a00");
 });
 
 // ============================================================
