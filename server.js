@@ -1201,10 +1201,10 @@ app.post('/api/generate-name', rateLimitMiddleware, async (req, res) => {
     const status = getUserStatus(userId);
     const devTest = isLocalDevTest(req);
 
-    const shouldUseFreeQuota = !devTest && (status.package === 'free' || !status.package);
+    const quotaLimited = !devTest && status.package !== 'ultimate';
 
-    // \u514d\u8d39\u7528\u6237\u5148\u6821\u9a8c\u914d\u989d\uff0c\u751f\u6210\u6210\u529f\u540e\u518d\u6263\u51cf\uff0c\u907f\u514dAI\u5931\u8d25\u4e5f\u6d88\u8017\u6b21\u6570\u3002
-    if(shouldUseFreeQuota) {
+    // Quota-limited users are checked before generation, then charged only after a successful result.
+    if(quotaLimited) {
         if((status.quota || 0) <= 0) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
@@ -1304,7 +1304,7 @@ Return only valid JSON with this exact shape:
                 birthText
             }));
         }
-        if(shouldUseFreeQuota && !useQuota(userId)) {
+        if(quotaLimited && !useQuota(userId)) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
         res.json({ success: true, devTest, data: normalized });
@@ -1318,7 +1318,7 @@ Return only valid JSON with this exact shape:
             meaning: finalMeaning,
             birthText
         }));
-        if(shouldUseFreeQuota && !useQuota(userId)) {
+        if(quotaLimited && !useQuota(userId)) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
         res.json({ success: true, devTest, data: fallback, fallback: true });
