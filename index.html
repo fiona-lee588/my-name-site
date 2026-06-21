@@ -725,9 +725,13 @@ function getPlainShareText(){
     return rand(SHARE_TITLES) + '\n\n' + rand(SHARE_DESCS) + '\n\n' + url;
 }
 
+function getShareCaption(){
+    return rand(SHARE_TITLES) + '\n\n' + rand(SHARE_DESCS);
+}
+
 function getPlatformShareUrl(platform, text){
     const title = encodeURIComponent(rand(SHARE_TITLES));
-    const desc = encodeURIComponent(text || shareTextEN);
+    const desc = encodeURIComponent(text || getShareCaption());
     const shareUrl = encodeURIComponent(currentSharePageUrl || OFFICIAL_SHARE_URL);
     const urls = {
         wx: 'https://api.whatsapp.com/send?text=' + desc + '%20' + shareUrl,
@@ -930,7 +934,7 @@ async function claimShareReward(platform){
 
 async function openPlatformShare(platform, name){
     await ensureSharePageReady();
-    const text = getPlainShareText();
+    const text = platform === 'x' ? getShareCaption() : getPlainShareText();
     window.open(getPlatformShareUrl(platform, text), '_blank');
     claimShareReward(platform);
 }
@@ -968,7 +972,8 @@ async function shareImageWithSystem(platform, name){
 
 // \u5206\u4eab\u51fd\u6570
 function doShare(platform){
-    window.open(getPlatformShareUrl(platform, getPlainShareText()),'_blank');
+    const text = platform === 'x' ? getShareCaption() : getPlainShareText();
+    window.open(getPlatformShareUrl(platform, text),'_blank');
 }
 
 // \u4ed8\u8d39\u5f39\u7a97
