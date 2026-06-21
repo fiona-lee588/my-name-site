@@ -25,6 +25,12 @@ const SHARE_DOMAIN = (process.env.SHARE_DOMAIN || OFFICIAL_DOMAIN).replace(/\/+$
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const ADMIN_PATH = '/admin-dashboard-2026';
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PASSWORD || 'local-admin-session';
+function normalizeSecret(value){
+    return String(value || '')
+        .trim()
+        .replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
+}
+const DEEPSEEK_API_KEY = normalizeSecret(process.env.DEEPSEEK_API_KEY);
 const SEO_LANDING_PAGES = {
     '/chinese-name-generator': {
         title: 'Chinese Name Generator Inspired by the I Ching and Book of Songs',
@@ -92,7 +98,7 @@ const SEO_LANDING_PAGES = {
 const log = (...args) => { console.log(...args); };
 const logError = (...args) => { console.error(...args); };
 
-log("DeepSeek key configured:", !!process.env.DEEPSEEK_API_KEY);
+log("DeepSeek key configured:", !!DEEPSEEK_API_KEY);
 log("PayPal mode:", process.env.PAYPAL_MODE || 'sandbox');
 log("PayPal client id configured:", !!process.env.PAYPAL_CLIENT_ID);
 log("PayPal client secret configured:", !!process.env.PAYPAL_CLIENT_SECRET);
@@ -1137,7 +1143,7 @@ app.get('/api/dev-test-status', (req, res) => {
 });
 
 async function probeNameEngine(){
-    if(!process.env.DEEPSEEK_API_KEY) {
+    if(!DEEPSEEK_API_KEY) {
         return { configured: false, ok: false, error: 'DEEPSEEK_API_KEY is not configured' };
     }
     const controller = new AbortController();
@@ -1148,7 +1154,7 @@ async function probeNameEngine(){
             signal: controller.signal,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
                 model: 'deepseek-chat',
@@ -1180,8 +1186,9 @@ app.get('/api/admin/name-engine-status', async (req, res) => {
     const probe = req.query.probe === '1';
     const status = {
         nodeEnv: process.env.NODE_ENV || '',
-        deepseekKeyConfigured: !!process.env.DEEPSEEK_API_KEY,
-        deepseekKeyLooksValid: /^sk-[A-Za-z0-9_-]{20,}$/.test(process.env.DEEPSEEK_API_KEY || '')
+        deepseekKeyConfigured: !!DEEPSEEK_API_KEY,
+        deepseekKeyLooksValid: /^sk-[A-Za-z0-9_-]{20,}$/.test(DEEPSEEK_API_KEY),
+        deepseekKeyWasNormalized: DEEPSEEK_API_KEY !== String(process.env.DEEPSEEK_API_KEY || '').trim()
     };
     if(probe) status.probe = await probeNameEngine();
     res.json(status);
@@ -1465,7 +1472,7 @@ Return only valid JSON with this exact shape:
     const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat" };
 
     async function callAI() {
-        if(!process.env.DEEPSEEK_API_KEY) {
+        if(!DEEPSEEK_API_KEY) {
             throw new Error('DEEPSEEK_API_KEY is not configured');
         }
         const body = {
@@ -1483,7 +1490,7 @@ Return only valid JSON with this exact shape:
         try {
             const resp = await fetch(deepseek.url, {
                 method:'POST', signal:controller.signal,
-                headers: {'Content-Type':'application/json','Authorization':`Bearer ${process.env.DEEPSEEK_API_KEY}`},
+                headers: {'Content-Type':'application/json','Authorization':`Bearer ${DEEPSEEK_API_KEY}`},
                 body: JSON.stringify(body)
             });
             clearTimeout(timeout);
