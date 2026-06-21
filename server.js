@@ -582,7 +582,34 @@ function extractJsonObject(text){
     try { return JSON.parse(cleaned.slice(start, end + 1)); } catch { return null; }
 }
 
+function seededHash(text){
+    const input = String(text || 'fallback');
+    let hash = 2166136261;
+    for(let i = 0; i < input.length; i += 1) {
+        hash ^= input.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+}
+
+function pickSeeded(list, seed, offset = 0){
+    if(!Array.isArray(list) || list.length === 0) return null;
+    const n = Math.abs((seed + Math.imul(offset + 1, 2654435761)) >>> 0);
+    return list[n % list.length];
+}
+
+function birthElement(birthText){
+    const month = Number((String(birthText || '').match(/^\d{0,4}-?(\d{1,2})/) || [])[1]);
+    if([2, 3, 4].includes(month)) return { key:'wood', cn:'木', en:'wood', hint:'growth, kindness, and renewal' };
+    if([5, 6, 7].includes(month)) return { key:'fire', cn:'火', en:'fire', hint:'warmth, clarity, and confidence' };
+    if([8, 9, 10].includes(month)) return { key:'metal', cn:'金', en:'metal', hint:'focus, integrity, and refinement' };
+    if([11, 12, 1].includes(month)) return { key:'water', cn:'水', en:'water', hint:'wisdom, adaptability, and depth' };
+    return { key:'earth', cn:'土', en:'earth', hint:'steadiness, trust, and balance' };
+}
+
 function buildFallbackName({ givenName, surname, gender, style, meaning, birthText }){
+    const seed = seededHash(`${givenName}|${surname}|${gender}|${style}|${meaning}|${birthText}`);
+    const element = birthElement(birthText);
     const surnameMap = [
         { re:/^(smith|smyth)$/i, cn:'\u6c88', pinyin:'Shen', reason:'chosen for its soft sh sound and refined literary feeling' },
         { re:/^(johnson|jones|james)$/i, cn:'\u6c5f', pinyin:'Jiang', reason:'chosen for a clear j sound and the image of a broad river' },
@@ -593,25 +620,136 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
         { re:/^(lee|li|lewis)$/i, cn:'\u674e', pinyin:'Li', reason:'chosen for its direct sound match and deep Baijiaxing heritage' },
         { re:/^(martin|moore|morgan)$/i, cn:'\u7a46', pinyin:'Mu', reason:'chosen for its calm m sound and meaning of sincerity and harmony' }
     ];
-    const matched = surnameMap.find(item => item.re.test(surname || '')) || {
-        cn:'\u6797', pinyin:'Lin', reason:'chosen for a natural, graceful image that feels accessible across cultures'
+    const surnamePools = {
+        a:[{cn:'\u5b89', pinyin:'An', reason:'chosen for its open a sound and peaceful cultural meaning'}],
+        b:[{cn:'\u767d', pinyin:'Bai', reason:'chosen for its bright, clean image and close b sound'}],
+        c:[{cn:'\u66f9', pinyin:'Cao', reason:'chosen for a grounded c sound and classical surname presence'}, {cn:'\u9648', pinyin:'Chen', reason:'chosen for a familiar Chinese surname with a clear ch sound'}],
+        d:[{cn:'\u675c', pinyin:'Du', reason:'chosen for a concise d sound and literary elegance'}],
+        e:[{cn:'\u6613', pinyin:'Yi', reason:'chosen for its link to change, balance, and the I Ching'}],
+        f:[{cn:'\u65b9', pinyin:'Fang', reason:'chosen for its f sound and sense of upright character'}],
+        g:[{cn:'\u9ad8', pinyin:'Gao', reason:'chosen for its g sound and image of aspiration'}, {cn:'\u987e', pinyin:'Gu', reason:'chosen for its refined sound and thoughtful temperament'}],
+        h:[{cn:'\u4f55', pinyin:'He', reason:'chosen for its soft h sound and well-known surname tradition'}],
+        i:[{cn:'\u5c39', pinyin:'Yin', reason:'chosen for its graceful vowel opening and classical surname feel'}],
+        j:[{cn:'\u6c5f', pinyin:'Jiang', reason:'chosen for a clear j sound and the image of a broad river'}],
+        k:[{cn:'\u5eb7', pinyin:'Kang', reason:'chosen for its k sound and meaning of well-being'}],
+        l:[{cn:'\u674e', pinyin:'Li', reason:'chosen for its l sound and deep Hundred Family Surnames heritage'}, {cn:'\u6797', pinyin:'Lin', reason:'chosen for its l sound and natural, graceful image'}],
+        m:[{cn:'\u7c73', pinyin:'Mi', reason:'chosen for its m sound and warm everyday cultural image'}, {cn:'\u7a46', pinyin:'Mu', reason:'chosen for sincerity, calmness, and harmony'}],
+        n:[{cn:'\u5b81', pinyin:'Ning', reason:'chosen for its n sound and peaceful meaning'}],
+        o:[{cn:'\u6b27', pinyin:'Ou', reason:'chosen for its close o sound and established surname usage'}],
+        p:[{cn:'\u6f58', pinyin:'Pan', reason:'chosen for its p sound and elegant surname tradition'}],
+        q:[{cn:'\u79e6', pinyin:'Qin', reason:'chosen for its crisp sound and strong historical resonance'}],
+        r:[{cn:'\u4efb', pinyin:'Ren', reason:'chosen for its r sound and sense of responsibility'}],
+        s:[{cn:'\u6c88', pinyin:'Shen', reason:'chosen for its soft sh sound and refined literary feeling'}, {cn:'\u82cf', pinyin:'Su', reason:'chosen for a smooth s sound and poetic lightness'}],
+        t:[{cn:'\u5510', pinyin:'Tang', reason:'chosen for its dignified sound and Tang dynasty cultural resonance'}],
+        u:[{cn:'\u4e8e', pinyin:'Yu', reason:'chosen for its clear vowel sound and classic surname form'}],
+        v:[{cn:'\u65b9', pinyin:'Fang', reason:'chosen for a close v/f sound and upright cultural image'}],
+        w:[{cn:'\u9b4f', pinyin:'Wei', reason:'chosen for its w sound and noble historical presence'}],
+        x:[{cn:'\u8c22', pinyin:'Xie', reason:'chosen for its distinctive x sound and established surname tradition'}],
+        y:[{cn:'\u53f6', pinyin:'Ye', reason:'chosen for its y sound and leaf imagery of renewal'}],
+        z:[{cn:'\u5468', pinyin:'Zhou', reason:'chosen for its z/zh sound and deep cultural continuity'}]
     };
+    const firstLetter = (String(surname || givenName || '').trim().match(/[a-z]/i)?.[0] || '').toLowerCase();
+    const fallbackSurnames = [
+        {cn:'\u6797', pinyin:'Lin', reason:'chosen for a natural, graceful image that feels accessible across cultures'},
+        {cn:'\u6c88', pinyin:'Shen', reason:'chosen for literary refinement and a gentle sound'},
+        {cn:'\u6c5f', pinyin:'Jiang', reason:'chosen for river imagery, openness, and memorable pronunciation'},
+        {cn:'\u5510', pinyin:'Tang', reason:'chosen for Tang dynasty resonance and dignified sound'},
+        {cn:'\u4f55', pinyin:'He', reason:'chosen for a soft sound and familiar Chinese surname tradition'},
+        {cn:'\u82cf', pinyin:'Su', reason:'chosen for poetic lightness and cross-cultural ease'},
+        {cn:'\u5468', pinyin:'Zhou', reason:'chosen for deep cultural continuity and a strong surname profile'},
+        {cn:'\u79e6', pinyin:'Qin', reason:'chosen for historical depth and concise pronunciation'}
+    ];
+    const matched = surnameMap.find(item => item.re.test(surname || ''))
+        || pickSeeded(surnamePools[firstLetter] || fallbackSurnames, seed, 1)
+        || fallbackSurnames[0];
     const profile = `${meaning || ''} ${style || ''}`;
     const wantsWisdom = /wisdom|wise|intelligence|learn|knowledge|\u806a|\u667a/i.test(profile);
     const wantsPeace = /peace|calm|gentle|grace|serene|\u5b89|\u5b81|\u96c5/i.test(profile);
     const wantsBright = /bright|success|future|hope|light|prosper|\u6210|\u5149|\u660e/i.test(profile);
+    const wantsCourage = /courage|brave|strong|bold|confident|leader|power|\u52c7|\u5f3a|\u4fe1/i.test(profile);
     const feminine = /female|girl|woman/i.test(gender || '');
-    const given = wantsWisdom ? { cn:'\u77e5\u97f5', pinyin:'Zhi Yun', gloss:'wisdom with poetic rhythm' }
-        : wantsBright ? { cn: feminine ? '\u660e\u8212' : '\u660e\u8fdc', pinyin: feminine ? 'Ming Shu' : 'Ming Yuan', gloss: feminine ? 'clear light and ease' : 'bright vision and far-reaching promise' }
-        : wantsPeace ? { cn: feminine ? '\u5b89\u96c5' : '\u5b89\u548c', pinyin: feminine ? 'An Ya' : 'An He', gloss: feminine ? 'peaceful elegance' : 'peace and harmony' }
-        : { cn: feminine ? '\u6e05\u5b81' : '\u6000\u747e', pinyin: feminine ? 'Qing Ning' : 'Huai Jin', gloss: feminine ? 'clarity and serenity' : 'holding inner jade-like virtue' };
+    const neutralNames = [
+        { cn:'\u6000\u747e', pinyin:'Huai Jin', gloss:'holding jade-like inner virtue' },
+        { cn:'\u4e91\u821f', pinyin:'Yun Zhou', gloss:'a steady boat under open clouds' },
+        { cn:'\u666f\u884c', pinyin:'Jing Xing', gloss:'upright conduct and admired character' },
+        { cn:'\u6e05\u548c', pinyin:'Qing He', gloss:'clarity with gentle harmony' }
+    ];
+    const categories = {
+        wisdom:[
+            { cn:'\u77e5\u97f5', pinyin:'Zhi Yun', gloss:'wisdom with poetic rhythm' },
+            { cn:'\u601d\u8861', pinyin:'Si Heng', gloss:'thoughtful balance and clear judgment' },
+            { cn:'\u95fb\u6e05', pinyin:'Wen Qing', gloss:'cultivated insight and clarity' },
+            { cn:'\u4e66\u5b81', pinyin:'Shu Ning', gloss:'learning with inner calm' }
+        ],
+        bright:feminine ? [
+            { cn:'\u660e\u8212', pinyin:'Ming Shu', gloss:'clear light and ease' },
+            { cn:'\u6653\u7136', pinyin:'Xiao Ran', gloss:'dawn-like brightness and natural confidence' },
+            { cn:'\u7167\u5b81', pinyin:'Zhao Ning', gloss:'warm light with quiet steadiness' },
+            { cn:'\u660e\u73a5', pinyin:'Ming Yue', gloss:'bright grace like fine jade' }
+        ] : [
+            { cn:'\u660e\u8fdc', pinyin:'Ming Yuan', gloss:'bright vision and far-reaching promise' },
+            { cn:'\u666f\u8fb0', pinyin:'Jing Chen', gloss:'morning light and noble aspiration' },
+            { cn:'\u662d\u884c', pinyin:'Zhao Xing', gloss:'clear purpose and visible integrity' },
+            { cn:'\u6717\u8d8a', pinyin:'Lang Yue', gloss:'open brightness and the will to rise' }
+        ],
+        peace:feminine ? [
+            { cn:'\u5b89\u96c5', pinyin:'An Ya', gloss:'peaceful elegance' },
+            { cn:'\u5b81\u8212', pinyin:'Ning Shu', gloss:'serenity and ease' },
+            { cn:'\u9759\u8a00', pinyin:'Jing Yan', gloss:'quiet poise and trustworthy speech' },
+            { cn:'\u548c\u94c3', pinyin:'He Ling', gloss:'harmony with a clear, graceful sound' }
+        ] : [
+            { cn:'\u5b89\u548c', pinyin:'An He', gloss:'peace and harmony' },
+            { cn:'\u5b81\u8fdc', pinyin:'Ning Yuan', gloss:'calm strength with long vision' },
+            { cn:'\u548c\u5149', pinyin:'He Guang', gloss:'gentle light and balanced presence' },
+            { cn:'\u5b9a\u7136', pinyin:'Ding Ran', gloss:'steadiness and natural composure' }
+        ],
+        courage:feminine ? [
+            { cn:'\u82e5\u82f1', pinyin:'Ruo Ying', gloss:'soft grace with heroic spirit' },
+            { cn:'\u661f\u8a00', pinyin:'Xing Yan', gloss:'clear voice and star-like confidence' },
+            { cn:'\u7acb\u5b81', pinyin:'Li Ning', gloss:'independence with composed strength' },
+            { cn:'\u8c28\u7476', pinyin:'Jin Yao', gloss:'disciplined virtue and precious brightness' }
+        ] : [
+            { cn:'\u5fd7\u884c', pinyin:'Zhi Xing', gloss:'ambition carried into action' },
+            { cn:'\u627f\u5cf0', pinyin:'Cheng Feng', gloss:'bearing responsibility and rising like a peak' },
+            { cn:'\u7acb\u8f69', pinyin:'Li Xuan', gloss:'upright confidence and broad presence' },
+            { cn:'\u656c\u7136', pinyin:'Jing Ran', gloss:'respectful strength and natural dignity' }
+        ],
+        element:{
+            wood:[
+                { cn:'\u82e5\u6797', pinyin:'Ruo Lin', gloss:'renewal and gentle growth' },
+                { cn:'\u9752\u884c', pinyin:'Qing Xing', gloss:'fresh vitality and forward movement' }
+            ],
+            fire:[
+                { cn:'\u660e\u70c1', pinyin:'Ming Shuo', gloss:'bright warmth and confident clarity' },
+                { cn:'\u666f\u7136', pinyin:'Jing Ran', gloss:'radiant presence and natural ease' }
+            ],
+            metal:[
+                { cn:'\u94ed\u8fdc', pinyin:'Ming Yuan', gloss:'memorable integrity and long vision' },
+                { cn:'\u9526\u884c', pinyin:'Jin Xing', gloss:'refined promise carried into action' }
+            ],
+            water:[
+                { cn:'\u6e05\u6e90', pinyin:'Qing Yuan', gloss:'clear depth and original insight' },
+                { cn:'\u6c90\u8a00', pinyin:'Mu Yan', gloss:'gentle depth and sincere expression' }
+            ],
+            earth:[
+                { cn:'\u5b89\u57ce', pinyin:'An Cheng', gloss:'stable trust and protective strength' },
+                { cn:'\u539a\u7136', pinyin:'Hou Ran', gloss:'generosity, steadiness, and natural poise' }
+            ]
+        }
+    };
+    const pool = wantsWisdom ? categories.wisdom
+        : wantsCourage ? categories.courage
+        : wantsBright ? categories.bright
+        : wantsPeace ? categories.peace
+        : (categories.element[element.key] || neutralNames).concat(neutralNames);
+    const given = pickSeeded(pool, seed, 2) || neutralNames[0];
     const fullName = `${matched.cn}${given.cn}`;
     const fullPinyin = `${matched.pinyin} ${given.pinyin}`;
     return {
         chineseName: fullName,
         pinyin: fullPinyin,
         pronunciation: fullPinyin,
-        meaning: `${fullName} means ${given.gloss}, selected as a culturally meaningful Chinese name rather than a random translation.`,
+        meaning: `${fullName} means ${given.gloss}, selected as a culturally meaningful Chinese name rather than a random translation. The backup engine also considered the birth-period ${element.en} image of ${element.hint}.`,
         sections: [
             {
                 titleCn:'\u59d3\u6c0f\u89e3\u91ca',
@@ -634,10 +772,12 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
             {
                 titleCn:'\u6574\u4f53\u5bd3\u610f',
                 titleEn:'Overall Meaning',
-                cn:`\u7ed3\u5408\u51fa\u751f\u4fe1\u606f${birthText || '\u4e0e\u4e2a\u4eba\u504f\u597d'}\uff0c\u8fd9\u4e2a\u540d\u5b57\u5448\u73b0\u542b\u84c4\u3001\u53ef\u4fe1\u3001\u9002\u5408\u8de8\u6587\u5316\u573a\u666f\u4f7f\u7528\u7684\u4e1c\u65b9\u6c14\u8d28\u3002`,
-                en:`Considering ${birthText || 'your profile'}, this name feels refined, memorable, and suitable for long-term cross-cultural use.`
+                cn:`\u7ed3\u5408\u51fa\u751f\u4fe1\u606f${birthText || '\u4e0e\u4e2a\u4eba\u504f\u597d'}\uff0c\u53c2\u8003\u4e94\u884c\u4e2d\u201c${element.cn}\u201d\u7684\u610f\u8c61\uff0c\u8fd9\u4e2a\u540d\u5b57\u5448\u73b0\u542b\u84c4\u3001\u53ef\u4fe1\u3001\u9002\u5408\u8de8\u6587\u5316\u573a\u666f\u4f7f\u7528\u7684\u4e1c\u65b9\u6c14\u8d28\u3002`,
+                en:`Considering ${birthText || 'your profile'} and the five-elements image of ${element.en}, this name feels refined, memorable, and suitable for long-term cross-cultural use.`
             }
-        ]
+        ],
+        source: 'fallback',
+        fallbackSeed: seed
     };
 }
 
@@ -665,7 +805,9 @@ function normalizeNameResult(raw){
         pronunciation: cleanStr(parsed.pronunciation || parsed.pronunciationGuide || parsed.pinyin || ''),
         meaning,
         sections,
-        raw: rawText || ''
+        raw: rawText || '',
+        source: cleanStr(parsed.source || ''),
+        fallbackSeed: parsed.fallbackSeed || ''
     };
 }
 
@@ -1321,6 +1463,7 @@ Return only valid JSON with this exact shape:
         log('[app] request processed');
         const result = await callAI('deepseek');
         let normalized = normalizeNameResult(result);
+        let usedFallback = false;
         if(!normalized.chineseName) {
             logError('[generate-name] AI response missing chineseName, using safe fallback');
             normalized = normalizeNameResult(buildFallbackName({
@@ -1331,11 +1474,12 @@ Return only valid JSON with this exact shape:
                 meaning: finalMeaning,
                 birthText
             }));
+            usedFallback = true;
         }
-        if(quotaLimited && !useQuota(userId)) {
+        if(quotaLimited && !usedFallback && !useQuota(userId)) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
-        res.json({ success: true, devTest, data: normalized });
+        res.json({ success: true, devTest, data: normalized, fallback: usedFallback, quotaCharged: !usedFallback });
     } catch(err) {
         logError('[generate-name] AI failed, using safe fallback:', err.message);
         const fallback = normalizeNameResult(buildFallbackName({
@@ -1346,10 +1490,7 @@ Return only valid JSON with this exact shape:
             meaning: finalMeaning,
             birthText
         }));
-        if(quotaLimited && !useQuota(userId)) {
-            return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
-        }
-        res.json({ success: true, devTest, data: fallback, fallback: true });
+        res.json({ success: true, devTest, data: fallback, fallback: true, quotaCharged: false });
     }
 });
 
