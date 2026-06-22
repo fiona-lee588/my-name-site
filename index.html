@@ -1152,6 +1152,21 @@ function trackEvent(event, meta){
     } catch(e) {}
 }
 
+function trackPageView(){
+    try {
+        const params = new URLSearchParams({
+            event: 'page_view',
+            path: location.pathname || '/',
+            uid: BROWSER_USER_ID,
+            t: String(Date.now())
+        });
+        const img = new Image();
+        img.src = apiUrl('/api/track-pixel.gif?' + params.toString());
+    } catch(e) {
+        trackEvent('page_view', { path: location.pathname, devTest: DEV_TEST_MODE });
+    }
+}
+
 function renderPackageFeatures(features){
     return (features || []).map(item => {
         const icon = item.icon || 'OK';
@@ -1244,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', function(){
         };
         document.body.appendChild(badge);
     }
-    trackEvent('page_view', { path: location.pathname, devTest: DEV_TEST_MODE });
+    trackPageView();
     loadPricing().catch(function(e){ console.error('loadPricing failed:', e); });
     syncQuota().catch(function(e){ console.error('syncQuota failed:', e); });
 });
