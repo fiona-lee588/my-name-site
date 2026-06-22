@@ -388,12 +388,14 @@ const PACKAGE_ENTITLEMENTS = {
 // ============================================================
 // \u6587\u4ef6\u8def\u5f84
 // ============================================================
-const USER_STATE_FILE = path.join(__dirname, 'user-state.json');
-const PAYMENT_LOG_FILE = path.join(__dirname, 'payment-log.json');
-const ANALYTICS_LOG_FILE = path.join(__dirname, 'analytics-log.json');
-const SHARE_CARD_FILE = path.join(__dirname, 'share-cards.json');
-const PAYPAL_ORDER_FILE = path.join(__dirname, 'paypal-orders.json');
-const CONTACT_MESSAGES_FILE = path.join(__dirname, 'contact-messages.json');
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(err) { logError('[data-dir] failed to create:', err.message); }
+const USER_STATE_FILE = path.join(DATA_DIR, 'user-state.json');
+const PAYMENT_LOG_FILE = path.join(DATA_DIR, 'payment-log.json');
+const ANALYTICS_LOG_FILE = path.join(DATA_DIR, 'analytics-log.json');
+const SHARE_CARD_FILE = path.join(DATA_DIR, 'share-cards.json');
+const PAYPAL_ORDER_FILE = path.join(DATA_DIR, 'paypal-orders.json');
+const CONTACT_MESSAGES_FILE = path.join(DATA_DIR, 'contact-messages.json');
 
 // ============================================================
 // \u72b6\u6001\u8bfb\u5199
@@ -1305,7 +1307,7 @@ function renderAdminDashboard(req){
       ${card('\u8d2d\u4e70\u70b9\u51fb', analytics.counts.buy_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.buy_click || 0}`)}
       ${card('\u5206\u4eab\u70b9\u51fb', analytics.counts.share_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.share_click || 0}`)}
     </div>
-    <section><h2>\u7edf\u8ba1\u8bca\u65ad</h2><div class="muted">analytics-log.json: ${analyticsFileExists ? '\u5df2\u5b58\u5728' : '\u4e0d\u5b58\u5728'} \u00b7 ${analyticsFileSize} bytes \u00b7 total events ${analytics.total || 0} \u00b7 latest page_view ${htmlEscape(latestPageView?._ts || '\u6682\u65e0')}</div></section>
+    <section><h2>\u7edf\u8ba1\u8bca\u65ad</h2><div class="muted">analytics-log.json: ${analyticsFileExists ? '\u5df2\u5b58\u5728' : '\u4e0d\u5b58\u5728'} \u00b7 ${analyticsFileSize} bytes \u00b7 total events ${analytics.total || 0} \u00b7 latest page_view ${htmlEscape(latestPageView?._ts || '\u6682\u65e0')}<br>DATA_DIR: ${htmlEscape(DATA_DIR)} \u00b7 ${process.env.DATA_DIR ? '\u5df2\u914d\u7f6e\u6301\u4e45\u5316\u76ee\u5f55' : '\u672a\u914d\u7f6e\uff0c\u90e8\u7f72\u540e\u53ef\u80fd\u5f52\u96f6'}</div></section>
     <section><h2>\u6700\u8fd1 7 \u5929\u8d8b\u52bf</h2><table><thead><tr><th>\u65e5\u671f</th><th>\u8bbf\u95ee</th><th>\u70b9\u51fb\u751f\u6210</th><th>\u751f\u6210\u6210\u529f</th><th>\u751f\u6210\u5931\u8d25</th><th>\u4ed8\u8d39\u5f39\u7a97</th><th>\u8d2d\u4e70\u70b9\u51fb</th><th>\u5206\u4eab\u70b9\u51fb</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
     <section><h2>\u6700\u8fd1\u4e8b\u4ef6</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4e8b\u4ef6</th><th>\u7528\u6237</th><th>IP</th><th>\u4fe1\u606f</th></tr></thead><tbody>${recentRows || '<tr><td colspan="5">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
     <section><h2>\u8054\u7cfb\u6211\u4eec\u7559\u8a00</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u59d3\u540d</th><th>\u90ae\u7bb1</th><th>IP</th><th>\u7559\u8a00\u5185\u5bb9</th></tr></thead><tbody>${contactRows || '<tr><td colspan="5">\u6682\u65e0\u7559\u8a00</td></tr>'}</tbody></table></section>
