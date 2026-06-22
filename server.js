@@ -1819,6 +1819,9 @@ app.get('/terms',             (req, res) => res.sendFile(path.join(__dirname, 't
 app.get('/privacy',           (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/faq',               (req, res) => res.sendFile(path.join(__dirname, 'faq.html')));
 app.get('/payment-guide',     (req, res) => res.sendFile(path.join(__dirname, 'payment-guide.html')));
+app.get('/googlee0af6ad701bdcf22.html', (req, res) => {
+    res.type('text/plain').send('google-site-verification: googlee0af6ad701bdcf22.html');
+});
 
 // ============================================================
 // \u4e66\u6cd5\u5934\u50cf\uff08\u540e\u7aef\u6e32\u67d3\u515c\u5e95\uff09
