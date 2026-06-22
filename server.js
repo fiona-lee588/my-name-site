@@ -247,6 +247,136 @@ const SEO_LANDING_PAGES = {
         h1: 'Chinese Name for Isabella',
         intro: 'Isabella often matches elegant Chinese name imagery around beauty, dignity, softness, and inner brightness.',
         focus: 'Create a personalized Chinese name for Isabella with pinyin, character meaning, and classical inspiration.'
+    },
+    '/chinese-name-examples': {
+        title: 'Chinese Name Examples with Meanings, Pinyin, and Cultural Notes',
+        h1: 'Chinese Name Examples',
+        intro: 'Browse meaningful Chinese name examples for foreigners, with pinyin, English meaning, and the cultural feeling behind each name.',
+        focus: 'Examples help users understand what a natural Chinese name looks like before generating their own personalized name.',
+        examples: [
+            ['顾若英', 'Gu Ruo Ying', 'A graceful, confident name with a bright and heroic feeling.'],
+            ['魏思娴', 'Wei Si Xian', 'Thoughtful, refined, and elegant; suitable for a gentle but intelligent personality.'],
+            ['唐明远', 'Tang Ming Yuan', 'Bright vision and long-term promise, with a dignified surname.'],
+            ['沈知韵', 'Shen Zhi Yun', 'Wisdom with poetic rhythm, carrying a literary and calm temperament.'],
+            ['莫安澜', 'Mo An Lan', 'Peaceful and steady, like calm water with quiet strength.']
+        ],
+        sections: [
+            ['What makes a good example?', 'A good Chinese name should be readable, culturally natural, positive in meaning, and easy to explain in English.'],
+            ['Why examples matter', 'Foreign users often need to see real-looking names before they trust a generator or choose a name for personal use.'],
+            ['From example to personal name', 'The best result still depends on surname, birthday, style, and personality, so examples are a starting point rather than final answers.']
+        ],
+        questions: [
+            ['Can I use one of these examples directly?', 'You can, but a personalized name based on your own surname and profile is usually better.'],
+            ['Are these random translations?', 'No. These examples follow Chinese naming style with surname, given-name rhythm, and positive meaning.']
+        ]
+    },
+    '/english-to-chinese-name-examples': {
+        title: 'English to Chinese Name Examples That Sound Natural',
+        h1: 'English to Chinese Name Examples',
+        intro: 'See how English names can become natural Chinese names without looking like machine translations or phonetic jokes.',
+        focus: 'The goal is not to copy every sound. A good Chinese name carries identity, meaning, and a story.',
+        examples: [
+            ['Olivia Garcia', '顾若英', 'Graceful confidence with a surname chosen for sound and temperament.'],
+            ['Emily Wilson', '魏思娴', 'A refined name with thoughtful and elegant qualities.'],
+            ['Daniel Morgan', '莫安澜', 'Calm integrity and long-term steadiness.'],
+            ['James Taylor', '唐和光', 'Gentle light and balanced presence.'],
+            ['Sophia Miller', '米知韵', 'Wisdom, poetry, and a warm surname match.']
+        ],
+        sections: [
+            ['Surname comes first', 'Chinese full names place the surname first, so the English last name usually guides the Chinese surname match.'],
+            ['Given name carries personality', 'The given-name characters should express temperament, hopes, and cultural imagery rather than simply copying sound.'],
+            ['A shareable identity', 'A good English-to-Chinese name should be easy to introduce and interesting enough to become a conversation starter.']
+        ],
+        questions: [
+            ['Is English to Chinese naming the same as translation?', 'No. Translation changes words; naming creates a culturally usable identity.'],
+            ['Can the same English name have different Chinese names?', 'Yes. Birthday, surname, gender, style, and preferred meaning can lead to different results.']
+        ]
+    },
+    '/book-of-songs-name-examples': {
+        title: 'Book of Songs Chinese Name Examples',
+        h1: 'Book of Songs Name Examples',
+        intro: 'Explore Chinese name ideas inspired by the elegance, restraint, and poetic imagery of the Book of Songs.',
+        focus: 'Book of Songs style names often feel gentle, literary, refined, and culturally memorable.',
+        examples: [
+            ['清扬', 'Qing Yang', 'Clear and uplifting, inspired by bright and graceful imagery.'],
+            ['思齐', 'Si Qi', 'To think toward virtue and self-cultivation.'],
+            ['嘉言', 'Jia Yan', 'Beautiful speech and trustworthy character.'],
+            ['静姝', 'Jing Shu', 'Quiet beauty and gentle dignity.'],
+            ['怀瑾', 'Huai Jin', 'Holding jade-like virtue within.']
+        ],
+        sections: [
+            ['Poetry as naming material', 'Classical poetry offers images of light, jade, water, virtue, and graceful conduct that work well in names.'],
+            ['Use carefully', 'A poetic phrase should become a natural name, not a copied line that feels too heavy or obscure.'],
+            ['For overseas users', 'The explanation matters. Pinyin and English meaning help the user carry the name with confidence.']
+        ],
+        questions: [
+            ['Are Book of Songs names only for girls?', 'No. Some feel feminine, but many poetic ideas work for boys or gender-neutral names.'],
+            ['Can I request a poetic style?', 'Yes. Choose a refined, literary, or graceful style when generating your name.']
+        ]
+    },
+    '/chinese-names-for-foreigners': {
+        title: 'Chinese Names for Foreigners: Meaningful, Natural, and Usable',
+        h1: 'Chinese Names for Foreigners',
+        intro: 'Foreigners often need Chinese names for language learning, travel, business, social media, art, or personal identity.',
+        focus: 'A good name for a foreigner should be respectful, pronounceable, culturally natural, and easy to explain.',
+        sections: [
+            ['Avoid joke names', 'Do not choose characters only because they sound similar to English. The name should not become a pun or awkward phrase.'],
+            ['Balance identity and culture', 'The name should still feel like you while fitting Chinese surname and given-name conventions.'],
+            ['Use it in real life', 'A usable name includes Chinese characters, pinyin, pronunciation guidance, and a short meaning story.']
+        ],
+        questions: [
+            ['Do foreigners need Chinese names?', 'Not always, but a Chinese name is useful for Mandarin learning, cross-cultural introductions, and identity building.'],
+            ['Should the name sound like my English name?', 'It can, but meaning and cultural fit are more important than exact sound matching.']
+        ]
+    },
+    '/best-chinese-names-for-girls': {
+        title: 'Best Chinese Names for Girls with Elegant Meanings',
+        h1: 'Best Chinese Names for Girls',
+        intro: 'Elegant Chinese names for girls often carry images of clarity, grace, wisdom, brightness, and quiet confidence.',
+        focus: 'The best girl names are beautiful without being shallow, poetic without being difficult, and natural enough for real use.',
+        examples: [
+            ['安雅', 'An Ya', 'Peaceful elegance.'],
+            ['明舒', 'Ming Shu', 'Clear light and ease.'],
+            ['若英', 'Ruo Ying', 'Gentle grace with heroic spirit.'],
+            ['宁舒', 'Ning Shu', 'Serenity and comfort.'],
+            ['思娴', 'Si Xian', 'Thoughtful and refined.']
+        ],
+        questions: [
+            ['What makes a Chinese girl name elegant?', 'Balanced sound, positive meaning, graceful characters, and natural usage.'],
+            ['Can a girl name also sound strong?', 'Yes. Many beautiful names combine softness with confidence or independence.']
+        ]
+    },
+    '/best-chinese-names-for-boys': {
+        title: 'Best Chinese Names for Boys with Strong Meanings',
+        h1: 'Best Chinese Names for Boys',
+        intro: 'Chinese names for boys often express integrity, clear ambition, steadiness, brightness, and inner strength.',
+        focus: 'A strong name should feel dignified and natural, not exaggerated or overly dramatic.',
+        examples: [
+            ['明远', 'Ming Yuan', 'Bright vision and far-reaching promise.'],
+            ['志行', 'Zhi Xing', 'Ambition carried into action.'],
+            ['承峰', 'Cheng Feng', 'Responsibility and rising aspiration.'],
+            ['景辰', 'Jing Chen', 'Morning light and noble presence.'],
+            ['安澜', 'An Lan', 'Calm water and steady character.']
+        ],
+        questions: [
+            ['Should boy names be very powerful?', 'Not always. Refined strength often feels more natural than aggressive wording.'],
+            ['Can a boy name be literary?', 'Yes. Many classic male names use poetry, virtue, and landscape imagery.']
+        ]
+    },
+    '/chinese-name-by-personality': {
+        title: 'Chinese Name by Personality and Meaning',
+        h1: 'Chinese Name by Personality',
+        intro: 'Choose a Chinese name that reflects personality traits such as wisdom, calmness, courage, elegance, creativity, or ambition.',
+        focus: 'Personality gives the name a social story, making it easier to explain and remember.',
+        sections: [
+            ['Wisdom names', 'Names with 知, 思, 明, or 文 can suggest learning, insight, and clarity.'],
+            ['Calm names', 'Names with 安, 宁, 和, or 澜 can suggest peace, steadiness, and emotional balance.'],
+            ['Courage names', 'Names with 志, 行, 峰, or 立 can suggest ambition, action, and confidence.']
+        ],
+        questions: [
+            ['Can personality change the final name?', 'Yes. The same English name can lead to a different Chinese name if the desired personality changes.'],
+            ['Is this better than a random generator?', 'Yes. Personality-based naming gives the result a story and a reason.']
+        ]
     }
 };
 
@@ -1003,6 +1133,9 @@ function renderSeoLandingPage(pathname, page){
     const questionHtml = Array.isArray(page.questions) && page.questions.length
         ? `<div class="panel"><h2>Common Questions</h2>${page.questions.map(item => `<details><summary>${htmlEscape(item[0] || '')}</summary><p>${htmlEscape(item[1] || '')}</p></details>`).join('')}</div>`
         : '';
+    const exampleHtml = Array.isArray(page.examples) && page.examples.length
+        ? `<div class="panel"><h2>Name Examples</h2><table class="examples"><tbody>${page.examples.map(row => `<tr>${row.map(cell => `<td>${htmlEscape(cell || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
+        : '';
     const faqJsonLd = Array.isArray(page.questions) && page.questions.length ? {
         '@context':'https://schema.org',
         '@type':'FAQPage',
@@ -1057,6 +1190,10 @@ h2{font-size:24px;color:#8c2318;margin:0 0 8px}
 .links a{color:#8c2318;text-decoration:none;border-bottom:1px solid #d8c6b0;padding-bottom:4px}
 details{border-top:1px solid #eadbc8;padding:12px 0}
 summary{cursor:pointer;color:#5f3428;font-weight:700}
+table.examples{width:100%;border-collapse:collapse;margin-top:12px}
+.examples td{border-bottom:1px solid #eadbc8;padding:12px 10px;vertical-align:top}
+.examples td:first-child{font-size:22px;color:#8c2318;font-family:KaiTi,STKaiti,serif;white-space:nowrap}
+.examples td:nth-child(2){color:#7a563d;white-space:nowrap}
 .cta{display:inline-block;margin-top:24px;padding:12px 18px;background:#8c2318;color:#fff;text-decoration:none;border-radius:6px}
 .han{font-family:KaiTi,STKaiti,serif;color:#9a6a2f}
 ul{padding-left:20px}
@@ -1077,6 +1214,7 @@ ul{padding-left:20px}
 <p class="han">\u540d\u4ee5\u8f7d\u9053\uff0c\u5b57\u4e2d\u6709\u5149\u3002</p>
 <a class="cta" href="/">Generate My Chinese Name</a>
 </div>
+${exampleHtml}
 ${sectionHtml}
 ${questionHtml}
 <div class="panel"><h2>Explore More Naming Guides</h2><div class="links">${relatedLinks}</div></div>
