@@ -91,6 +91,162 @@ const SEO_LANDING_PAGES = {
         h1: 'Chinese Name for Michael',
         intro: 'Michael can become a strong yet elegant Chinese name through sound matching, surname selection, and meaningful character choices.',
         focus: 'Generate a personalized Chinese name for Michael with pronunciation, source, and English explanation.'
+    },
+    '/how-to-choose-a-chinese-name': {
+        title: 'How to Choose a Chinese Name That Sounds Natural',
+        h1: 'How to Choose a Chinese Name',
+        intro: 'A useful Chinese name should sound natural, use real surname conventions, carry positive meaning, and feel respectful in Chinese culture.',
+        focus: 'This guide explains the difference between a random translation and a name that Chinese speakers can recognize as thoughtful.',
+        sections: [
+            ['Start with a real Chinese surname', 'A good name usually begins with a surname from Chinese naming tradition. Sound matching can help, but the surname should still feel real and usable.'],
+            ['Choose characters for meaning and tone', 'The given name should balance pronunciation, written form, personality, and long-term use instead of simply copying an English sound.'],
+            ['Check the whole name aloud', 'A name may look beautiful but sound awkward. Pinyin, rhythm, and the connection between surname and given name all matter.']
+        ],
+        questions: [
+            ['Can I translate my English name directly?', 'Sometimes, but direct translation often sounds like a nickname rather than a real Chinese name.'],
+            ['Should foreigners use Chinese surnames?', 'Yes, if the goal is a complete Chinese name. The surname makes the name feel culturally complete.']
+        ]
+    },
+    '/chinese-name-by-birthday': {
+        title: 'Chinese Name by Birthday and Five Elements',
+        h1: 'Chinese Name by Birthday',
+        intro: 'Use birth year, month, day, and time as cultural context for a Chinese name with five-elements imagery and balanced meaning.',
+        focus: 'Birth information should influence the name direction, not merely appear in the explanation after the name is chosen.',
+        sections: [
+            ['Birth information as cultural context', 'Traditional naming often considers season, time, balance, and symbolic elements when selecting characters.'],
+            ['Five-elements imagery', 'Wood, fire, earth, metal, and water can suggest different name qualities such as growth, clarity, steadiness, refinement, or wisdom.'],
+            ['A modern, respectful approach', 'For overseas users, birthday analysis should guide the name gently while keeping the final name natural and easy to use.']
+        ],
+        questions: [
+            ['Do I need exact birth time?', 'Exact time helps, but year, month, and day can still provide useful cultural imagery.'],
+            ['Is this fortune telling?', 'No. The site uses traditional symbolism as naming context, not as a prediction of fate.']
+        ]
+    },
+    '/chinese-surname-matching': {
+        title: 'Chinese Surname Matching for English Last Names',
+        h1: 'Chinese Surname Matching',
+        intro: 'Match an English last name to a real Chinese surname by sound, temperament, cultural image, and ease of pronunciation.',
+        focus: 'A complete Chinese name needs a surname that feels natural before the given-name characters can work well.',
+        sections: [
+            ['Sound is only one signal', 'Smith may become Shen, Wilson may become Wei, and Lee may become Li, but sound is only part of the decision.'],
+            ['Cultural image matters', 'Some surnames carry historical, poetic, or visual associations that can strengthen the whole name.'],
+            ['Avoid joke translations', 'A surname should never make the full name feel like a pun, meme, or accidental phrase.']
+        ],
+        questions: [
+            ['Can I keep my English surname?', 'You can, but a Chinese full name normally uses a Chinese surname form.'],
+            ['What if my last name has no close Chinese sound?', 'Then the best match may come from temperament, first letter, or cultural image.']
+        ]
+    },
+    '/chinese-name-for-tattoo': {
+        title: 'Chinese Name for Tattoo: Meaning, Characters, and Safety',
+        h1: 'Chinese Name for Tattoo',
+        intro: 'Before using Chinese characters in a tattoo, check the meaning, pronunciation, cultural tone, and whether the full name sounds natural.',
+        focus: 'A tattoo name needs extra care because the characters become permanent and highly visible.',
+        sections: [
+            ['Use real name characters', 'Avoid random single characters or machine translations that may look decorative but sound strange to native speakers.'],
+            ['Check visual balance', 'Characters should look good together in calligraphy while still forming a real name.'],
+            ['Understand the full meaning', 'Every character should have a positive role in the whole name, not just a pretty isolated meaning.']
+        ],
+        questions: [
+            ['Can I tattoo only the given name?', 'Yes, but a full Chinese name often feels more complete and personal.'],
+            ['Should I verify the name first?', 'Yes. Always check meaning, pronunciation, and cultural tone before tattooing.']
+        ]
+    },
+    '/chinese-name-for-business': {
+        title: 'Chinese Name for Business, Networking, and Social Profiles',
+        h1: 'Chinese Name for Business',
+        intro: 'Create a Chinese name suitable for professional introductions, networking, creator profiles, language learning, and cross-cultural communication.',
+        focus: 'A business-friendly Chinese name should sound confident, respectful, and easy for Chinese speakers to remember.',
+        sections: [
+            ['Professional tone', 'The name should avoid childish, overly romantic, or overly dramatic characters if it will appear in business contexts.'],
+            ['Easy introduction', 'Good pinyin and a simple pronunciation guide help overseas users introduce themselves confidently.'],
+            ['Memorable cultural story', 'A short explanation from classics or character meaning can become a natural conversation starter.']
+        ],
+        questions: [
+            ['Can I use the name on LinkedIn?', 'Yes, if the name feels natural and the explanation matches your professional identity.'],
+            ['Should business names be gendered?', 'They can be, but many professional Chinese names work well with a balanced, neutral tone.']
+        ]
+    },
+    '/chinese-name-for-instagram': {
+        title: 'Chinese Name for Instagram, TikTok, and Social Media',
+        h1: 'Chinese Name for Social Media',
+        intro: 'Get a Chinese name that works as a cultural identity signal, profile story, and shareable name card for social platforms.',
+        focus: 'For social media, the name should be memorable, visually attractive, and easy to explain in one sentence.',
+        sections: [
+            ['Identity first', 'The strongest social names feel like a new cultural identity, not a decorative translation.'],
+            ['Shareable visuals', 'A calligraphy-style name card can make the name easier to post, save, and discuss.'],
+            ['Conversation value', 'The best names come with a short story: surname match, character meaning, and classical image.']
+        ],
+        questions: [
+            ['Can I use it as a username?', 'You can use the Chinese characters in your bio or display name, and pinyin in your username if needed.'],
+            ['What makes people comment?', 'A visible name card plus a clear cultural explanation gives viewers something specific to react to.']
+        ]
+    },
+    '/chinese-calligraphy-name-card': {
+        title: 'Chinese Calligraphy Name Card for Sharing',
+        h1: 'Chinese Calligraphy Name Card',
+        intro: 'Turn a generated Chinese name into a brush-style visual card designed for saving, posting, and sharing with friends.',
+        focus: 'The share card gives the name a visual identity so it can travel on social platforms, not just stay as plain text.',
+        sections: [
+            ['Designed for cultural keepsakes', 'A calligraphy card makes the name feel ceremonial, personal, and easier to remember.'],
+            ['Better social previews', 'A clear image preview can help shared links look intentional on X, Facebook, LinkedIn, and messaging apps.'],
+            ['Name plus story', 'The card should connect to the written explanation, pinyin, and meaning so the image is not empty decoration.']
+        ],
+        questions: [
+            ['Can I save the card?', 'Yes. The site provides a PNG-style name card for saving and social sharing.'],
+            ['Why use calligraphy?', 'Calligraphy gives the name a recognizably Chinese visual texture and makes the result feel more complete.']
+        ]
+    },
+    '/chinese-name-pronunciation': {
+        title: 'Chinese Name Pronunciation and Pinyin Guide',
+        h1: 'Chinese Name Pronunciation',
+        intro: 'Understand how to read a Chinese name with pinyin, simple pronunciation guidance, and a clearer sense of name rhythm.',
+        focus: 'A meaningful Chinese name should be pronounceable for the user and still sound natural to Chinese speakers.',
+        sections: [
+            ['Pinyin is the bridge', 'Pinyin helps overseas users read Chinese names, but the characters and meaning still define the name.'],
+            ['Rhythm matters', 'A full name should flow from surname to given name without awkward pauses or harsh sound collisions.'],
+            ['Use the name confidently', 'A short pronunciation guide makes it easier to introduce the name in class, work, or social settings.']
+        ],
+        questions: [
+            ['Is pinyin the same as the name?', 'No. Pinyin is the pronunciation guide; the Chinese characters are the actual written name.'],
+            ['Do tones matter?', 'Yes, but for beginners a simple guide can help before learning exact Mandarin tones.']
+        ]
+    },
+    '/chinese-name-for-olivia': {
+        title: 'Chinese Name for Olivia with Meaning and Pinyin',
+        h1: 'Chinese Name for Olivia',
+        intro: 'Olivia often fits Chinese name imagery connected with grace, brightness, renewal, and elegant confidence.',
+        focus: 'Generate a personalized Chinese name for Olivia using surname matching, birthday context, and cultural meaning.'
+    },
+    '/chinese-name-for-daniel': {
+        title: 'Chinese Name for Daniel with Meaning and Cultural Source',
+        h1: 'Chinese Name for Daniel',
+        intro: 'Daniel can become a Chinese name with calm strength, integrity, intelligence, and a professional tone.',
+        focus: 'Create a personalized Chinese name for Daniel with pinyin, meaning, and a shareable calligraphy card.'
+    },
+    '/chinese-name-for-emily': {
+        title: 'Chinese Name for Emily: Elegant Chinese Name Ideas',
+        h1: 'Chinese Name for Emily',
+        intro: 'Emily pairs naturally with Chinese name ideas of refinement, kindness, literary grace, and clear personal presence.',
+        focus: 'Generate a Chinese name for Emily that feels natural in Chinese while still reflecting the original personality.'
+    },
+    '/chinese-name-for-alex': {
+        title: 'Chinese Name for Alex: Balanced and Natural Ideas',
+        h1: 'Chinese Name for Alex',
+        intro: 'Alex works well with balanced Chinese names that can feel confident, adaptable, and gender-neutral when needed.',
+        focus: 'Create a Chinese name for Alex with surname matching, character meaning, and pronunciation guidance.'
+    },
+    '/chinese-name-for-david': {
+        title: 'Chinese Name for David with Pinyin and Meaning',
+        h1: 'Chinese Name for David',
+        intro: 'David can be adapted into a Chinese name with steady character, sincerity, and a clear professional sound.',
+        focus: 'Generate a Chinese name for David that avoids random translation and includes a cultural explanation.'
+    },
+    '/chinese-name-for-isabella': {
+        title: 'Chinese Name for Isabella: Graceful Name Ideas',
+        h1: 'Chinese Name for Isabella',
+        intro: 'Isabella often matches elegant Chinese name imagery around beauty, dignity, softness, and inner brightness.',
+        focus: 'Create a personalized Chinese name for Isabella with pinyin, character meaning, and classical inspiration.'
     }
 };
 
@@ -819,6 +975,26 @@ function normalizeNameResult(raw){
 
 function renderSeoLandingPage(pathname, page){
     const canonical = `${OFFICIAL_DOMAIN}${pathname}`;
+    const relatedLinks = Object.entries(SEO_LANDING_PAGES)
+        .filter(([url]) => url !== pathname)
+        .slice(0, 8)
+        .map(([url, item]) => `<a href="${url}">${htmlEscape(item.h1)}</a>`)
+        .join('');
+    const sectionHtml = Array.isArray(page.sections) && page.sections.length
+        ? `<div class="panel grid">${page.sections.map(section => `<section><h2>${htmlEscape(section[0] || '')}</h2><p>${htmlEscape(section[1] || '')}</p></section>`).join('')}</div>`
+        : '';
+    const questionHtml = Array.isArray(page.questions) && page.questions.length
+        ? `<div class="panel"><h2>Common Questions</h2>${page.questions.map(item => `<details><summary>${htmlEscape(item[0] || '')}</summary><p>${htmlEscape(item[1] || '')}</p></details>`).join('')}</div>`
+        : '';
+    const faqJsonLd = Array.isArray(page.questions) && page.questions.length ? {
+        '@context':'https://schema.org',
+        '@type':'FAQPage',
+        mainEntity: page.questions.map(item => ({
+            '@type':'Question',
+            name: item[0],
+            acceptedAnswer: { '@type':'Answer', text: item[1] }
+        }))
+    } : null;
     const jsonLd = {
         '@context':'https://schema.org',
         '@type':'WebPage',
@@ -833,6 +1009,7 @@ function renderSeoLandingPage(pathname, page){
             ]
         }
     };
+    const structuredData = faqJsonLd ? [jsonLd, faqJsonLd] : jsonLd;
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -848,17 +1025,25 @@ function renderSeoLandingPage(pathname, page){
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${htmlEscape(page.title)}">
 <meta name="twitter:description" content="${htmlEscape(page.intro)}">
-<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
 <style>
 body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Roman",serif;line-height:1.7}
 .wrap{max-width:960px;margin:0 auto;padding:48px 20px}
 .eyebrow{color:#8c2318;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
 h1{font-size:clamp(34px,5vw,58px);line-height:1.05;margin:12px 0 18px;color:#8c2318}
+h2{font-size:24px;color:#8c2318;margin:0 0 8px}
 .lead{font-size:20px;max-width:760px}
 .panel{margin-top:32px;padding:24px;border:1px solid #d8c6b0;background:#fffbf5;border-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid section{border-left:3px solid #d4af37;padding-left:14px}
+.links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.links a{color:#8c2318;text-decoration:none;border-bottom:1px solid #d8c6b0;padding-bottom:4px}
+details{border-top:1px solid #eadbc8;padding:12px 0}
+summary{cursor:pointer;color:#5f3428;font-weight:700}
 .cta{display:inline-block;margin-top:24px;padding:12px 18px;background:#8c2318;color:#fff;text-decoration:none;border-radius:6px}
 .han{font-family:KaiTi,STKaiti,serif;color:#9a6a2f}
 ul{padding-left:20px}
+@media(max-width:760px){.grid,.links{grid-template-columns:1fr}.wrap{padding:34px 16px}}
 </style>
 </head>
 <body><main class="wrap">
@@ -875,6 +1060,9 @@ ul{padding-left:20px}
 <p class="han">\u540d\u4ee5\u8f7d\u9053\uff0c\u5b57\u4e2d\u6709\u5149\u3002</p>
 <a class="cta" href="/">Generate My Chinese Name</a>
 </div>
+${sectionHtml}
+${questionHtml}
+<div class="panel"><h2>Explore More Naming Guides</h2><div class="links">${relatedLinks}</div></div>
 </main></body></html>`;
 }
 
