@@ -729,14 +729,17 @@ function getPlainShareText(){
     return rand(SHARE_TITLES) + '\n\n' + rand(SHARE_DESCS) + '\n\n' + url;
 }
 
-function getShareCaption(){
-    return rand(SHARE_TITLES) + '\n\n' + rand(SHARE_DESCS);
+function getShareCaption(name){
+    if(name) {
+        return `My Chinese name is ${name}. See the meaning, pinyin, and calligraphy card.`;
+    }
+    return 'I received a meaningful Chinese name with pinyin, cultural meaning, and a calligraphy card.';
 }
 
-function getPlatformShareUrl(platform, text){
+function getPlatformShareUrl(platform, text, urlOverride){
     const title = encodeURIComponent(rand(SHARE_TITLES));
     const desc = encodeURIComponent(text || getShareCaption());
-    const shareUrl = encodeURIComponent(currentSharePageUrl || OFFICIAL_SHARE_URL);
+    const shareUrl = encodeURIComponent(urlOverride || currentSharePageUrl || OFFICIAL_SHARE_URL);
     const urls = {
         wx: 'https://api.whatsapp.com/send?text=' + desc + '%20' + shareUrl,
         fb: 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl + '&quote=' + desc,
@@ -1044,9 +1047,9 @@ async function downloadCurrentAvatarPng(name){
 
 async function copyCurrentShareLink(){
     await ensureSharePageReady();
-    const url = currentSharePageUrl || OFFICIAL_SHARE_URL;
+    const url = currentSharePageUrl;
     if(!url) {
-        alert('Please generate a name card first, then share it.');
+        alert('The name-card link is not ready yet. Please tap Share again in a moment.');
         return;
     }
     const ok = await copyShareText(url);
@@ -1084,12 +1087,12 @@ async function claimShareReward(platform){
 
 async function openPlatformShare(platform, name){
     const readyUrl = await ensureSharePageReady();
-    if(!readyUrl && !getCurrentAvatarSvgText()) {
-        alert('Please generate a name card first, then share it.');
+    if(!readyUrl) {
+        alert('The name-card link is not ready yet. Please tap Share again in a moment.');
         return;
     }
-    const text = platform === 'x' ? getShareCaption() : getPlainShareText();
-    window.open(getPlatformShareUrl(platform, text), '_blank');
+    const text = platform === 'x' ? getShareCaption(name) : getPlainShareText();
+    window.open(getPlatformShareUrl(platform, text, readyUrl), '_blank');
     claimShareReward(platform);
 }
 
@@ -1137,8 +1140,9 @@ async function doShare(platform){
         alert('Generate a name card first, then share it.');
         return;
     }
-    const text = platform === 'x' ? getShareCaption() : getPlainShareText();
-    window.open(getPlatformShareUrl(platform, text),'_blank');
+    const shareUrl = readyUrl || OFFICIAL_SHARE_URL;
+    const text = platform === 'x' ? getShareCaption(currentShareName) : getPlainShareText();
+    window.open(getPlatformShareUrl(platform, text, shareUrl),'_blank');
     claimShareReward(platform);
 }
 
