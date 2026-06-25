@@ -698,6 +698,8 @@ let currentSharePageUrl = '';
 let currentShareImageUrl = '';
 let currentShareSquareImageUrl = '';
 let currentSharePublishPromise = null;
+let currentShareName = '';
+let currentShareResult = null;
 let currentPackage = 'free';
 let shareRewardClaimed = false;
 
@@ -949,11 +951,13 @@ function publishShareCard(name, svgText, result){
     currentSharePageUrl = '';
     currentShareImageUrl = '';
     currentShareSquareImageUrl = '';
+    currentShareName = name || '';
+    currentShareResult = result || null;
     const status = document.getElementById('shareRewardStatus');
     if(status) status.textContent = 'Preparing share images...';
     currentSharePublishPromise = Promise.all([
-        svgTextToPreviewPngDataUrl(svgText, name, result),
-        svgTextToSquarePngDataUrl(svgText)
+        svgTextToPreviewPngDataUrl(svgText, name, result).catch(() => ''),
+        svgTextToSquarePngDataUrl(svgText).catch(() => '')
     ]).then(([previewPng, squarePng]) => fetch(apiUrl('/api/share-card'), {
         method: 'POST',
         headers: apiHeaders({ 'Content-Type': 'application/json' }),
@@ -977,7 +981,7 @@ function publishShareCard(name, svgText, result){
                   linkEl.textContent = currentSharePageUrl;
               }
               const status = document.getElementById('shareRewardStatus');
-              if(status) status.textContent = 'Share card is ready.';
+              if(status) status.textContent = (currentShareImageUrl && currentShareImageUrl.endsWith('.png')) ? 'Share card is ready.' : 'Share page is ready. Image preview may take a moment.';
           } else {
               const status = document.getElementById('shareRewardStatus');
               if(status) status.textContent = 'Share images could not be prepared. Please try New Style or Save Image.';
@@ -991,9 +995,19 @@ function publishShareCard(name, svgText, result){
     return currentSharePublishPromise;
 }
 
+async function retryShareCardPublish(){
+    const svgText = getCurrentAvatarSvgText();
+    if(!svgText || !currentShareName) return '';
+    await publishShareCard(currentShareName, svgText, currentShareResult);
+    return currentSharePageUrl || '';
+}
+
 async function ensureSharePageReady(){
     if(currentSharePublishPromise && !currentSharePageUrl) {
         await currentSharePublishPromise;
+    }
+    if(!currentSharePageUrl) {
+        await retryShareCardPublish();
     }
     return currentSharePageUrl || '';
 }
@@ -1080,24 +1094,25 @@ async function openPlatformShare(platform, name){
 }
 
 async function shareImageWithSystem(platform, name){
-    const readyUrl = await ensureSharePageReady();
-    if(!readyUrl) {
-        alert('Share card is still preparing. Please try again in a moment.');
-        return;
-    }
     const text = getPlainShareText();
     const svgText = getCurrentAvatarSvgText();
+    const readyPromise = ensureSharePageReady();
 
     if(svgText && navigator.share) {
         try {
             const file = await svgTextToPngFile(svgText, (name || 'chinese_name') + '_name_card.png');
             if(!navigator.canShare || navigator.canShare({ files: [file] })) {
+                const readyUrl = await Promise.race([
+                    readyPromise,
+                    new Promise(resolve => setTimeout(() => resolve(currentSharePageUrl || OFFICIAL_SHARE_URL), 1200))
+                ]);
                 await navigator.share({
                     title: 'My Chinese Name',
                     text,
-                    url: currentSharePageUrl || OFFICIAL_SHARE_URL,
+                    url: readyUrl || currentSharePageUrl || OFFICIAL_SHARE_URL,
                     files: [file]
                 });
+                await readyPromise;
                 claimShareReward(platform);
                 return;
             }
@@ -1109,8 +1124,9 @@ async function shareImageWithSystem(platform, name){
     if(svgText) {
         await downloadCurrentAvatarPng(name);
         await copyShareText(text);
-        alert('Your PNG name card has been saved. The share text has been copied when supported. Please upload the saved image in the social app.');
+        alert('Name card image saved. Share text copied when supported. Please upload the saved image in the social app.');
     }
+    await readyPromise;
     claimShareReward(platform);
 }
 
@@ -1642,6 +1658,7 @@ function regenerateAvatar(name){
     if(!wrap || !name) return;
     const svg = createChineseStyleAvatarSvg(name, { size: 400, font, theme });
     wrap.innerHTML = svg;
+    publishShareCard(name, svg, currentShareResult);
 }
 
 // \u4e0b\u8f7d\u5f53\u524d\u5c55\u793a\u7684\u5934\u50cfSVG

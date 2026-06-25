@@ -1252,7 +1252,7 @@ app.post('/api/share-card', (req, res) => {
     const name = cleanStr(req.body?.name || '').slice(0, 24);
     const pinyin = cleanStr(req.body?.pinyin || '').slice(0, 80);
     const summary = cleanStr(req.body?.summary || '').slice(0, 280);
-    if(!svg || !name || !previewPng || !squarePng) {
+    if(!svg || !name) {
         appendAnalyticsEvent(req, 'share_card_failed', {
             hasSvg: !!svg,
             hasName: !!name,
@@ -1275,13 +1275,17 @@ app.post('/api/share-card', (req, res) => {
         userId: getUserId(req)
     };
     writeShareCards(cards);
-    appendAnalyticsEvent(req, 'share_card_created', { id });
+    appendAnalyticsEvent(req, 'share_card_created', {
+        id,
+        hasPreviewPng: !!previewPng,
+        hasSquarePng: !!squarePng
+    });
     res.json({
         success: true,
         id,
         url: `${SHARE_DOMAIN}/share/${id}`,
-        imageUrl: `${SHARE_DOMAIN}/share-card/${id}.png`,
-        squareImageUrl: `${SHARE_DOMAIN}/share-card/${id}-square.png`
+        imageUrl: previewPng ? `${SHARE_DOMAIN}/share-card/${id}.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`,
+        squareImageUrl: squarePng ? `${SHARE_DOMAIN}/share-card/${id}-square.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`
     });
 });
 
