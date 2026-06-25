@@ -1875,7 +1875,7 @@ Return only valid JSON with this exact shape:
             }
             const result = data.choices[0].message.content;
             console.log('[DeepSeek] result:', result.substring(0, 200));
-            return result;
+            return { content: result, provider: 'deepseek', status: resp.status };
         } catch(err) {
             clearTimeout(timeout);
             console.error('[DeepSeek] exception:', err.message);
@@ -1885,8 +1885,8 @@ Return only valid JSON with this exact shape:
 
     try {
         log('[app] request processed');
-        const result = await callAI('deepseek');
-        let normalized = normalizeNameResult(result);
+        const aiResult = await callAI('deepseek');
+        let normalized = normalizeNameResult(aiResult.content);
         let usedFallback = false;
         if(!normalized.chineseName) {
             logError('[generate-name] AI response missing chineseName, using safe fallback');
@@ -1903,7 +1903,15 @@ Return only valid JSON with this exact shape:
         if(quotaLimited && !usedFallback && !useQuota(userId)) {
             return res.status(402).json({ error: 'quota exhausted', showPaywall: true });
         }
-        res.json({ success: true, devTest, data: normalized, fallback: usedFallback, quotaCharged: !usedFallback });
+        res.json({
+            success: true,
+            devTest,
+            data: normalized,
+            fallback: usedFallback,
+            quotaCharged: !usedFallback,
+            aiProvider: aiResult.provider,
+            aiStatus: aiResult.status
+        });
     } catch(err) {
         logError('[generate-name] AI failed, using safe fallback:', err.message);
         const fallback = normalizeNameResult(buildFallbackName({
@@ -1914,7 +1922,16 @@ Return only valid JSON with this exact shape:
             meaning: finalMeaning,
             birthText
         }));
-        res.json({ success: true, devTest, data: fallback, fallback: true, quotaCharged: false });
+        res.json({
+            success: true,
+            devTest,
+            data: fallback,
+            fallback: true,
+            quotaCharged: false,
+            aiProvider: 'fallback',
+            aiStatus: 0,
+            aiError: String(err.message || '').slice(0, 160)
+        });
     }
 });
 

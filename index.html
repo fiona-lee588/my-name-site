@@ -1044,9 +1044,9 @@ async function downloadCurrentAvatarPng(name){
 
 async function copyCurrentShareLink(){
     await ensureSharePageReady();
-    const url = currentSharePageUrl;
+    const url = currentSharePageUrl || OFFICIAL_SHARE_URL;
     if(!url) {
-        alert('Share card is still preparing. Please try again in a moment.');
+        alert('Please generate a name card first, then share it.');
         return;
     }
     const ok = await copyShareText(url);
@@ -1084,8 +1084,8 @@ async function claimShareReward(platform){
 
 async function openPlatformShare(platform, name){
     const readyUrl = await ensureSharePageReady();
-    if(!readyUrl) {
-        alert('Share card is still preparing. Please try again in a moment.');
+    if(!readyUrl && !getCurrentAvatarSvgText()) {
+        alert('Please generate a name card first, then share it.');
         return;
     }
     const text = platform === 'x' ? getShareCaption() : getPlainShareText();
@@ -1133,7 +1133,7 @@ async function shareImageWithSystem(platform, name){
 // \u5206\u4eab\u51fd\u6570
 async function doShare(platform){
     const readyUrl = await ensureSharePageReady();
-    if(!readyUrl) {
+    if(!readyUrl && !getCurrentAvatarSvgText()) {
         alert('Generate a name card first, then share it.');
         return;
     }
@@ -1341,7 +1341,9 @@ function parseGeneratedName(text){
             sections: Array.isArray(data.sections) ? data.sections : [],
             raw: data.raw || '',
             fallback: Boolean(payload.fallback || data.source === 'fallback'),
-            quotaCharged: payload.quotaCharged !== false
+            quotaCharged: payload.quotaCharged !== false,
+            aiProvider: payload.aiProvider || '',
+            aiStatus: payload.aiStatus || 0
         };
     }
 
@@ -1354,7 +1356,9 @@ function parseGeneratedName(text){
             sections: Array.isArray(payload.sections) ? payload.sections : [],
             raw: text,
             fallback: Boolean(payload.fallback || payload.source === 'fallback'),
-            quotaCharged: payload.quotaCharged !== false
+            quotaCharged: payload.quotaCharged !== false,
+            aiProvider: payload.aiProvider || '',
+            aiStatus: payload.aiStatus || 0
         };
     }
 
@@ -1370,7 +1374,9 @@ function parseGeneratedName(text){
         sections: [],
         raw: text,
         fallback: false,
-        quotaCharged: true
+        quotaCharged: true,
+        aiProvider: '',
+        aiStatus: 0
     };
 }
 
@@ -1481,7 +1487,14 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             currentQuota = Math.max(0, currentQuota - 1);
             updateQuotaUI();
         }
-        trackEvent('generate_success', { devTest: DEV_TEST_MODE, fallback: result.fallback, quotaCharged: result.quotaCharged, hasSections: Array.isArray(result.sections) && result.sections.length > 0 });
+        trackEvent('generate_success', {
+            devTest: DEV_TEST_MODE,
+            fallback: result.fallback,
+            quotaCharged: result.quotaCharged,
+            aiProvider: result.aiProvider,
+            aiStatus: result.aiStatus,
+            hasSections: Array.isArray(result.sections) && result.sections.length > 0
+        });
 
         // \u63d0\u53d6\u4e94\u884c\u559c\u7528\uff08\u7528\u4e8e\u663e\u793a\u5728\u5934\u50cf\u4e0b\u65b9\uff09
         const wuxingMatch = text.match(/\u3010\u4e94\u884c\u559c\u7528\u3011\uff1a(.+)/);
