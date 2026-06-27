@@ -22,6 +22,7 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 const OFFICIAL_DOMAIN = (process.env.PUBLIC_SITE_URL || process.env.DOMAIN || 'https://mychinesename.co').replace(/\/+$/, '');
 const SHARE_DOMAIN = (process.env.SHARE_DOMAIN || OFFICIAL_DOMAIN).replace(/\/+$/, '');
+const DEFAULT_SOCIAL_IMAGE_URL = `${OFFICIAL_DOMAIN}/assets/social-preview.png`;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const ADMIN_PATH = '/admin-dashboard-2026';
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PASSWORD || 'local-admin-session';
@@ -31,6 +32,12 @@ function normalizeSecret(value){
         .replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
 }
 const DEEPSEEK_API_KEY = normalizeSecret(process.env.DEEPSEEK_API_KEY);
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+function secretFingerprint(value){
+    if(!value) return '';
+    return crypto.createHash('sha256').update(String(value)).digest('hex').slice(0, 12);
+}
+const DEEPSEEK_KEY_FINGERPRINT = secretFingerprint(DEEPSEEK_API_KEY);
 const SEO_LANDING_PAGES = {
     '/chinese-name-generator': {
         title: 'Chinese Name Generator Inspired by the I Ching and Book of Songs',
@@ -626,7 +633,8 @@ function appendContactMessage(entry){
 function appendAnalyticsEvent(req, event, meta = {}){
     const allowed = new Set([
         'page_view', 'generate_click', 'generate_success', 'generate_failed',
-        'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created', 'share_card_failed'
+        'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created', 'share_card_failed',
+        'ai_call_success', 'ai_call_failed'
     ]);
     if(!allowed.has(event)) return { ok: false };
     const logs = readAnalyticsLog();
@@ -731,7 +739,7 @@ function createShareId(){
 function renderSharePage(id, card){
     const canonical = `${SHARE_DOMAIN}/share/${id}`;
     const hasPng = !!(card.previewPng || card.png);
-    const imageUrl = hasPng ? `${SHARE_DOMAIN}/share-card/${id}.png` : `${SHARE_DOMAIN}/share-card/${id}.svg`;
+    const imageUrl = hasPng ? `${SHARE_DOMAIN}/share-card/${id}.png` : DEFAULT_SOCIAL_IMAGE_URL;
     const name = card.name || 'My Chinese Name';
     const title = `${name} - Meaningful Chinese Name Card`;
     const desc = card.summary || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
@@ -749,7 +757,7 @@ function renderSharePage(id, card){
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${imageUrl}">
 <meta property="og:image:secure_url" content="${imageUrl}">
-<meta property="og:image:type" content="${hasPng ? 'image/png' : 'image/svg+xml'}">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -1389,7 +1397,9 @@ function renderAdminDashboard(req){
         share_click: '\u5206\u4eab\u70b9\u51fb',
         share_reward: '\u5206\u4eab\u5956\u52b1',
         share_card_created: '\u5206\u4eab\u9875\u751f\u6210',
-        share_card_failed: '\u5206\u4eab\u9875\u751f\u6210\u5931\u8d25'
+        share_card_failed: '\u5206\u4eab\u9875\u751f\u6210\u5931\u8d25',
+        ai_call_success: 'DeepSeek\u8c03\u7528\u6210\u529f',
+        ai_call_failed: 'DeepSeek\u8c03\u7528\u5931\u8d25'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
@@ -1444,6 +1454,8 @@ function renderAdminDashboard(req){
       ${card('\u603b\u8bbf\u95ee', analytics.counts.page_view || 0, 'page_view total')}
       ${card('\u751f\u6210\u6210\u529f', analytics.counts.generate_success || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_success || 0}`)}
       ${card('\u751f\u6210\u5931\u8d25', analytics.counts.generate_failed || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_failed || 0}`)}
+      ${card('AI\u8c03\u7528\u6210\u529f', analytics.counts.ai_call_success || 0, `\u4eca\u65e5 ${analytics.todayCounts.ai_call_success || 0}`)}
+      ${card('AI\u8c03\u7528\u5931\u8d25', analytics.counts.ai_call_failed || 0, `\u4eca\u65e5 ${analytics.todayCounts.ai_call_failed || 0}`)}
       ${card('\u70b9\u51fb\u751f\u6210', analytics.counts.generate_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.generate_click || 0}`)}
       ${card('\u4ed8\u8d39\u5f39\u7a97', analytics.counts.paywall_show || 0, `\u4eca\u65e5 ${analytics.todayCounts.paywall_show || 0}`)}
       ${card('\u8d2d\u4e70\u70b9\u51fb', analytics.counts.buy_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.buy_click || 0}`)}
@@ -1508,7 +1520,7 @@ async function probeNameEngine(){
                 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: DEEPSEEK_MODEL,
                 messages: [
                     { role: 'system', content: 'Return JSON only.' },
                     { role: 'user', content: 'Return {"ok":true}.' }
@@ -1524,6 +1536,9 @@ async function probeNameEngine(){
             configured: true,
             ok: resp.ok && !!body.choices?.[0]?.message?.content,
             status: resp.status,
+            model: DEEPSEEK_MODEL,
+            usage: body.usage || null,
+            keyFingerprint: DEEPSEEK_KEY_FINGERPRINT,
             error: resp.ok ? '' : (body.error?.message || body.error || 'DeepSeek probe failed')
         };
     } catch(err) {
@@ -1539,7 +1554,9 @@ app.get('/api/admin/name-engine-status', async (req, res) => {
         nodeEnv: process.env.NODE_ENV || '',
         deepseekKeyConfigured: !!DEEPSEEK_API_KEY,
         deepseekKeyLooksValid: /^sk-[A-Za-z0-9_-]{20,}$/.test(DEEPSEEK_API_KEY),
-        deepseekKeyWasNormalized: DEEPSEEK_API_KEY !== String(process.env.DEEPSEEK_API_KEY || '').trim()
+        deepseekKeyWasNormalized: DEEPSEEK_API_KEY !== String(process.env.DEEPSEEK_API_KEY || '').trim(),
+        deepseekModel: DEEPSEEK_MODEL,
+        deepseekKeyFingerprint: DEEPSEEK_KEY_FINGERPRINT
     };
     if(probe) status.probe = await probeNameEngine();
     res.json(status);
@@ -1835,12 +1852,13 @@ Return only valid JSON with this exact shape:
   ]
 }`;
 
-    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: "deepseek-chat" };
+    const deepseek = { url:'https://api.deepseek.com/v1/chat/completions', model: DEEPSEEK_MODEL };
 
     async function callAI() {
         if(!DEEPSEEK_API_KEY) {
             throw new Error('DEEPSEEK_API_KEY is not configured');
         }
+        const aiRequestId = `ai_${Date.now().toString(36)}_${crypto.randomBytes(3).toString('hex')}`;
         const body = {
             model: deepseek.model,
             messages:[
@@ -1871,14 +1889,52 @@ Return only valid JSON with this exact shape:
             if(!resp.ok || !data.choices?.[0]?.message?.content) {
                 const errMsg = data.error?.message || data.error || 'API error';
                 console.error('[DeepSeek] error:', errMsg);
-                throw new Error(errMsg);
+                appendAnalyticsEvent(req, 'ai_call_failed', {
+                    requestId: aiRequestId,
+                    provider: 'deepseek',
+                    model: deepseek.model,
+                    status: resp.status,
+                    keyFingerprint: DEEPSEEK_KEY_FINGERPRINT,
+                    error: String(errMsg).slice(0, 180)
+                });
+                const apiErr = new Error(errMsg);
+                apiErr.aiLogged = true;
+                throw apiErr;
             }
             const result = data.choices[0].message.content;
+            const usage = data.usage || {};
             console.log('[DeepSeek] result:', result.substring(0, 200));
-            return { content: result, provider: 'deepseek', status: resp.status };
+            appendAnalyticsEvent(req, 'ai_call_success', {
+                requestId: aiRequestId,
+                provider: 'deepseek',
+                model: deepseek.model,
+                status: resp.status,
+                promptTokens: usage.prompt_tokens || 0,
+                completionTokens: usage.completion_tokens || 0,
+                totalTokens: usage.total_tokens || 0,
+                keyFingerprint: DEEPSEEK_KEY_FINGERPRINT
+            });
+            return {
+                content: result,
+                provider: 'deepseek',
+                status: resp.status,
+                model: deepseek.model,
+                requestId: aiRequestId,
+                usage
+            };
         } catch(err) {
             clearTimeout(timeout);
             console.error('[DeepSeek] exception:', err.message);
+            if(!err.aiLogged) {
+                appendAnalyticsEvent(req, 'ai_call_failed', {
+                    requestId: aiRequestId,
+                    provider: 'deepseek',
+                    model: deepseek.model,
+                    status: 0,
+                    keyFingerprint: DEEPSEEK_KEY_FINGERPRINT,
+                    error: String(err.message || '').slice(0, 180)
+                });
+            }
             throw err;
         }
     }
@@ -1910,7 +1966,10 @@ Return only valid JSON with this exact shape:
             fallback: usedFallback,
             quotaCharged: !usedFallback,
             aiProvider: aiResult.provider,
-            aiStatus: aiResult.status
+            aiStatus: aiResult.status,
+            aiModel: aiResult.model,
+            aiRequestId: aiResult.requestId,
+            aiUsage: aiResult.usage || null
         });
     } catch(err) {
         logError('[generate-name] AI failed, using safe fallback:', err.message);

@@ -12,9 +12,16 @@
 <meta property="og:description" content="A culturally meaningful Chinese name with characters, pinyin, pronunciation, English explanation, and classical source.">
 <meta property="og:url" content="https://mychinesename.co/">
 <meta property="og:site_name" content="My Chinese Name">
+<meta property="og:image" content="https://mychinesename.co/assets/social-preview.png">
+<meta property="og:image:secure_url" content="https://mychinesename.co/assets/social-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Get a Meaningful Chinese Name Inspired by the I Ching and Book of Songs">
 <meta name="twitter:description" content="Not a random translation: receive a Chinese name with pinyin, meaning, and cultural source.">
+<meta name="twitter:image" content="https://mychinesename.co/assets/social-preview.png">
+<meta name="twitter:image:alt" content="My Chinese Name calligraphy card preview">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"My Chinese Name","url":"https://mychinesename.co/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","description":"Generate meaningful Chinese names for overseas users using surname matching, I Ching, Book of Songs, Chu Ci, and five-elements interpretation."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this just a random Chinese translation?","acceptedAnswer":{"@type":"Answer","text":"No. The service matches an English surname to a Chinese surname and explains the given name through pinyin, meaning, classical source, and cultural symbolism."}},{"@type":"Question","name":"Can overseas users understand the result?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every result includes Chinese characters, pinyin, an English pronunciation guide, and bilingual explanations."}},{"@type":"Question","name":"What classics are used?","acceptedAnswer":{"@type":"Answer","text":"Names may be inspired by the I Ching, Book of Songs, Chu Ci, and traditional five-elements thinking."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mychinesename.co/"}]}]}
 </script>
@@ -1347,7 +1354,10 @@ function parseGeneratedName(text){
             fallback: Boolean(payload.fallback || data.source === 'fallback'),
             quotaCharged: payload.quotaCharged !== false,
             aiProvider: payload.aiProvider || '',
-            aiStatus: payload.aiStatus || 0
+            aiStatus: payload.aiStatus || 0,
+            aiModel: payload.aiModel || '',
+            aiRequestId: payload.aiRequestId || '',
+            aiUsage: payload.aiUsage || null
         };
     }
 
@@ -1362,7 +1372,10 @@ function parseGeneratedName(text){
             fallback: Boolean(payload.fallback || payload.source === 'fallback'),
             quotaCharged: payload.quotaCharged !== false,
             aiProvider: payload.aiProvider || '',
-            aiStatus: payload.aiStatus || 0
+            aiStatus: payload.aiStatus || 0,
+            aiModel: payload.aiModel || '',
+            aiRequestId: payload.aiRequestId || '',
+            aiUsage: payload.aiUsage || null
         };
     }
 
@@ -1380,7 +1393,10 @@ function parseGeneratedName(text){
         fallback: false,
         quotaCharged: true,
         aiProvider: '',
-        aiStatus: 0
+        aiStatus: 0,
+        aiModel: '',
+        aiRequestId: '',
+        aiUsage: null
     };
 }
 
@@ -1497,6 +1513,9 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
             quotaCharged: result.quotaCharged,
             aiProvider: result.aiProvider,
             aiStatus: result.aiStatus,
+            aiModel: result.aiModel,
+            aiRequestId: result.aiRequestId,
+            aiTokens: result.aiUsage?.total_tokens || 0,
             hasSections: Array.isArray(result.sections) && result.sections.length > 0
         });
 
