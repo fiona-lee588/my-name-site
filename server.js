@@ -1418,7 +1418,7 @@ function renderAdminDashboard(req){
         <td>${htmlEscape(eventLabel[item.event] || item.event)}</td>
         <td>${htmlEscape(item.userId)}</td>
         <td>${htmlEscape(item.ip)}</td>
-        <td>${htmlEscape(JSON.stringify(item.meta || {})).substring(0, 220)}</td>
+        <td>${htmlEscape(JSON.stringify(item.meta || {})).substring(0, 520)}</td>
     </tr>`).join('');
     const paymentRows = payments.map(item => `<tr>
         <td>${htmlEscape(item._ts || '')}</td><td>${htmlEscape(item.txn || '')}</td><td>${htmlEscape(item.pkg || '')}</td>
