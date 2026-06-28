@@ -382,6 +382,11 @@ input:focus,select:focus{
 .meaning-title .en{color:#997755;font-size:12px;font-weight:normal;margin-left:6px}
 .meaning-cn{color:#443322;font-size:15px;line-height:1.75;margin-bottom:6px;max-width:760px;white-space:normal}
 .meaning-en{color:#997755;font-size:13px;line-height:1.65;max-width:760px;white-space:normal}
+.result-feedback{max-width:760px;margin:18px auto 6px;padding:14px;background:#fff8ea;border:1px solid #e4cfad;border-radius:10px;text-align:center}
+.feedback-title{color:#8c2318;font-size:14px;margin-bottom:10px}
+.feedback-btn{padding:8px 14px;margin:0 5px 8px;border:1px solid #c9a96e;border-radius:7px;background:#fffbf5;color:#8c2318;cursor:pointer;font-family:inherit;font-size:14px}
+.feedback-btn:hover{background:#8c2318;color:#fff;border-color:#8c2318}
+.feedback-status{min-height:18px;color:#997755;font-size:12px}
 /* 涔︽硶澶村儚灞曠ず鍖?*/
 .avatar-showcase{max-width:760px;margin:28px auto;padding:24px 20px;background:#fffbf5;border:1px solid #e4cfad;border-radius:12px;text-align:center;white-space:normal;box-shadow:0 8px 24px rgba(140,35,24,0.08)}
 .avatar-label{font-size:18px;color:#8c2318;margin-bottom:6px;}
@@ -1046,9 +1051,12 @@ async function downloadCurrentAvatarPng(name){
         a.download = file.name;
         a.click();
         URL.revokeObjectURL(url);
+        trackEvent('save_image', { name, type: 'png', hasShareUrl: !!currentSharePageUrl });
         return true;
     } catch(e) {
-        return downloadCurrentAvatarCopy(name);
+        const ok = downloadCurrentAvatarCopy(name);
+        if(ok) trackEvent('save_image', { name, type: 'svg_fallback', hasShareUrl: !!currentSharePageUrl });
+        return ok;
     }
 }
 
@@ -1060,6 +1068,7 @@ async function copyCurrentShareLink(){
         return;
     }
     const ok = await copyShareText(url);
+    trackEvent('copy_share_link', { copied: ok, urlReady: !!url });
     alert(ok ? 'Share link copied.' : 'Share link: ' + url);
 }
 
@@ -1099,6 +1108,7 @@ async function openPlatformShare(platform, name){
         return;
     }
     const text = platform === 'x' ? getShareCaption(name) : getPlainShareText();
+    trackEvent('platform_share_open', { platform, name, url: readyUrl });
     window.open(getPlatformShareUrl(platform, text, readyUrl), '_blank');
     claimShareReward(platform);
 }
@@ -1123,6 +1133,7 @@ async function shareImageWithSystem(platform, name){
                     files: [file]
                 });
                 await readyPromise;
+                trackEvent('share_image', { platform, name, method: 'navigator_share', urlReady: !!currentSharePageUrl });
                 claimShareReward(platform);
                 return;
             }
@@ -1134,6 +1145,7 @@ async function shareImageWithSystem(platform, name){
     if(svgText) {
         await downloadCurrentAvatarPng(name);
         await copyShareText(text);
+        trackEvent('share_image', { platform, name, method: 'download_fallback', urlReady: !!currentSharePageUrl });
         alert('Name card image saved. Share text copied when supported. Please upload the saved image in the social app.');
     }
     await readyPromise;
@@ -1149,8 +1161,22 @@ async function doShare(platform){
     }
     const shareUrl = readyUrl || OFFICIAL_SHARE_URL;
     const text = platform === 'x' ? getShareCaption(currentShareName) : getPlainShareText();
+    trackEvent('platform_share_open', { platform, name: currentShareName, url: shareUrl, fixedBar: true });
     window.open(getPlatformShareUrl(platform, text, shareUrl),'_blank');
     claimShareReward(platform);
+}
+
+function submitResultFeedback(value, name){
+    const status = document.getElementById('resultFeedbackStatus');
+    trackEvent('result_feedback', {
+        value,
+        name,
+        aiProvider: currentShareResult?.aiProvider || '',
+        aiModel: currentShareResult?.aiModel || '',
+        aiRequestId: currentShareResult?.aiRequestId || '',
+        hasShareUrl: !!currentSharePageUrl
+    });
+    if(status) status.textContent = value === 'love' ? 'Thanks. Glad this name feels right.' : 'Thanks. We will use this to improve the naming result.';
 }
 
 // \u4ed8\u8d39\u5f39\u7a97
@@ -1168,12 +1194,24 @@ function apiUrl(path){
     return `${API_BASE}${path}`;
 }
 
+function getAttributionMeta(){
+    const params = new URLSearchParams(location.search || '');
+    return {
+        path: location.pathname || '/',
+        referrer: document.referrer || '',
+        utm_source: params.get('utm_source') || '',
+        utm_medium: params.get('utm_medium') || '',
+        utm_campaign: params.get('utm_campaign') || '',
+        utm_content: params.get('utm_content') || ''
+    };
+}
+
 function trackEvent(event, meta){
     try {
         fetch(apiUrl('/api/track'), {
             method: 'POST',
             headers: apiHeaders({'Content-Type':'application/json'}),
-            body: JSON.stringify({ event, meta: meta || {} }),
+            body: JSON.stringify({ event, meta: Object.assign(getAttributionMeta(), meta || {}) }),
             keepalive: true
         }).catch(() => {});
     } catch(e) {}
@@ -1185,6 +1223,11 @@ function trackPageView(){
             event: 'page_view',
             path: location.pathname || '/',
             uid: BROWSER_USER_ID,
+            referrer: document.referrer || '',
+            utm_source: new URLSearchParams(location.search || '').get('utm_source') || '',
+            utm_medium: new URLSearchParams(location.search || '').get('utm_medium') || '',
+            utm_campaign: new URLSearchParams(location.search || '').get('utm_campaign') || '',
+            utm_content: new URLSearchParams(location.search || '').get('utm_content') || '',
             t: String(Date.now())
         });
         const img = new Image();
@@ -1543,6 +1586,12 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         }
         html += renderMeaningSections(result);
         html += `</div>`;
+        html += `<div class="result-feedback">
+    <div class="feedback-title">How does this name feel?</div>
+    <button class="feedback-btn" onclick="submitResultFeedback('love','${safeFullName}')">Love it</button>
+    <button class="feedback-btn" onclick="submitResultFeedback('not_quite','${safeFullName}')">Not quite</button>
+    <div class="feedback-status" id="resultFeedbackStatus"></div>
+</div>`;
 
         const fontsIdx = Math.floor(Math.random() * avatarFonts.length);
         const bgIdx = Math.floor(Math.random() * avatarThemes.length);

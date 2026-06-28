@@ -634,7 +634,8 @@ function appendAnalyticsEvent(req, event, meta = {}){
     const allowed = new Set([
         'page_view', 'generate_click', 'generate_success', 'generate_failed',
         'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created', 'share_card_failed',
-        'ai_call_success', 'ai_call_failed'
+        'ai_call_success', 'ai_call_failed',
+        'save_image', 'copy_share_link', 'share_image', 'platform_share_open', 'result_feedback'
     ]);
     if(!allowed.has(event)) return { ok: false };
     const logs = readAnalyticsLog();
@@ -1399,7 +1400,12 @@ function renderAdminDashboard(req){
         share_card_created: '\u5206\u4eab\u9875\u751f\u6210',
         share_card_failed: '\u5206\u4eab\u9875\u751f\u6210\u5931\u8d25',
         ai_call_success: 'DeepSeek\u8c03\u7528\u6210\u529f',
-        ai_call_failed: 'DeepSeek\u8c03\u7528\u5931\u8d25'
+        ai_call_failed: 'DeepSeek\u8c03\u7528\u5931\u8d25',
+        save_image: '\u4fdd\u5b58\u56fe\u7247',
+        copy_share_link: '\u590d\u5236\u5206\u4eab\u94fe\u63a5',
+        share_image: '\u7cfb\u7edf\u5206\u4eab\u56fe\u7247',
+        platform_share_open: '\u6253\u5f00\u5e73\u53f0\u5206\u4eab',
+        result_feedback: '\u7ed3\u679c\u53cd\u9988'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
@@ -1573,6 +1579,11 @@ app.get('/api/track-pixel.gif', (req, res) => {
     const meta = {
         path: cleanStr(req.query.path || ''),
         uid: cleanStr(req.query.uid || '').slice(0, 80),
+        referrer: cleanStr(req.query.referrer || '').slice(0, 220),
+        utm_source: cleanStr(req.query.utm_source || '').slice(0, 60),
+        utm_medium: cleanStr(req.query.utm_medium || '').slice(0, 60),
+        utm_campaign: cleanStr(req.query.utm_campaign || '').slice(0, 80),
+        utm_content: cleanStr(req.query.utm_content || '').slice(0, 80),
         source: 'pixel'
     };
     appendAnalyticsEvent(req, event, meta);
