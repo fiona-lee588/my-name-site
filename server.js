@@ -420,6 +420,25 @@ app.use((req, res, next) => {
     res.charset = 'utf-8';
     next();
 });
+app.use((req, res, next) => {
+    const host = String(req.headers.host || '').toLowerCase();
+    const isRenderHost = host.includes('mychinesename-api.onrender.com');
+    const isPageRequest = req.method === 'GET'
+        && !req.path.startsWith('/api/')
+        && !req.path.startsWith('/share-card/')
+        && !req.path.startsWith('/assets/')
+        && req.path !== '/robots.txt'
+        && req.path !== '/sitemap.xml'
+        && !req.path.endsWith('.png')
+        && !req.path.endsWith('.jpg')
+        && !req.path.endsWith('.jpeg')
+        && !req.path.endsWith('.svg')
+        && !req.path.endsWith('.ico');
+    if(isRenderHost && isPageRequest){
+        return res.redirect(301, `${OFFICIAL_DOMAIN}${req.originalUrl}`);
+    }
+    return next();
+});
 // helmet() \u5df2\u79fb\u9664 CSP
 // app.use(helmet());
 app.use(express.json({ limit: '768kb' }));
