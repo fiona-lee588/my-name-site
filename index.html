@@ -27,7 +27,10 @@
 </script>
 <title>Get a Meaningful Chinese Name Inspired by the I Ching and Book of Songs</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap');
+@font-face{font-family:"MCN-MaShan";src:url("/assets/fonts/calligraphy/MaShanZheng-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-ZhiMang";src:url("/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-MaoCao";src:url("/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-LongCang";src:url("/assets/fonts/calligraphy/LongCang-Regular.ttf") format("truetype");font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --c-primary:#8c2318;--c-primary-dark:#701c13;
@@ -815,7 +818,51 @@ function svgTextToImage(svgText){
     });
 }
 
-async function svgTextToSquarePngDataUrl(svgText){
+const CALLIGRAPHY_FONT_FILES = {
+    regular: ['/assets/fonts/calligraphy/MaShanZheng-Regular.ttf', 'MCN-MaShan'],
+    running: ['/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf', 'MCN-ZhiMang'],
+    cursive: ['/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf', 'MCN-MaoCao'],
+    seal: ['/assets/fonts/calligraphy/LongCang-Regular.ttf', 'MCN-LongCang']
+};
+let calligraphyFontsReadyPromise = null;
+
+function ensureCalligraphyFontsReady(){
+    if(calligraphyFontsReadyPromise) return calligraphyFontsReadyPromise;
+    calligraphyFontsReadyPromise = Promise.all(Object.values(CALLIGRAPHY_FONT_FILES).map(([url, family]) => {
+        if(!('FontFace' in window) || !document.fonts) return Promise.resolve();
+        const face = new FontFace(family, `url(${url})`);
+        return face.load().then(loaded => document.fonts.add(loaded)).catch(() => null);
+    })).then(() => document.fonts?.ready || null).catch(() => null);
+    return calligraphyFontsReadyPromise;
+}
+
+function drawCanvasCalligraphyName(ctx, name, x, y, size, style = 'running', fill = '#050403'){
+    if(!name) return;
+    const familyMap = {
+        regular: 'MCN-MaShan',
+        running: 'MCN-ZhiMang',
+        cursive: 'MCN-MaoCao',
+        seal: 'MCN-LongCang'
+    };
+    const family = familyMap[style] || familyMap.running;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${size}px "${family}", "SimKai", "KaiTi", serif`;
+    ctx.shadowColor = 'rgba(0,0,0,.22)';
+    ctx.shadowBlur = Math.max(4, size * .035);
+    ctx.shadowOffsetX = Math.max(2, size * .025);
+    ctx.shadowOffsetY = Math.max(3, size * .035);
+    ctx.strokeStyle = 'rgba(0,0,0,.22)';
+    ctx.lineWidth = Math.max(1.2, size * .018);
+    ctx.strokeText(name, x, y);
+    ctx.fillStyle = fill;
+    ctx.fillText(name, x, y);
+    ctx.restore();
+}
+
+async function svgTextToSquarePngDataUrl(svgText, name){
+    await ensureCalligraphyFontsReady();
     const img = await svgTextToImage(svgText);
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
@@ -824,10 +871,12 @@ async function svgTextToSquarePngDataUrl(svgText){
     ctx.fillStyle = '#f7f2e9';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawImageContain(ctx, img, 36, 36, 1008, 1008);
+    drawCanvasCalligraphyName(ctx, name || currentShareName, 540, 508, 142, 'running');
     return canvas.toDataURL('image/png');
 }
 
 async function svgTextToPreviewPngDataUrl(svgText, name, result){
+    await ensureCalligraphyFontsReady();
     const img = await svgTextToImage(svgText);
     const canvas = document.createElement('canvas');
     canvas.width = 1200;
@@ -850,6 +899,7 @@ async function svgTextToPreviewPngDataUrl(svgText, name, result){
     ctx.fill();
     ctx.stroke();
     drawImageContain(ctx, img, 86, 90, 458, 458);
+    drawCanvasCalligraphyName(ctx, name, 315, 330, 92, 'running');
 
     const pinyin = result?.pinyin || '';
     const summary = buildShareSummary(result);
@@ -872,7 +922,7 @@ async function svgTextToPreviewPngDataUrl(svgText, name, result){
 }
 
 async function svgTextToPngFile(svgText, fileName){
-    const dataUrl = await svgTextToSquarePngDataUrl(svgText);
+    const dataUrl = await svgTextToSquarePngDataUrl(svgText, currentShareName);
     const bytes = atob(dataUrl.split(',')[1] || '');
     const arr = new Uint8Array(bytes.length);
     for(let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
@@ -972,7 +1022,7 @@ function publishShareCard(name, svgText, result){
     if(status) status.textContent = 'Preparing share images...';
     currentSharePublishPromise = Promise.all([
         svgTextToPreviewPngDataUrl(svgText, name, result).catch(() => ''),
-        svgTextToSquarePngDataUrl(svgText).catch(() => '')
+        svgTextToSquarePngDataUrl(svgText, name).catch(() => '')
     ]).then(([previewPng, squarePng]) => fetch(apiUrl('/api/share-card'), {
         method: 'POST',
         headers: apiHeaders({ 'Content-Type': 'application/json' }),
@@ -1644,10 +1694,10 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
 // \u524d\u7aef\u751f\u6210\u4e66\u6cd5\u5934\u50cf\uff08\u591a\u5b57\u4f53\u591a\u80cc\u666f\u5207\u6362\uff0c\u65e0\u9700\u540e\u7aef\uff09
 const avatarFonts = [
-    "'Zhi Mang Xing', 'Ma Shan Zheng', STXingkai, FZShuTi, KaiTi, cursive",
-    "'Ma Shan Zheng', 'Zhi Mang Xing', STXingkai, FZShuTi, KaiTi, cursive",
-    "STXingkai, 'Zhi Mang Xing', 'Ma Shan Zheng', FZShuTi, KaiTi, cursive",
-    "FZShuTi, 'Zhi Mang Xing', 'Ma Shan Zheng', KaiTi, cursive"
+    "'MCN-ZhiMang', 'MCN-MaShan', 'SimKai', 'KaiTi', cursive",
+    "'MCN-MaShan', 'MCN-ZhiMang', 'SimKai', 'KaiTi', cursive",
+    "'MCN-MaoCao', 'MCN-ZhiMang', 'MCN-MaShan', cursive",
+    "'MCN-LongCang', 'MCN-MaShan', 'SimKai', 'KaiTi', serif"
 ];
 const avatarThemes = ['cloud','ink','paper','mountain'];
 let currentAvatarFontsIdx = 0;
@@ -1697,6 +1747,12 @@ function createChineseStyleAvatarSvg(name, options){
 
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <style>
+      @font-face{font-family:MCN-MaShan;src:url('/assets/fonts/calligraphy/MaShanZheng-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-ZhiMang;src:url('/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-MaoCao;src:url('/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-LongCang;src:url('/assets/fonts/calligraphy/LongCang-Regular.ttf') format('truetype');}
+    </style>
     <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#fffaf0"/>
       <stop offset="48%" stop-color="#f5ead6"/>
