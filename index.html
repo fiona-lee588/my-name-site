@@ -1164,9 +1164,7 @@ function ensureCalligraphyFontsReady(){
     calligraphyFontsReadyPromise = Promise.all(Object.values(CALLIGRAPHY_FONT_FILES).map(([url, family]) => {
         if(!('FontFace' in window) || !document.fonts) return Promise.resolve();
         const face = new FontFace(family, `url(${url})`);
-        return face.load().then(loaded => {
-            document.fonts.add(loaded);
-        }).catch(() => null);
+        return face.load().then(loaded => document.fonts.add(loaded)).catch(() => null);
     })).then(() => document.fonts?.ready || null).catch(() => null);
     return calligraphyFontsReadyPromise;
 }
@@ -1175,7 +1173,7 @@ function drawCanvasCalligraphyName(ctx, name, x, y, size, style = 'running', fil
     if(!name) return;
     const familyMap = {
         regular: 'MCN-MaShan',
-        running: 'MCN-MaShan',
+        running: 'MCN-ZhiMang',
         cursive: 'MCN-MaoCao',
         seal: 'MCN-LongCang'
     };
