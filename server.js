@@ -20,12 +20,13 @@ const IS_PROD     = process.env.NODE_ENV === 'production';
 const DOMAIN      = process.env.DOMAIN   || (IS_PROD ? 'https://mychinesename.co' : 'http://localhost:3000');
 const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename.co' : '*');
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
-const OFFICIAL_DOMAIN = (process.env.PUBLIC_SITE_URL || process.env.DOMAIN || 'https://mychinesename.co').replace(/\/+$/, '');
+const OFFICIAL_DOMAIN = (process.env.PUBLIC_SITE_URL || process.env.DOMAIN || DOMAIN).replace(/\/+$/, '');
 const SHARE_DOMAIN = (process.env.SHARE_DOMAIN || OFFICIAL_DOMAIN).replace(/\/+$/, '');
 const DEFAULT_SOCIAL_IMAGE_URL = `${OFFICIAL_DOMAIN}/assets/social-preview.png`;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const ADMIN_PATH = '/admin-dashboard-2026';
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PASSWORD || 'local-admin-session';
+const BLOG_API_TOKEN = normalizeSecret(process.env.BLOG_API_TOKEN || '');
 function normalizeSecret(value){
     return String(value || '')
         .trim()
@@ -404,6 +405,10 @@ const ALLOWED_ORIGINS = new Set([
     'https://mychinesename.co',
     'https://www.mychinesename.co',
     'https://mychinesename-api.onrender.com',
+    'http://127.0.0.1:4318',
+    'http://localhost:4318',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
     CORS_ORIGIN
 ].filter(Boolean));
 
@@ -419,6 +424,25 @@ app.use(cors({
 app.use((req, res, next) => {
     res.charset = 'utf-8';
     next();
+});
+app.use((req, res, next) => {
+    const host = String(req.headers.host || '').toLowerCase();
+    const isRenderHost = host.includes('mychinesename-api.onrender.com');
+    const isPageRequest = req.method === 'GET'
+        && !req.path.startsWith('/api/')
+        && !req.path.startsWith('/share-card/')
+        && !req.path.startsWith('/assets/')
+        && req.path !== '/robots.txt'
+        && req.path !== '/sitemap.xml'
+        && !req.path.endsWith('.png')
+        && !req.path.endsWith('.jpg')
+        && !req.path.endsWith('.jpeg')
+        && !req.path.endsWith('.svg')
+        && !req.path.endsWith('.ico');
+    if(isRenderHost && isPageRequest){
+        return res.redirect(301, `${OFFICIAL_DOMAIN}${req.originalUrl}`);
+    }
+    return next();
 });
 // helmet() \u5df2\u79fb\u9664 CSP
 // app.use(helmet());
@@ -533,6 +557,10 @@ const ANALYTICS_LOG_FILE = path.join(DATA_DIR, 'analytics-log.json');
 const SHARE_CARD_FILE = path.join(DATA_DIR, 'share-cards.json');
 const PAYPAL_ORDER_FILE = path.join(DATA_DIR, 'paypal-orders.json');
 const CONTACT_MESSAGES_FILE = path.join(DATA_DIR, 'contact-messages.json');
+const BLOG_POSTS_FILE = path.join(DATA_DIR, 'blog-posts.json');
+const CALLIGRAPHY_PROVIDER = (process.env.CALLIGRAPHY_PROVIDER || (process.env.OPENAI_API_KEY ? 'openai' : '')).toLowerCase();
+const OPENAI_API_KEY = normalizeSecret(process.env.OPENAI_API_KEY || process.env.OPENAI_IMAGE_API_KEY || '');
+const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
 
 // ============================================================
 // \u72b6\u6001\u8bfb\u5199
@@ -623,6 +651,82 @@ function writeContactMessages(messages){
     fs.writeFileSync(CONTACT_MESSAGES_FILE, JSON.stringify(messages, null, 2));
 }
 
+function createBlogId(){
+    return `blog_${Date.now().toString(36)}_${crypto.randomBytes(4).toString('hex')}`;
+}
+
+function slugifyBlogSlug(value, fallback = ''){
+    const slug = String(value || fallback || '')
+        .toLowerCase()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 90);
+    return slug || `post-${Date.now().toString(36)}`;
+}
+
+function cleanBlogStatus(value){
+    return String(value || '').toLowerCase() === 'published' ? 'published' : 'draft';
+}
+
+function normalizeBlogPost(input = {}, existing = {}){
+    const now = new Date().toISOString();
+    const title = cleanStr(input.title || existing.title || '').slice(0, 180);
+    const slug = slugifyBlogSlug(input.slug || existing.slug, title);
+    const content = String(input.content ?? existing.content ?? '').trim();
+    const sections = Array.isArray(input.sections) ? input.sections : (Array.isArray(existing.sections) ? existing.sections : []);
+    return {
+        id: cleanStr(existing.id || input.id || createBlogId()),
+        slug,
+        title,
+        category: cleanStr(input.category || existing.category || 'Guide').slice(0, 60),
+        description: cleanStr(input.description || existing.description || '').slice(0, 260),
+        status: cleanBlogStatus(input.status || existing.status),
+        date: cleanStr(input.date || existing.date || new Date().toISOString().slice(0, 10)),
+        updatedAt: now,
+        author: cleanStr(input.author || existing.author || 'My Chinese Name').slice(0, 80),
+        intro: cleanStr(input.intro || existing.intro || input.description || existing.description || '').slice(0, 800),
+        content,
+        sections: sections.map(section => Array.isArray(section)
+            ? [cleanStr(section[0] || '').slice(0, 160), cleanStr(section[1] || '').slice(0, 3000)]
+            : [cleanStr(section.title || '').slice(0, 160), cleanStr(section.body || section.content || '').slice(0, 3000)]
+        ).filter(section => section[0] || section[1]),
+        keywords: Array.isArray(input.keywords) ? input.keywords.map(item => cleanStr(item).slice(0, 60)).filter(Boolean).slice(0, 20) : (existing.keywords || [])
+    };
+}
+
+function readManagedBlogPosts(){
+    try {
+        if(!fs.existsSync(BLOG_POSTS_FILE)) return [];
+        const data = JSON.parse(fs.readFileSync(BLOG_POSTS_FILE, 'utf8'));
+        return Array.isArray(data) ? data : [];
+    } catch { return []; }
+}
+
+function writeManagedBlogPosts(posts){
+    fs.writeFileSync(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2));
+}
+
+function allBlogPosts({ includeDrafts = false } = {}){
+    const builtIn = Object.entries(BLOG_POSTS).map(([slug, post]) => ({
+        id: `builtin:${slug}`,
+        slug,
+        status: 'published',
+        builtIn: true,
+        ...post,
+        content: post.content || '',
+        sections: post.sections || []
+    }));
+    const managed = readManagedBlogPosts();
+    return [...managed, ...builtIn]
+        .filter(post => includeDrafts || post.status === 'published')
+        .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+}
+
+function findBlogPostBySlug(slug){
+    return allBlogPosts({ includeDrafts: false }).find(post => post.slug === slug);
+}
+
 function appendContactMessage(entry){
     const messages = readContactMessages();
     messages.push({ ...entry, _ts: new Date().toISOString() });
@@ -635,7 +739,10 @@ function appendAnalyticsEvent(req, event, meta = {}){
         'page_view', 'generate_click', 'generate_success', 'generate_failed',
         'paywall_show', 'buy_click', 'share_click', 'share_reward', 'share_card_created', 'share_card_failed',
         'ai_call_success', 'ai_call_failed',
-        'save_image', 'copy_share_link', 'share_image', 'platform_share_open', 'result_feedback'
+        'save_image', 'copy_share_link', 'share_image', 'platform_share_open', 'result_feedback',
+        'identity_pack_view', 'script_style_select', 'certificate_preview', 'tattoo_preview',
+        'social_bio_preview', 'premium_unlock_click', 'homepage_preview_view', 'homepage_preview_click',
+        'identity_asset_created', 'identity_asset_download'
     ]);
     if(!allowed.has(event)) return { ok: false };
     const logs = readAnalyticsLog();
@@ -694,7 +801,10 @@ function summarizeAnalytics(){
             generate_failed: daily[d]?.generate_failed || 0,
             paywall_show: daily[d]?.paywall_show || 0,
             buy_click: daily[d]?.buy_click || 0,
-            share_click: daily[d]?.share_click || 0
+            share_click: daily[d]?.share_click || 0,
+            identity_pack_view: daily[d]?.identity_pack_view || 0,
+            script_style_select: daily[d]?.script_style_select || 0,
+            premium_unlock_click: daily[d]?.premium_unlock_click || 0
         }))
     };
 }
@@ -731,6 +841,76 @@ function cleanPngDataUrl(value, maxLength = 2600000){
     const match = text.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/);
     if(!match || match[1].length > maxLength) return '';
     return match[1];
+}
+
+function cleanChineseName(value){
+    return String(value || '').replace(/[^\u4e00-\u9fa5]/g, '').slice(0, 8);
+}
+
+function cleanCalligraphyStyle(value){
+    const text = String(value || '').toLowerCase().replace(/[^a-z-]/g, '');
+    return ['running', 'regular', 'seal'].includes(text) ? text : 'running';
+}
+
+function buildCalligraphyPrompt(name, style, result){
+    const styleText = {
+        running: 'expressive running script / xingshu brush calligraphy, elegant and shareable',
+        regular: 'formal regular script / kaishu brush calligraphy, dignified and certificate-ready',
+        seal: 'ancient small seal script / zhuanshu inspired ceremonial calligraphy'
+    }[style] || 'expressive running script / xingshu brush calligraphy';
+    const pinyin = cleanStr(result?.pinyin || '');
+    const summary = cleanStr(result?.summary || result?.meaning || '');
+    return `Create a premium square Chinese cultural name card image for the exact Chinese name: ${name}.
+
+Critical text rule:
+- The main calligraphy must show exactly these Chinese characters: ${name}
+- Do not replace, simplify incorrectly, invent, or add extra Chinese characters.
+- The name must be the visual center and must look like real brush calligraphy, not a computer font.
+
+Visual style:
+- ${styleText}
+- warm rice paper, refined ink texture, subtle Chinese landscape or paper texture, elegant red seal, premium cultural keepsake
+- no clutter, no cartoon, no cheap stock look, no mockup UI, no Latin text except a tiny unobtrusive mychinesename.co
+- final image should be suitable for saving, sharing on X/Instagram, and social profile storytelling
+
+Context for small supporting text only if it does not distract:
+Pinyin: ${pinyin}
+Meaning: ${summary.slice(0, 120)}
+
+Return only the finished image.`;
+}
+
+async function generateCalligraphyCardPng(name, style, result){
+    if(CALLIGRAPHY_PROVIDER !== 'openai' || !OPENAI_API_KEY) {
+        const err = new Error('calligraphy image provider is not configured');
+        err.code = 'CALLIGRAPHY_PROVIDER_MISSING';
+        throw err;
+    }
+    const resp = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: OPENAI_IMAGE_MODEL,
+            prompt: buildCalligraphyPrompt(name, style, result),
+            size: process.env.OPENAI_IMAGE_SIZE || '1024x1024',
+            n: 1
+        })
+    });
+    const data = await resp.json().catch(() => ({}));
+    if(!resp.ok) {
+        const msg = data?.error?.message || `image generation failed: ${resp.status}`;
+        const err = new Error(msg);
+        err.status = resp.status;
+        throw err;
+    }
+    const b64 = data?.data?.[0]?.b64_json;
+    if(!b64 || !/^[A-Za-z0-9+/=]+$/.test(b64)) {
+        throw new Error('image generation returned no PNG data');
+    }
+    return b64;
 }
 
 function createShareId(){
@@ -771,6 +951,7 @@ body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Ro
 .wrap{max-width:900px;margin:0 auto;padding:36px 18px;text-align:center}
 .card{max-width:min(560px,92vw);margin:0 auto 22px}
 .card svg{width:100%;height:auto;display:block}
+.card img{width:100%;height:auto;display:block;border-radius:12px}
 h1{margin:10px 0;color:#8c2318;font-size:clamp(32px,6vw,56px)}
 .pinyin{color:#775533;font-size:18px}
 .summary{max-width:680px;margin:18px auto;font-size:18px}
@@ -778,7 +959,7 @@ h1{margin:10px 0;color:#8c2318;font-size:clamp(32px,6vw,56px)}
 </style>
 </head>
 <body><main class="wrap">
-<div class="card">${card.svg}</div>
+<div class="card">${card.svg ? card.svg : `<img src="${imageUrl}" alt="${htmlEscape(name)} calligraphy name card">`}</div>
 <h1>${htmlEscape(name)}</h1>
 ${card.pinyin ? `<div class="pinyin">${htmlEscape(card.pinyin)}</div>` : ''}
 <p class="summary">${htmlEscape(desc)}</p>
@@ -917,12 +1098,49 @@ function pickSeeded(list, seed, offset = 0){
 }
 
 function birthElement(birthText){
-    const month = Number((String(birthText || '').match(/^\d{0,4}-?(\d{1,2})/) || [])[1]);
-    if([2, 3, 4].includes(month)) return { key:'wood', cn:'木', en:'wood', hint:'growth, kindness, and renewal' };
-    if([5, 6, 7].includes(month)) return { key:'fire', cn:'火', en:'fire', hint:'warmth, clarity, and confidence' };
-    if([8, 9, 10].includes(month)) return { key:'metal', cn:'金', en:'metal', hint:'focus, integrity, and refinement' };
-    if([11, 12, 1].includes(month)) return { key:'water', cn:'水', en:'water', hint:'wisdom, adaptability, and depth' };
-    return { key:'earth', cn:'土', en:'earth', hint:'steadiness, trust, and balance' };
+    const text = String(birthText || '');
+    const month = Number((text.match(/^\d{0,4}-?(\d{1,2})/) || [])[1]);
+    const monthElement = [2, 3, 4].includes(month) ? { key:'wood', cn:'\u6728', en:'wood', hint:'growth, kindness, and renewal' }
+        : [5, 6, 7].includes(month) ? { key:'fire', cn:'\u706b', en:'fire', hint:'warmth, clarity, and confidence' }
+        : [8, 9, 10].includes(month) ? { key:'metal', cn:'\u91d1', en:'metal', hint:'focus, integrity, and refinement' }
+        : [11, 12, 1].includes(month) ? { key:'water', cn:'\u6c34', en:'water', hint:'wisdom, adaptability, and depth' }
+        : { key:'earth', cn:'\u571f', en:'earth', hint:'steadiness, trust, and balance' };
+
+    const hourElements = [
+        { re:/\bzi\b|23:00-01:00/i, key:'water', cn:'\u6c34', en:'water', branch:'Zi hour', hint:'wisdom, adaptability, and depth' },
+        { re:/\bchou\b|01:00-03:00/i, key:'earth', cn:'\u571f', en:'earth', branch:'Chou hour', hint:'steadiness, trust, and balance' },
+        { re:/\byin\b|03:00-05:00/i, key:'wood', cn:'\u6728', en:'wood', branch:'Yin hour', hint:'growth, kindness, and renewal' },
+        { re:/\bmao\b|05:00-07:00/i, key:'wood', cn:'\u6728', en:'wood', branch:'Mao hour', hint:'growth, kindness, and renewal' },
+        { re:/\bchen\b|07:00-09:00/i, key:'earth', cn:'\u571f', en:'earth', branch:'Chen hour', hint:'steadiness, trust, and balance' },
+        { re:/\bsi\b|09:00-11:00/i, key:'fire', cn:'\u706b', en:'fire', branch:'Si hour', hint:'warmth, clarity, and confidence' },
+        { re:/\bwu\b|11:00-13:00/i, key:'fire', cn:'\u706b', en:'fire', branch:'Wu hour', hint:'warmth, clarity, and confidence' },
+        { re:/\bwei\b|13:00-15:00/i, key:'earth', cn:'\u571f', en:'earth', branch:'Wei hour', hint:'steadiness, trust, and balance' },
+        { re:/\bshen\b|15:00-17:00/i, key:'metal', cn:'\u91d1', en:'metal', branch:'Shen hour', hint:'focus, integrity, and refinement' },
+        { re:/\byou\b|17:00-19:00/i, key:'metal', cn:'\u91d1', en:'metal', branch:'You hour', hint:'focus, integrity, and refinement' },
+        { re:/\bxu\b|19:00-21:00/i, key:'earth', cn:'\u571f', en:'earth', branch:'Xu hour', hint:'steadiness, trust, and balance' },
+        { re:/\bhai\b|21:00-23:00/i, key:'water', cn:'\u6c34', en:'water', branch:'Hai hour', hint:'wisdom, adaptability, and depth' }
+    ];
+    const hourElement = hourElements.find(item => item.re.test(text));
+    if(!hourElement) return { ...monthElement, context:`seasonal ${monthElement.en}` };
+
+    const primary = hourElement;
+    const context = primary.key === monthElement.key
+        ? `${primary.branch} strengthens the seasonal ${monthElement.en} image`
+        : `${primary.branch} adds ${primary.en} balance to the seasonal ${monthElement.en} image`;
+    return {
+        key: primary.key,
+        cn: primary.cn,
+        en: primary.en,
+        hint: primary.hint,
+        monthKey: monthElement.key,
+        monthCn: monthElement.cn,
+        monthEn: monthElement.en,
+        hourKey: hourElement.key,
+        hourCn: hourElement.cn,
+        hourEn: hourElement.en,
+        branch: hourElement.branch,
+        context
+    };
 }
 
 function buildFallbackName({ givenName, surname, gender, style, meaning, birthText }){
@@ -1055,11 +1273,15 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
             ]
         }
     };
-    const pool = wantsWisdom ? categories.wisdom
+    const preferencePool = wantsWisdom ? categories.wisdom
         : wantsCourage ? categories.courage
         : wantsBright ? categories.bright
         : wantsPeace ? categories.peace
-        : (categories.element[element.key] || neutralNames).concat(neutralNames);
+        : neutralNames;
+    const elementPool = categories.element[element.key] || [];
+    const pool = element.branch
+        ? elementPool.concat(preferencePool, neutralNames)
+        : preferencePool.concat(elementPool, neutralNames);
     const given = pickSeeded(pool, seed, 2) || neutralNames[0];
     const fullName = `${matched.cn}${given.cn}`;
     const fullPinyin = `${matched.pinyin} ${given.pinyin}`;
@@ -1067,7 +1289,7 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
         chineseName: fullName,
         pinyin: fullPinyin,
         pronunciation: fullPinyin,
-        meaning: `${fullName} means ${given.gloss}, selected as a culturally meaningful Chinese name rather than a random translation. The backup engine also considered the birth-period ${element.en} image of ${element.hint}.`,
+        meaning: `${fullName} means ${given.gloss}, selected as a culturally meaningful Chinese name rather than a random translation. The naming process considered ${element.context || `the birth-period ${element.en} image`} of ${element.hint}.`,
         sections: [
             {
                 titleCn:'\u59d3\u6c0f\u89e3\u91ca',
@@ -1090,8 +1312,8 @@ function buildFallbackName({ givenName, surname, gender, style, meaning, birthTe
             {
                 titleCn:'\u6574\u4f53\u5bd3\u610f',
                 titleEn:'Overall Meaning',
-                cn:`\u7ed3\u5408\u51fa\u751f\u4fe1\u606f${birthText || '\u4e0e\u4e2a\u4eba\u504f\u597d'}\uff0c\u53c2\u8003\u4e94\u884c\u4e2d\u201c${element.cn}\u201d\u7684\u610f\u8c61\uff0c\u8fd9\u4e2a\u540d\u5b57\u5448\u73b0\u542b\u84c4\u3001\u53ef\u4fe1\u3001\u9002\u5408\u8de8\u6587\u5316\u573a\u666f\u4f7f\u7528\u7684\u4e1c\u65b9\u6c14\u8d28\u3002`,
-                en:`Considering ${birthText || 'your profile'} and the five-elements image of ${element.en}, this name feels refined, memorable, and suitable for long-term cross-cultural use.`
+                cn:`\u7ed3\u5408\u51fa\u751f\u4fe1\u606f${birthText || '\u4e0e\u4e2a\u4eba\u504f\u597d'}\uff0c\u53c2\u8003\u4e94\u884c\u4e2d\u201c${element.cn}\u201d\u7684\u610f\u8c61${element.branch ? `\uff08${element.branch}\u5e26\u6765\u201c${element.hourCn}\u201d\u7684\u65f6\u8fb0\u53d6\u5411\uff09` : ''}\uff0c\u8fd9\u4e2a\u540d\u5b57\u5448\u73b0\u542b\u84c4\u3001\u53ef\u4fe1\u3001\u9002\u5408\u8de8\u6587\u5316\u573a\u666f\u4f7f\u7528\u7684\u4e1c\u65b9\u6c14\u8d28\u3002`,
+                en:`Considering ${birthText || 'your profile'}, ${element.context || `the five-elements image of ${element.en}`}, this name feels refined, memorable, and suitable for long-term cross-cultural use.`
             }
         ],
         source: 'fallback',
@@ -1127,6 +1349,128 @@ function normalizeNameResult(raw){
         source: cleanStr(parsed.source || ''),
         fallbackSeed: parsed.fallbackSeed || ''
     };
+}
+
+const BLOG_POSTS = {
+    'why-your-chinese-name-should-not-sound-like-your-english-name': {
+        title: 'Why Your Chinese Name Should Not Simply Sound Like Your English Name',
+        category: 'Identity',
+        date: '2026-08-11',
+        description: 'A meaningful Chinese name is not a phonetic costume. It should work as a real identity with surname, characters, pinyin, source, and story.',
+        intro: 'Many English-to-Chinese name tools begin by copying sound. That can be useful as a clue, but it rarely creates a name that Chinese speakers recognize as natural.',
+        sections: [
+            ['Sound is only the first layer', 'A Chinese name needs a real surname, readable characters, positive meaning, and a rhythm that feels like a name rather than a joke or nickname.'],
+            ['Identity comes from meaning', 'The strongest result connects the user personality to images such as jade, water, clarity, steadiness, light, or scholarly grace.'],
+            ['A name should be easy to show', 'Pinyin, pronunciation, a one-sentence persona tag, and a shareable card help the user carry the name in social profiles, school, work, or travel.']
+        ]
+    },
+    'i-ching-five-elements-chinese-name': {
+        title: 'How I Ching and Five Elements Guide a Chinese Name',
+        category: 'Tradition',
+        date: '2026-08-11',
+        description: 'Birth date and Chinese hour can guide the feeling of a name through balance, season, and symbolic imagery.',
+        intro: 'The I Ching and Five Elements are best used here as cultural naming context, not as a hard prediction. They help decide the direction of the characters.',
+        sections: [
+            ['Birth context gives direction', 'Year, month, day, and hour can suggest seasonal tone, balance, and imagery before characters are selected.'],
+            ['Five Elements become imagery', 'Wood can suggest growth, fire can suggest brightness, earth can suggest steadiness, metal can suggest refinement, and water can suggest wisdom.'],
+            ['Modern naming stays natural', 'The final name still needs to sound natural, look balanced in characters, and be easy for the user to explain.']
+        ]
+    },
+    'book-of-songs-chu-ci-name-sources': {
+        title: 'Book of Songs and Chu Ci as Chinese Name Sources',
+        category: 'Classics',
+        date: '2026-08-11',
+        description: 'Classical Chinese texts give a name literary depth, but the source must be adapted into a natural modern name.',
+        intro: 'The Book of Songs and Chu Ci offer images of light, jade, fragrance, water, virtue, and distant horizons. These images can make a name feel rooted.',
+        sections: [
+            ['Classics provide atmosphere', 'A name does not need to copy a full line. It can borrow a refined image and turn it into usable characters.'],
+            ['The source should explain the feeling', 'A good source note tells the user why the name fits, what it evokes, and how to introduce it in English.'],
+            ['Poetic does not mean obscure', 'For overseas users, the best classical name is elegant, readable, and easy enough to remember.']
+        ]
+    }
+};
+
+function renderBlogIndex(){
+    const canonical = `${OFFICIAL_DOMAIN}/blog`;
+    const cards = allBlogPosts().map(post => `<a class="post" href="/blog/${post.slug}">
+<span>${htmlEscape(post.category)} &middot; ${htmlEscape(post.date)}</span>
+<h2>${htmlEscape(post.title)}</h2>
+<p>${htmlEscape(post.description)}</p>
+</a>`).join('');
+    const jsonLd = {
+        '@context':'https://schema.org',
+        '@type':'Blog',
+        name:'My Chinese Name Blog',
+        url: canonical,
+        description:'Cultural naming guides for Chinese names, I Ching, Five Elements, and classical sources.'
+    };
+    return `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chinese Naming Blog | My Chinese Name</title>
+<meta name="description" content="Cultural naming guides for Chinese names, I Ching, Five Elements, Book of Songs, Chu Ci, surname matching, and identity cards.">
+<link rel="canonical" href="${canonical}">
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<style>
+body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Roman",serif;line-height:1.7}
+.wrap{max-width:1040px;margin:0 auto;padding:48px 20px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:34px}
+a{color:#8c2318}.brand{text-decoration:none;color:#5f3428;font-weight:700}.cta{border:1px solid #d8c6b0;border-radius:999px;padding:9px 14px;text-decoration:none;background:#fffef9}
+.eyebrow{color:#8c2318;font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}h1{font-size:clamp(36px,6vw,64px);line-height:1.02;margin:12px 0 18px;color:#2f2019}.lead{font-size:20px;max-width:760px;color:#76583c}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}.post{display:block;text-decoration:none;color:#443322;background:#fffbf5;border:1px solid #e2d0b8;border-radius:8px;padding:22px;min-height:250px;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.post:hover{transform:translateY(-3px);border-color:#c9a96e;box-shadow:0 12px 26px rgba(140,35,24,.12)}
+.post span{display:block;color:#a97138;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}.post h2{font-size:24px;line-height:1.15;color:#5f3428;margin:14px 0 10px}.post p{color:#76583c;margin:0}
+@media(max-width:820px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.wrap{padding:34px 16px}}
+</style></head><body><main class="wrap">
+<div class="top"><a class="brand" href="/">My Chinese Name</a><a class="cta" href="/#generator">Create Your Chinese Identity</a></div>
+<div class="eyebrow">Cultural Naming Journal</div>
+<h1>Chinese names with source, meaning, and identity.</h1>
+<p class="lead">Short guides for users who want a Chinese name that feels real: surname matching, I Ching and Five Elements context, Book of Songs and Chu Ci sources, pinyin, and shareable identity assets.</p>
+<section class="grid">${cards}</section>
+</main></body></html>`;
+}
+
+function renderBlogPost(slug, post){
+    const canonical = `${OFFICIAL_DOMAIN}/blog/${slug}`;
+    const sectionHtml = Array.isArray(post.sections) && post.sections.length
+        ? post.sections.map(section => `<section><h2>${htmlEscape(section[0])}</h2><p>${htmlEscape(section[1])}</p></section>`).join('')
+        : '';
+    const contentHtml = post.content ? `<section class="content">${post.content}</section>` : sectionHtml;
+    const articleBody = post.content
+        ? String(post.content).replace(/<[^>]*>/g, ' ')
+        : (post.sections || []).map(section => `${section[0]}\n${section[1]}`).join('\n\n');
+    const otherLinks = allBlogPosts()
+        .filter(item => item.slug !== slug)
+        .slice(0, 3)
+        .map(item => `<a href="/blog/${item.slug}">${htmlEscape(item.title)}</a>`)
+        .join('');
+    const jsonLd = {
+        '@context':'https://schema.org',
+        '@type':'BlogPosting',
+        headline: post.title,
+        description: post.description,
+        datePublished: post.date,
+        dateModified: post.date,
+        author: {'@type':'Organization', name:'My Chinese Name'},
+        publisher: {'@type':'Organization', name:'My Chinese Name'},
+        mainEntityOfPage: canonical,
+        articleBody
+    };
+    return `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${htmlEscape(post.title)} | My Chinese Name</title>
+<meta name="description" content="${htmlEscape(post.description)}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:type" content="article"><meta property="og:title" content="${htmlEscape(post.title)}"><meta property="og:description" content="${htmlEscape(post.description)}"><meta property="og:url" content="${canonical}">
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<style>
+body{margin:0;background:#f7f2e9;color:#3f3024;font-family:Georgia,"Times New Roman",serif;line-height:1.75}.wrap{max-width:860px;margin:0 auto;padding:48px 20px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:34px}a{color:#8c2318}.brand{text-decoration:none;color:#5f3428;font-weight:700}.cta{border:1px solid #d8c6b0;border-radius:999px;padding:9px 14px;text-decoration:none;background:#fffef9}.eyebrow{color:#8c2318;font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}h1{font-size:clamp(34px,5vw,58px);line-height:1.04;margin:12px 0 16px;color:#2f2019}.lead{font-size:20px;color:#76583c}.meta{color:#a97138;font-size:13px;margin-bottom:26px}.panel{background:#fffbf5;border:1px solid #e2d0b8;border-radius:8px;padding:26px;margin-top:28px}h2{font-size:26px;color:#5f3428;margin:0 0 8px}.han{font-family:KaiTi,STKaiti,serif;color:#9a6a2f;font-size:22px}.links{display:grid;gap:10px}.links a{text-decoration:none;border-bottom:1px solid #eadbc8;padding-bottom:8px}@media(max-width:720px){.top{align-items:flex-start;flex-direction:column}.wrap{padding:34px 16px}}
+</style></head><body><main class="wrap">
+<div class="top"><a class="brand" href="/">My Chinese Name</a><a class="cta" href="/#generator">Create Your Chinese Identity</a></div>
+<div class="eyebrow">${htmlEscape(post.category)}</div>
+<h1>${htmlEscape(post.title)}</h1>
+<div class="meta">${htmlEscape(post.date)} &middot; Chinese naming guide</div>
+<p class="lead">${htmlEscape(post.intro || post.description)}</p>
+<article class="panel">${contentHtml}<p class="han">\u540d\u4ee5\u8f7d\u9053\uff0c\u5b57\u4e2d\u6709\u5149\u3002</p><a class="cta" href="/#generator">Generate My Chinese Name</a></article>
+<div class="panel"><h2>More Guides</h2><div class="links">${otherLinks}<a href="/blog">All blog posts</a></div></div>
+</main></body></html>`;
 }
 
 function renderSeoLandingPage(pathname, page){
@@ -1221,7 +1565,7 @@ ul{padding-left:20px}
 <li>Each result includes Chinese characters, pinyin, pronunciation guidance, English meaning, and cultural source.</li>
 </ul>
 <p class="han">\u540d\u4ee5\u8f7d\u9053\uff0c\u5b57\u4e2d\u6709\u5149\u3002</p>
-<a class="cta" href="/">Generate My Chinese Name</a>
+<a class="cta" href="/#generator">Generate My Chinese Name</a>
 </div>
 ${exampleHtml}
 ${sectionHtml}
@@ -1243,15 +1587,138 @@ Sitemap: ${OFFICIAL_DOMAIN}/sitemap.xml
 
 app.get('/sitemap.xml', (req, res) => {
     const staticPages = ['/', '/brand-intro', '/contact-us', '/faq', '/privacy', '/terms', '/payment-guide'];
-    const urls = [...staticPages, ...Object.keys(SEO_LANDING_PAGES)]
+    const blogPages = ['/blog', ...allBlogPosts().map(post => `/blog/${post.slug}`)];
+    const urls = [...staticPages, ...Object.keys(SEO_LANDING_PAGES), ...blogPages]
         .map(url => `<url><loc>${OFFICIAL_DOMAIN}${url === '/' ? '/' : url}</loc><changefreq>weekly</changefreq><priority>${url === '/' ? '1.0' : '0.8'}</priority></url>`)
         .join('');
     res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
 });
 
+app.get('/blog', (req, res) => res.send(renderBlogIndex()));
+
+app.get('/blog/:slug', (req, res) => {
+    const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/g, '');
+    const post = findBlogPostBySlug(slug);
+    if(!post) return res.status(404).send(renderBlogIndex());
+    res.send(renderBlogPost(slug, post));
+});
+
+function requireBlogApiToken(req, res, next){
+    if(!BLOG_API_TOKEN) return res.status(503).json({ success: false, error: 'BLOG_API_TOKEN is not configured' });
+    const auth = String(req.headers.authorization || '');
+    const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+    if(!token || token !== BLOG_API_TOKEN) return res.status(401).json({ success: false, error: 'Invalid blog API token' });
+    next();
+}
+
+app.get('/api/admin/blog-posts', requireBlogApiToken, (req, res) => {
+    const posts = allBlogPosts({ includeDrafts: true }).map(post => ({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        category: post.category,
+        description: post.description,
+        status: post.status,
+        date: post.date,
+        updatedAt: post.updatedAt || '',
+        builtIn: !!post.builtIn,
+        url: `${OFFICIAL_DOMAIN}/blog/${post.slug}`
+    }));
+    res.json({ success: true, count: posts.length, posts });
+});
+
+app.post('/api/admin/blog-posts', requireBlogApiToken, (req, res) => {
+    const posts = readManagedBlogPosts();
+    const post = normalizeBlogPost(req.body || {});
+    if(!post.title) return res.status(400).json({ success: false, error: 'title is required' });
+    if(!post.description) return res.status(400).json({ success: false, error: 'description is required' });
+    if(!post.content && !post.sections.length) return res.status(400).json({ success: false, error: 'content or sections is required' });
+    const slugTaken = allBlogPosts({ includeDrafts: true }).some(item => item.slug === post.slug);
+    if(slugTaken) return res.status(409).json({ success: false, error: 'slug already exists', slug: post.slug });
+    posts.unshift(post);
+    writeManagedBlogPosts(posts);
+    res.status(201).json({ success: true, post: { ...post, url: `${OFFICIAL_DOMAIN}/blog/${post.slug}` } });
+});
+
+app.post('/api/admin/blog-posts/:id/publish', requireBlogApiToken, (req, res) => {
+    const id = cleanStr(req.params.id || '');
+    const posts = readManagedBlogPosts();
+    const index = posts.findIndex(post => post.id === id || post.slug === id);
+    if(index === -1) return res.status(404).json({ success: false, error: 'blog post not found' });
+    posts[index] = normalizeBlogPost({ status: 'published' }, { ...posts[index], status: 'published' });
+    writeManagedBlogPosts(posts);
+    res.json({ success: true, post: { ...posts[index], url: `${OFFICIAL_DOMAIN}/blog/${posts[index].slug}` } });
+});
+
 Object.entries(SEO_LANDING_PAGES).forEach(([pathname, page]) => {
     app.get(pathname, (req, res) => res.send(renderSeoLandingPage(pathname, page)));
+});
+
+app.post('/api/calligraphy-card', async (req, res) => {
+    const name = cleanChineseName(req.body?.name);
+    const style = cleanCalligraphyStyle(req.body?.style);
+    const pinyin = cleanStr(req.body?.pinyin || '').slice(0, 80);
+    const summary = cleanStr(req.body?.summary || '').slice(0, 280);
+    if(!name || name.length < 2) {
+        appendAnalyticsEvent(req, 'share_card_failed', { reason: 'missing_dynamic_chinese_name' });
+        return res.status(400).json({ success: false, error: 'Chinese name is required for calligraphy card' });
+    }
+    try {
+        const png = await generateCalligraphyCardPng(name, style, {
+            pinyin,
+            summary,
+            meaning: req.body?.meaning || ''
+        });
+        const cards = readShareCards();
+        const id = createShareId();
+        cards[id] = {
+            name,
+            pinyin,
+            summary: summary || 'A meaningful Chinese name with brush calligraphy, cultural story, and shareable identity.',
+            svg: '',
+            previewPng: png,
+            squarePng: png,
+            style,
+            provider: CALLIGRAPHY_PROVIDER,
+            createdAt: new Date().toISOString(),
+            userId: getUserId(req)
+        };
+        writeShareCards(cards);
+        appendAnalyticsEvent(req, 'share_card_created', {
+            id,
+            name,
+            style,
+            provider: CALLIGRAPHY_PROVIDER,
+            dynamicName: true,
+            hasPreviewPng: true,
+            hasSquarePng: true
+        });
+        res.json({
+            success: true,
+            id,
+            name,
+            style,
+            url: `${SHARE_DOMAIN}/share/${id}`,
+            imageUrl: `${SHARE_DOMAIN}/share-card/${id}.png`,
+            squareImageUrl: `${SHARE_DOMAIN}/share-card/${id}-square.png`
+        });
+    } catch(err) {
+        appendAnalyticsEvent(req, 'share_card_failed', {
+            reason: err.code || 'calligraphy_generation_failed',
+            status: err.status || 0,
+            name,
+            style,
+            provider: CALLIGRAPHY_PROVIDER || 'none',
+            error: String(err.message || '').slice(0, 180)
+        });
+        res.status(err.code === 'CALLIGRAPHY_PROVIDER_MISSING' ? 503 : 502).json({
+            success: false,
+            error: err.code === 'CALLIGRAPHY_PROVIDER_MISSING'
+                ? 'Calligraphy image provider is not configured'
+                : 'Calligraphy card generation failed'
+        });
+    }
 });
 
 app.post('/api/share-card', (req, res) => {
@@ -1261,7 +1728,7 @@ app.post('/api/share-card', (req, res) => {
     const name = cleanStr(req.body?.name || '').slice(0, 24);
     const pinyin = cleanStr(req.body?.pinyin || '').slice(0, 80);
     const summary = cleanStr(req.body?.summary || '').slice(0, 280);
-    if(!svg || !name) {
+    if((!svg && !previewPng && !squarePng) || !name) {
         appendAnalyticsEvent(req, 'share_card_failed', {
             hasSvg: !!svg,
             hasName: !!name,
@@ -1301,7 +1768,7 @@ app.post('/api/share-card', (req, res) => {
 app.get('/share-card/:id.svg', (req, res) => {
     const id = String(req.params.id || '').replace(/[^a-f0-9]/g, '');
     const card = readShareCards()[id];
-    if(!card) return res.status(404).send('Not found');
+    if(!card || !card.svg) return res.status(404).send('Not found');
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
     res.type('image/svg+xml').send(card.svg);
 });
@@ -1341,37 +1808,37 @@ app.get('/api/pricing', (req, res) => {
             basic: {
                 price: 9.9,
                 originalPrice: 19.9,
-                label: 'Basic',
+                label: 'Name Explorer',
                 badge: 'Starter',
                 features: [
-                    { icon: '\u2705', text: '3 custom Chinese name options' },
-                    { icon: '\u2705', text: 'Basic five-elements interpretation' },
+                    { icon: '\u2705', text: '3 custom Chinese name generations' },
+                    { icon: '\u2705', text: 'Meaning, pinyin, and pronunciation guide' },
                     { icon: '\u2705', text: '1 regeneration if the direction feels wrong' },
-                    { icon: '\u2705', text: 'Chinese characters, pinyin, and English meaning' }
+                    { icon: '\u2705', text: 'Basic social name card' }
                 ]
             },
             premium: {
                 price: 19.9,
                 originalPrice: 39.9,
-                label: 'Premium',
+                label: 'Cultural Identity Pack',
                 badge: 'Most Popular',
                 features: [
                     { icon: '\u2705', text: '5 exclusive Chinese name options' },
                     { icon: '\u2705', text: 'Full birth-time and five-elements interpretation' },
                     { icon: '\u2705', text: 'Book of Songs / Chu Ci source explanation' },
-                    { icon: '\u2705', text: 'Downloadable naming certificate' },
-                    { icon: '\u2705', text: '1 calligraphy-style name card' }
+                    { icon: '\u2705', text: 'Certificate, script styles, and social cards' },
+                    { icon: '\u2705', text: 'Tattoo readiness preview' }
                 ]
             },
             ultimate: {
                 price: 29.9,
                 originalPrice: 59.9,
-                label: 'Ultimate',
+                label: 'Full Naming Report',
                 badge: 'Full Service',
                 features: [
                     { icon: '\u2705', text: 'Unlimited name generations for your project' },
                     { icon: '\u2705', text: 'In-depth cultural customization' },
-                    { icon: '\u2705', text: 'Lifetime name record storage' },
+                    { icon: '\u2705', text: 'Full report and lifetime name record storage' },
                     { icon: '\u2705', text: 'Priority support for payment or generation issues' }
                 ]
             }
@@ -1405,7 +1872,17 @@ function renderAdminDashboard(req){
         copy_share_link: '\u590d\u5236\u5206\u4eab\u94fe\u63a5',
         share_image: '\u7cfb\u7edf\u5206\u4eab\u56fe\u7247',
         platform_share_open: '\u6253\u5f00\u5e73\u53f0\u5206\u4eab',
-        result_feedback: '\u7ed3\u679c\u53cd\u9988'
+        result_feedback: '\u7ed3\u679c\u53cd\u9988',
+        identity_pack_view: '\u8eab\u4efd\u5305\u5c55\u793a',
+        script_style_select: '\u4e66\u4f53\u9009\u62e9',
+        certificate_preview: '\u8bc1\u4e66\u9884\u89c8',
+        tattoo_preview: '\u7eb9\u8eab\u9884\u89c8',
+        social_bio_preview: '\u793e\u5a92\u7b80\u4ecb\u9884\u89c8',
+        premium_unlock_click: '\u4ed8\u8d39\u89e3\u9501\u70b9\u51fb',
+        homepage_preview_view: '\u9996\u9875\u6210\u679c\u9884\u89c8',
+        homepage_preview_click: '\u9996\u9875\u9884\u89c8\u70b9\u51fb',
+        identity_asset_created: '\u8eab\u4efd\u7d20\u6750\u751f\u6210',
+        identity_asset_download: '\u8eab\u4efd\u7d20\u6750\u4e0b\u8f7d'
     };
     const userRows = Object.entries(users).slice(-120).reverse().map(([id, user]) => `<tr>
         <td>${htmlEscape(id)}</td>
@@ -1418,6 +1895,7 @@ function renderAdminDashboard(req){
     const dailyRows = analytics.dailyRows.map(row => `<tr>
         <td>${row.date}</td><td>${row.page_view}</td><td>${row.generate_click}</td><td>${row.generate_success}</td>
         <td>${row.generate_failed}</td><td>${row.paywall_show}</td><td>${row.buy_click}</td><td>${row.share_click}</td>
+        <td>${row.identity_pack_view}</td><td>${row.script_style_select}</td><td>${row.premium_unlock_click}</td>
     </tr>`).join('');
     const recentRows = analytics.recent.map(item => `<tr>
         <td>${htmlEscape(item._ts)}</td>
@@ -1437,6 +1915,14 @@ function renderAdminDashboard(req){
         <td>${htmlEscape(item.ip || '')}</td>
         <td>${htmlEscape(item.message || '')}</td>
     </tr>`).join('');
+    const blogPosts = allBlogPosts({ includeDrafts: true });
+    const blogRows = blogPosts.map(post => `<tr>
+        <td>${htmlEscape(post.date || '')}</td>
+        <td><strong>${htmlEscape(post.title || '')}</strong><div class="muted">${htmlEscape(post.slug || '')}</div></td>
+        <td>${htmlEscape(post.category || '')}</td>
+        <td>${post.status === 'published' ? '已发布' : '草稿'}${post.builtIn ? '<div class="muted">内置</div>' : ''}</td>
+        <td><a href="/blog/${htmlEscape(post.slug || '')}" target="_blank" rel="noopener">查看</a>${!post.builtIn && post.status !== 'published' ? ` · <form class="inline" method="post" action="${ADMIN_PATH}/blog-posts/${htmlEscape(post.id || '')}/publish"><button type="submit">发布</button></form>` : ''}</td>
+    </tr>`).join('');
 
     return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1451,7 +1937,7 @@ function renderAdminDashboard(req){
     section{background:#fffbf5;border:1px solid #e2d0b8;border-radius:8px;padding:16px;margin:16px 0;overflow:auto}
     h2{color:#8c2318;font-size:18px;margin:0 0 12px}table{width:100%;border-collapse:collapse;font-size:13px}
     th,td{border-bottom:1px solid #eadcc9;padding:8px;text-align:left;vertical-align:top}th{color:#8c2318;background:#fff6ea;white-space:nowrap}
-    .logout{color:#8c2318;text-decoration:none;border:1px solid #c9a96e;border-radius:6px;padding:7px 12px;background:#fffbf5}
+    .logout{color:#8c2318;text-decoration:none;border:1px solid #c9a96e;border-radius:6px;padding:7px 12px;background:#fffbf5}.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.admin-form label{display:grid;gap:4px;color:#775533;font-size:13px;font-weight:700}.admin-form input,.admin-form textarea,.admin-form select{width:100%;border:1px solid #d8c6b0;border-radius:6px;padding:9px;background:#fffef9;color:#443322}.admin-form .full{grid-column:1/-1}.admin-form textarea{min-height:180px;font-family:Consolas,monospace}.admin-form button,.inline button{border:0;border-radius:6px;background:#8c2318;color:#fff;padding:9px 12px;cursor:pointer}.inline{display:inline}.inline button{padding:4px 8px;font-size:12px}
     @media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
     </style></head><body><div class="wrap">
     <div class="top"><div><h1>\u8fd0\u8425\u540e\u53f0</h1><div class="muted">My Chinese Name Analytics Dashboard \u00b7 ${htmlEscape(new Date().toLocaleString())}</div></div><a class="logout" href="${ADMIN_PATH}?logout=1">\u9000\u51fa</a></div>
@@ -1466,9 +1952,21 @@ function renderAdminDashboard(req){
       ${card('\u4ed8\u8d39\u5f39\u7a97', analytics.counts.paywall_show || 0, `\u4eca\u65e5 ${analytics.todayCounts.paywall_show || 0}`)}
       ${card('\u8d2d\u4e70\u70b9\u51fb', analytics.counts.buy_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.buy_click || 0}`)}
       ${card('\u5206\u4eab\u70b9\u51fb', analytics.counts.share_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.share_click || 0}`)}
+      ${card('\u8eab\u4efd\u5305\u5c55\u793a', analytics.counts.identity_pack_view || 0, `\u4eca\u65e5 ${analytics.todayCounts.identity_pack_view || 0}`)}
+      ${card('\u4e66\u4f53\u9009\u62e9', analytics.counts.script_style_select || 0, `\u4eca\u65e5 ${analytics.todayCounts.script_style_select || 0}`)}
+      ${card('\u4ed8\u8d39\u89e3\u9501\u70b9\u51fb', analytics.counts.premium_unlock_click || 0, `\u4eca\u65e5 ${analytics.todayCounts.premium_unlock_click || 0}`)}
     </div>
     <section><h2>\u7edf\u8ba1\u8bca\u65ad</h2><div class="muted">analytics-log.json: ${analyticsFileExists ? '\u5df2\u5b58\u5728' : '\u4e0d\u5b58\u5728'} \u00b7 ${analyticsFileSize} bytes \u00b7 total events ${analytics.total || 0} \u00b7 latest page_view ${htmlEscape(latestPageView?._ts || '\u6682\u65e0')}<br>DATA_DIR: ${htmlEscape(DATA_DIR)} \u00b7 ${process.env.DATA_DIR ? '\u5df2\u914d\u7f6e\u6301\u4e45\u5316\u76ee\u5f55' : '\u672a\u914d\u7f6e\uff0c\u90e8\u7f72\u540e\u53ef\u80fd\u5f52\u96f6'}</div></section>
-    <section><h2>\u6700\u8fd1 7 \u5929\u8d8b\u52bf</h2><table><thead><tr><th>\u65e5\u671f</th><th>\u8bbf\u95ee</th><th>\u70b9\u51fb\u751f\u6210</th><th>\u751f\u6210\u6210\u529f</th><th>\u751f\u6210\u5931\u8d25</th><th>\u4ed8\u8d39\u5f39\u7a97</th><th>\u8d2d\u4e70\u70b9\u51fb</th><th>\u5206\u4eab\u70b9\u51fb</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
+    <section id="blog"><h2>博客管理</h2><form class="admin-form" method="post" action="${ADMIN_PATH}/blog-posts">
+      <label>文章标题<input name="title" required placeholder="How to choose a Chinese name..."></label>
+      <label>URL Slug<input name="slug" required placeholder="how-to-choose-a-chinese-name"></label>
+      <label>分类<input name="category" value="Guide"></label>
+      <label>状态<select name="status"><option value="published">发布</option><option value="draft">草稿</option></select></label>
+      <label class="full">SEO 摘要<input name="description" required placeholder="A short Google search description."></label>
+      <label class="full">HTML 正文<textarea name="content" required placeholder="<h2>Section title</h2><p>Article content...</p>"></textarea></label>
+      <div class="full"><button type="submit">保存文章</button> <span class="muted">发布后自动进入 /blog、/blog/:slug 和 sitemap.xml。</span></div>
+    </form><table style="margin-top:14px"><thead><tr><th>日期</th><th>标题</th><th>分类</th><th>状态</th><th>操作</th></tr></thead><tbody>${blogRows || '<tr><td colspan="5">暂无文章</td></tr>'}</tbody></table></section>
+    <section><h2>\u6700\u8fd1 7 \u5929\u8d8b\u52bf</h2><table><thead><tr><th>\u65e5\u671f</th><th>\u8bbf\u95ee</th><th>\u70b9\u51fb\u751f\u6210</th><th>\u751f\u6210\u6210\u529f</th><th>\u751f\u6210\u5931\u8d25</th><th>\u4ed8\u8d39\u5f39\u7a97</th><th>\u8d2d\u4e70\u70b9\u51fb</th><th>\u5206\u4eab\u70b9\u51fb</th><th>\u8eab\u4efd\u5305</th><th>\u4e66\u4f53</th><th>\u89e3\u9501</th></tr></thead><tbody>${dailyRows}</tbody></table></section>
     <section><h2>\u6700\u8fd1\u4e8b\u4ef6</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u4e8b\u4ef6</th><th>\u7528\u6237</th><th>IP</th><th>\u4fe1\u606f</th></tr></thead><tbody>${recentRows || '<tr><td colspan="5">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
     <section><h2>\u8054\u7cfb\u6211\u4eec\u7559\u8a00</h2><table><thead><tr><th>\u65f6\u95f4</th><th>\u59d3\u540d</th><th>\u90ae\u7bb1</th><th>IP</th><th>\u7559\u8a00\u5185\u5bb9</th></tr></thead><tbody>${contactRows || '<tr><td colspan="5">\u6682\u65e0\u7559\u8a00</td></tr>'}</tbody></table></section>
     <section><h2>\u7528\u6237\u989d\u5ea6</h2><table><thead><tr><th>\u7528\u6237ID/IP</th><th>\u5957\u9910</th><th>\u5269\u4f59\u989d\u5ea6</th><th>\u4e94\u884c\u7b49\u7ea7</th><th>\u4ea4\u6613\u53f7</th><th>\u652f\u4ed8\u65f6\u95f4</th></tr></thead><tbody>${userRows || '<tr><td colspan="6">\u6682\u65e0\u6570\u636e</td></tr>'}</tbody></table></section>
@@ -1498,6 +1996,31 @@ app.post(ADMIN_PATH, (req, res) => {
     }
     res.setHeader('Set-Cookie', `admin_auth=${encodeURIComponent(adminToken())}; HttpOnly; Path=/; Max-Age=${60 * 60 * 8}; SameSite=Lax`);
     res.redirect(ADMIN_PATH);
+});
+
+app.post(`${ADMIN_PATH}/blog-posts`, (req, res) => {
+    if(!isAdminAuthed(req)) return res.redirect(ADMIN_PATH);
+    const posts = readManagedBlogPosts();
+    const post = normalizeBlogPost(req.body || {});
+    if(!post.title || !post.description || (!post.content && !post.sections.length)) {
+        return res.status(400).send('Missing title, description, or content');
+    }
+    const slugTaken = allBlogPosts({ includeDrafts: true }).some(item => item.slug === post.slug);
+    if(slugTaken) return res.status(409).send('Slug already exists');
+    posts.unshift(post);
+    writeManagedBlogPosts(posts);
+    res.redirect(`${ADMIN_PATH}#blog`);
+});
+
+app.post(`${ADMIN_PATH}/blog-posts/:id/publish`, (req, res) => {
+    if(!isAdminAuthed(req)) return res.redirect(ADMIN_PATH);
+    const id = cleanStr(req.params.id || '');
+    const posts = readManagedBlogPosts();
+    const index = posts.findIndex(post => post.id === id || post.slug === id);
+    if(index === -1) return res.status(404).send('Blog post not found');
+    posts[index] = normalizeBlogPost({ status: 'published' }, { ...posts[index], status: 'published' });
+    writeManagedBlogPosts(posts);
+    res.redirect(`${ADMIN_PATH}#blog`);
 });
 
 app.get('/api/dev-test-status', (req, res) => {

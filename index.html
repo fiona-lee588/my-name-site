@@ -27,7 +27,10 @@
 </script>
 <title>Get a Meaningful Chinese Name Inspired by the I Ching and Book of Songs</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap');
+@font-face{font-family:"MCN-MaShan";src:url("/assets/fonts/calligraphy/MaShanZheng-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-ZhiMang";src:url("/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-MaoCao";src:url("/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"MCN-LongCang";src:url("/assets/fonts/calligraphy/LongCang-Regular.ttf") format("truetype");font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --c-primary:#8c2318;--c-primary-dark:#701c13;
@@ -62,6 +65,53 @@ body{
     margin-bottom:24px;color:var(--c-text);line-height:1.9;font-size:15px;
 }
 .culture-desc .en{margin-top:8px;font-size:13px;color:#776655;line-height:1.7}
+.outcome-preview{background:#fffaf2;border:1px solid #e2d0b8;border-radius:12px;padding:22px;margin-bottom:24px;box-shadow:0 10px 28px rgba(68,51,34,.08);white-space:normal}
+.outcome-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:18px}
+.outcome-kicker{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:#a97138;margin-bottom:4px}
+.outcome-title{font-size:27px;line-height:1.25;color:#8c2318;margin-bottom:6px}
+.outcome-subtitle{font-size:14px;color:#76583c;line-height:1.65;max-width:720px}
+.outcome-cta{border:0;border-radius:8px;background:#8c2318;color:#fff;padding:12px 18px;font-family:inherit;font-size:15px;cursor:pointer;white-space:nowrap}
+.outcome-cta:hover{background:#701c13}
+.outcome-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:stretch}
+.sample-result{background:#251b16;color:#fff7ea;border-radius:12px;padding:18px;position:relative;overflow:hidden;min-height:330px}
+.sample-result:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(201,169,110,.22),transparent 36%),linear-gradient(135deg,rgba(140,35,24,.34),transparent 60%);pointer-events:none}
+.sample-result>*{position:relative}
+.sample-result.is-changing,.outcome-cards.is-changing{animation:sampleFade .42s ease}
+.sample-switcher{position:absolute;right:18px;bottom:14px;display:flex;gap:6px;align-items:center;z-index:2}
+.sample-dot{width:7px;height:7px;border-radius:50%;background:rgba(249,223,173,.35);border:0;padding:0;cursor:pointer}
+.sample-dot.active{width:20px;border-radius:999px;background:#f8dfae}
+.sample-next{border:1px solid rgba(249,223,173,.45);background:rgba(255,255,255,.06);color:#f8dfae;border-radius:999px;padding:4px 9px;font-family:inherit;font-size:12px;cursor:pointer}
+.sample-next:hover{background:rgba(249,223,173,.16)}
+.sample-name-row{display:flex;gap:16px;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(249,223,173,.22);padding-bottom:14px;margin-bottom:14px}
+.sample-name{font-size:38px;letter-spacing:6px;color:#f8dfae;font-family:"SimKai","KaiTi","楷体","STKaiti",serif;line-height:1.1;text-shadow:0 1px 0 rgba(255,238,199,.35),1px 2px 6px rgba(0,0,0,.28)}
+.sample-pinyin{font-size:14px;color:#e6d2b8;margin-top:4px;letter-spacing:0}
+.sample-seal{width:52px;height:52px;border-radius:6px;background:#9d2419;color:#f8ead2;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;letter-spacing:3px;font-size:14px}
+.sample-persona{font-size:28px;color:#f8dfae;line-height:1.18;margin:8px 0}
+.sample-tags{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.sample-tags span{border:1px solid rgba(249,223,173,.5);border-radius:999px;padding:5px 10px;font-size:12px;color:#f8dfae;background:rgba(255,255,255,.06)}
+.sample-lines{display:grid;gap:8px;color:#e6d2b8;font-size:13px;line-height:1.5}
+.sample-line{border-left:3px solid rgba(249,223,173,.5);padding-left:10px}
+.outcome-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.outcome-card{background:#fffef9;border:1px solid #e4cfad;border-radius:10px;padding:13px;min-height:154px;display:flex;flex-direction:column;justify-content:space-between}
+.outcome-card h3{font-size:15px;color:#8c2318;margin-bottom:5px}
+.outcome-card p{font-size:12px;color:#76583c;line-height:1.45}
+.mini-script-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
+.mini-script{border:1px solid #d8c6b0;border-radius:6px;background:#f7efe4;text-align:center;padding:7px 3px;font-size:12px;color:#5c4631}
+.mini-cert{background:linear-gradient(135deg,#fffaf0,#ead7ae);border:1px solid #c9a96e;border-radius:7px;text-align:center;padding:10px;margin-top:8px;font-size:12px;color:#5c4631}
+.mini-cert strong{display:block;font-size:22px;letter-spacing:4px;color:#111;font-family:"SimKai","KaiTi","楷体","STKaiti",serif;margin:4px 0;text-shadow:.6px .8px 0 rgba(0,0,0,.18)}
+.mini-tattoo{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:center;margin-top:8px}
+.mini-tattoo-name{writing-mode:vertical-rl;font-size:25px;letter-spacing:3px;color:#111;text-align:center;font-family:"SimKai","KaiTi","楷体","STKaiti",serif;text-shadow:.5px .7px 0 rgba(0,0,0,.16)}
+.mini-social{border-left:3px solid #8c2318;padding-left:8px;margin-top:8px;font-size:12px;color:#5c4631;line-height:1.45}
+.outcome-plan{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.outcome-plan-box{border:1px solid #e4cfad;border-radius:9px;padding:12px;background:#fffef9}
+.outcome-plan-box.premium{background:#2a1d17;color:#f8ead2;border-color:#5d4232}
+.outcome-plan-box h3{font-size:15px;color:#8c2318;margin-bottom:6px}
+.outcome-plan-box.premium h3{color:#f8dfae}
+.outcome-plan-box ul{list-style:none;font-size:12px;line-height:1.65;color:#76583c}
+.outcome-plan-box.premium ul{color:#e6d2b8}
+@keyframes sampleFade{0%{opacity:.58;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.outcome-head,.outcome-grid,.outcome-plan,.form-intake-grid,.blog-head,.blog-grid{grid-template-columns:1fr}.outcome-cta{width:100%}.intake-story{border-right:0;border-bottom:1px solid #e2d0b8;padding:0 0 18px}}
+@media(max-width:640px){.outcome-preview,.form-intake,.blog-preview{padding:16px}.outcome-title{font-size:22px}.sample-name{font-size:30px}.sample-persona{font-size:23px}.outcome-cards{grid-template-columns:1fr}.intake-story h2,.blog-preview h2{font-size:24px}.birth-row{grid-template-columns:1fr 1fr}}
 .form-box{
     background:#fffbf5;
     border:1px solid #e2d0b8;
@@ -80,6 +130,98 @@ body{
     font-size:14px;
     color:#997755;
     margin-bottom:20px;
+}
+.form-intake{
+    background:
+        linear-gradient(135deg,rgba(255,251,245,.95),rgba(248,235,210,.9)),
+        radial-gradient(circle at 12% 18%,rgba(201,169,110,.18),transparent 34%);
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:22px;
+    box-shadow:0 10px 26px rgba(68,51,34,.08);
+}
+.form-intake-grid{
+    display:grid;
+    grid-template-columns:.82fr 1.18fr;
+    gap:24px;
+    align-items:stretch;
+}
+.intake-story{
+    border-right:1px solid #e2d0b8;
+    padding:8px 22px 8px 0;
+}
+.intake-kicker,.blog-kicker{
+    font-size:12px;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+    color:#a97138;
+    font-weight:700;
+    margin-bottom:8px;
+}
+.intake-story h2,.blog-preview h2{
+    color:#2f2019;
+    font-size:30px;
+    line-height:1.15;
+    margin:0 0 12px;
+}
+.intake-story p,.blog-preview p{
+    color:#76583c;
+    font-size:14px;
+    line-height:1.7;
+}
+.intake-signals{
+    display:grid;
+    gap:10px;
+    margin-top:18px;
+}
+.intake-signal{
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:10px;
+    align-items:start;
+    padding:10px;
+    background:rgba(255,254,249,.72);
+    border:1px solid #eadbc8;
+    border-radius:8px;
+}
+.intake-signal mark{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#f7e7dc;
+    color:#8c2318;
+    font-family:KaiTi,STKaiti,serif;
+    font-size:18px;
+}
+.intake-signal strong{
+    display:block;
+    color:#5f3428;
+    font-size:14px;
+    line-height:1.25;
+}
+.intake-signal span{
+    display:block;
+    color:#87694d;
+    font-size:12px;
+    line-height:1.5;
+    margin-top:2px;
+}
+.form-panel{
+    min-width:0;
+}
+.form-section{
+    margin-bottom:18px;
+}
+.form-section-title{
+    color:#8c2318;
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    font-weight:700;
+    margin:0 0 10px;
 }
 .form-row{
     display:grid;
@@ -112,16 +254,18 @@ input,select{
 input:focus,select:focus{
     outline:none;
     border-color:#c8a467;
+    box-shadow:0 0 0 3px rgba(201,169,110,.16);
 }
 .full{
     grid-column:1/-1;
 }
 .birth-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr)) minmax(150px,1.25fr);
     gap:12px;
 }
 .birth-col{
-    flex:1;
+    min-width:0;
 }
 #generateBtn{
     width:100%;
@@ -138,6 +282,69 @@ input:focus,select:focus{
 #generateBtn:hover{
     background:#701c13;
 }
+.blog-preview{
+    background:#fffbf5;
+    border:1px solid #e2d0b8;
+    border-radius:12px;
+    padding:24px;
+    margin-bottom:30px;
+    box-shadow:0 10px 26px rgba(68,51,34,.08);
+}
+.blog-head{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:18px;
+    align-items:end;
+    margin-bottom:18px;
+}
+.blog-link{
+    color:#8c2318;
+    text-decoration:none;
+    border:1px solid #d8c6b0;
+    border-radius:999px;
+    padding:9px 14px;
+    background:#fffef9;
+    white-space:nowrap;
+}
+.blog-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+.blog-card{
+    display:block;
+    min-height:170px;
+    text-decoration:none;
+    color:#443322;
+    background:linear-gradient(145deg,#fffef9,#f7ecdb);
+    border:1px solid #e2d0b8;
+    border-radius:10px;
+    padding:16px;
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.blog-card:hover{
+    transform:translateY(-3px);
+    border-color:#c9a96e;
+    box-shadow:0 10px 24px rgba(140,35,24,.12);
+}
+.blog-card small{
+    color:#a97138;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    font-size:11px;
+    font-weight:700;
+}
+.blog-card h3{
+    color:#5f3428;
+    font-size:18px;
+    line-height:1.25;
+    margin:10px 0 8px;
+}
+.blog-card span{
+    color:#76583c;
+    font-size:13px;
+    line-height:1.55;
+}
 #result{
     background:#fffbf5;
     border:1px solid #e2d0b8;
@@ -148,6 +355,7 @@ input:focus,select:focus{
     color:#443322;
     margin-bottom:30px;
 }
+#result:empty{display:none}
 .share-box{margin-top:18px;padding:18px;background:linear-gradient(145deg,#fdf6e9,#f0e2c5);border-radius:var(--radius);border:2px solid var(--c-gold);text-align:center;box-shadow:var(--shadow-hover)}
 .share-box h4{color:var(--c-primary);margin-bottom:8px;font-size:15px}
 .share-box p{font-size:13px;color:var(--c-text-light);line-height:1.7}
@@ -169,25 +377,6 @@ input:focus,select:focus{
     cursor:pointer;
     font-size:16px;
     margin-top:10px;
-}
-.extra-box{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
-.extra-card{background:var(--c-bg-card);border:1px solid var(--c-border);border-radius:var(--radius);padding:20px;overflow:hidden}
-.extra-card h3{color:var(--c-primary);margin-bottom:12px;border-bottom:1px solid var(--c-border);padding-bottom:8px;font-size:15px;word-break:break-word}
-.scroll-wrapper{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
-.scroll-wrapper::-webkit-scrollbar{display:none}
-.scroll-content{display:flex;flex-wrap:wrap;gap:14px;min-width:100%}
-.scroll-item{flex:1 1 calc(50% - 7px);min-width:180px;max-width:100%;padding:10px 14px;background:#f7efe4;border-radius:var(--radius-sm);border:1px solid var(--c-border);font-size:13px;line-height:1.65;color:var(--c-text);word-break:break-word}
-.scroll-item .item-title{font-size:14px;color:var(--c-primary);margin-bottom:3px;font-weight:500}
-.scroll-item .item-en{color:#997755;font-size:12px}
-.scroll-item .item-desc{margin-top:5px;color:var(--c-text);font-size:12px}
-.scroll-item .item-desc .en{color:#886655;font-size:11px;display:block;margin-top:2px}
-@media (max-width:768px){
-    .scroll-content{
-        flex-direction:row;
-    }
-    .scroll-item{
-        flex:1 1 100%;
-    }
 }
 .price-box{
     background:#fffbf5;
@@ -364,7 +553,6 @@ input:focus,select:focus{
   .header{padding:20px 14px}.header h1{font-size:24px;letter-spacing:2px}
   .form-box{padding:18px 14px}.form-row{grid-template-columns:1fr}
   .birth-col{flex:1 1 calc(50% - 5px)}
-  .extra-box{grid-template-columns:1fr}.scroll-item{flex:1 1 100%}
   .footer-row{grid-template-columns:1fr 1fr;gap:14px}
   #result{padding:18px 14px}.result-name{font-size:24px}
   .paywall-content{padding:18px 14px}.paywall-title{font-size:24px}.paywall-card{min-height:auto;padding:22px 18px}.paywall-card ul{font-size:16px}.fixed-share-bar{display:none}.help-float{right:12px;bottom:12px}
@@ -397,6 +585,56 @@ input:focus,select:focus{
 .avatar-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;}
 .avatar-btn{padding:10px 18px;background:#8c2318;color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:15px;}
 .avatar-btn:hover{background:#701c13;}
+.identity-kit{max-width:980px;margin:24px auto 0;white-space:normal}
+.identity-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:18px;align-items:stretch;margin-bottom:18px}
+.identity-panel{background:#fffaf2;border:1px solid #e4cfad;border-radius:12px;padding:18px;box-shadow:0 10px 28px rgba(68,51,34,.08)}
+.identity-panel.dark{background:#231914;color:#fff7ea;border-color:#4a3529;position:relative;overflow:hidden}
+.identity-panel.dark:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(201,169,110,.22),transparent 35%),linear-gradient(135deg,rgba(140,35,24,.35),transparent 60%);pointer-events:none}
+.identity-panel>*{position:relative}
+.identity-eyebrow{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:#a97138;margin-bottom:6px}
+.identity-title{font-size:25px;color:#8c2318;line-height:1.25;margin-bottom:8px}
+.identity-panel.dark .identity-title{color:#f9dfad}
+.persona-name{font-size:32px;line-height:1.15;color:#f9dfad;margin:10px 0 8px}
+.persona-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.persona-tag{border:1px solid rgba(249,223,173,.55);color:#f9dfad;border-radius:999px;padding:5px 10px;font-size:12px;background:rgba(255,255,255,.06)}
+.identity-copy{font-size:14px;color:#76583c;line-height:1.7}
+.identity-panel.dark .identity-copy{color:#e7d6bd}
+.kit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
+.kit-card{background:#fffaf2;border:1px solid #e4cfad;border-radius:10px;padding:14px;min-height:160px}
+.kit-card h3{font-size:16px;color:#8c2318;margin-bottom:6px}
+.kit-card p{font-size:13px;color:#76583c;line-height:1.55}
+.script-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.script-option{border:1px solid #d8c6b0;background:#fffef9;border-radius:8px;padding:9px 8px;text-align:left;cursor:pointer;color:#5b3a24;font-family:inherit;min-height:76px}
+.script-option strong{display:block;color:#8c2318;font-size:13px;margin-bottom:2px}
+.script-option span{display:block;color:#8b735d;font-size:12px;line-height:1.35}
+.script-option.active,.script-option:hover{border-color:#8c2318;box-shadow:0 6px 16px rgba(140,35,24,.12)}
+.certificate-mini{background:linear-gradient(135deg,#fffaf0,#ead7ae);border:1px solid #c9a96e;border-radius:8px;padding:14px;text-align:center;min-height:130px;display:flex;flex-direction:column;justify-content:center}
+.certificate-mini .cert-name{font-size:28px;color:#101010;letter-spacing:4px;margin:5px 0;font-family:"SimKai","KaiTi","楷体","STKaiti",serif;text-shadow:.7px .8px 0 rgba(0,0,0,.18)}
+.tattoo-mini{background:#f4ece1;border:1px solid #cdb696;border-radius:8px;padding:12px;display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:center;min-height:130px}
+.tattoo-vertical{writing-mode:vertical-rl;font-size:30px;letter-spacing:4px;color:#111;text-align:center;justify-self:center;font-family:"SimKai","KaiTi","楷体","STKaiti",serif;text-shadow:.7px .8px 0 rgba(0,0,0,.18)}
+.bio-line{border-left:3px solid #8c2318;padding-left:10px;font-size:13px;color:#5c4631;line-height:1.55;margin-top:10px}
+.unlock-panel{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;background:#271b16;color:#fff3df;border-radius:12px;padding:18px;margin-top:18px;align-items:center}
+.unlock-panel h3{font-size:22px;color:#f6d99a;margin-bottom:8px}
+.unlock-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:13px;color:#e9d4bd}
+.unlock-price{text-align:center;border:1px solid rgba(246,217,154,.38);border-radius:10px;padding:16px;background:rgba(255,255,255,.05)}
+.unlock-price strong{display:block;font-size:32px;color:#f6d99a;line-height:1}
+.unlock-btn{margin-top:12px;width:100%;padding:11px 16px;border:0;border-radius:8px;background:#f6d99a;color:#271b16;font-weight:bold;cursor:pointer;font-family:inherit}
+.unlock-btn:hover{background:#fff0c4}
+.preview-btn{margin-top:10px;border:1px solid #8c2318;background:#fffaf2;color:#8c2318;border-radius:7px;padding:8px 10px;cursor:pointer;font-family:inherit}
+.preview-btn:hover{background:#8c2318;color:#fff}.asset-modal{display:none;position:fixed;inset:0;background:rgba(23,17,13,.68);z-index:10020;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
+.asset-modal.show{display:flex}
+.asset-dialog{width:min(920px,96vw);max-height:92vh;overflow:auto;background:#fffaf2;border:1px solid #e4cfad;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.32);padding:18px}
+.asset-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.asset-head h3{color:#8c2318;font-size:20px;margin:0}
+.asset-close{border:0;background:#8c2318;color:#fff;border-radius:7px;padding:7px 10px;cursor:pointer;font-family:inherit}
+.asset-preview{background:#efe2cc;border:1px solid #d7bf98;border-radius:10px;padding:12px;display:flex;justify-content:center;align-items:center;min-height:300px}
+.asset-preview svg{width:100%;height:auto;max-height:68vh;display:block}
+.asset-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.asset-btn{border:1px solid #8c2318;background:#8c2318;color:#fff;border-radius:7px;padding:9px 14px;cursor:pointer;font-family:inherit}
+.asset-btn.secondary{background:#fffaf2;color:#8c2318}
+.asset-btn:hover{filter:brightness(.96)}
+@media(max-width:860px){.identity-hero,.unlock-panel{grid-template-columns:1fr}.kit-grid{grid-template-columns:1fr}.script-options{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.script-options{grid-template-columns:1fr}.unlock-list{grid-template-columns:1fr}.persona-name{font-size:26px}.identity-title{font-size:21px}}
 .dev-test-badge{position:fixed;right:14px;top:14px;z-index:10001;background:#2e7d32;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,0.18)}
 </style>
 </head>
@@ -413,144 +651,227 @@ input:focus,select:focus{
         We create Chinese names for overseas users by matching your English surname to a Chinese surname, then selecting given-name characters through classical imagery, five-elements balance, and your personal meaning preference.
         <div class="en">Not just phonetic translation. We consider surname, character meaning, classical source, and personal temperament.</div>
     </div>
-    <div class="form-box">
-        <div class="form-title">Create Your Chinese Name</div>
-        <div class="form-title-en">Receive Chinese characters, pinyin, English pronunciation, meaning, and classical source.</div>
-        <div class="form-row">
-            <div class="form-item">
-                <label>Gender</label>
-                <select id="gender">
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Neutral</option>
-                </select>
+    <section class="outcome-preview" id="outcomePreview">
+        <div class="outcome-head">
+            <div>
+                <div class="outcome-kicker">What You Receive</div>
+                <div class="outcome-title">A Chinese cultural identity, not just a translated name.</div>
+                <div class="outcome-subtitle">Generate a meaningful Chinese name with pinyin, cultural explanation, an oriental persona tag, and shareable visual assets for social profiles, certificates, and tattoo inspiration.</div>
             </div>
-            <div class="form-item">
-                <label>Name Style</label>
-                <select id="style">
-                    <option>Gentle & Poetic</option>
-                    <option>Grand & Confident</option>
-                    <option>Elegant & Scholarly</option>
-                    <option>Calm & Minimal</option>
-                </select>
-            </div>
+            <button class="outcome-cta" type="button" onclick="scrollToGenerator('homepage_top_cta')">Create My Chinese Identity</button>
         </div>
-        <div class="form-row">
-            <div class="form-item">
-                <label>English Given Name</label>
-                <input type="text" id="englishName" placeholder="Emma, James, Sophia...">
-            </div>
-            <div class="form-item">
-                <label>English Surname</label>
-                <input type="text" id="englishSurname" placeholder="Smith, Johnson, Miller...">
-            </div>
-        </div>
-
-        <div class="form-item full">
-            <label>Birth Date & Time <span class="en">optional</span></label>
-            <div class="birth-row">
-                <div class="birth-col">
-                    <input list="yearList" id="birthYear" placeholder="Year">
-                    <datalist id="yearList"></datalist>
+        <div class="outcome-grid">
+            <div class="sample-result">
+                <div class="sample-name-row">
+                    <div>
+                        <div class="sample-name" id="homeSampleName">林清瑶</div>
+                        <div class="sample-pinyin" id="homeSamplePinyin">Lin Qingyao · lin ching-yow</div>
+                    </div>
+                    <div class="sample-seal">雅名</div>
                 </div>
-                <div class="birth-col">
-                    <input list="monthList" id="birthMonth" placeholder="Month">
-                    <datalist id="monthList">
-                        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
-                        <option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
-                    </datalist>
+                <div class="outcome-kicker">Oriental Persona Tag</div>
+                <div class="sample-persona" id="homeSamplePersona">Jade-like Grace</div>
+                <div class="sample-tags" id="homeSampleTags"><span>Refined</span><span>Gentle</span><span>Poetic</span><span>Calm Power</span></div>
+                <div class="sample-lines">
+                    <div class="sample-line">Name meaning: clear jade, graceful light, and a calm presence.</div>
+                    <div class="sample-line">Cultural source: inspired by classical imagery, five-elements balance, and Chinese naming aesthetics.</div>
+                    <div class="sample-line">Use it as a social story, profile identity, keepsake certificate, or tattoo reference.</div>
                 </div>
-                <div class="birth-col">
-                    <input list="dayList" id="birthDay" placeholder="Day">
-                    <datalist id="dayList"></datalist>
-                </div>
-                <div class="birth-col">
-                    <input list="timeList" id="birthTime" placeholder="Time or Chinese hour">
-                    <datalist id="timeList">
-                        <option>Zi hour 23:00-01:00</option>
-                        <option>Chou hour 01:00-03:00</option>
-                        <option>Yin hour 03:00-05:00</option>
-                        <option>Mao hour 05:00-07:00</option>
-                        <option>Chen hour 07:00-09:00</option>
-                        <option>Si hour 09:00-11:00</option>
-                        <option>Wu hour 11:00-13:00</option>
-                        <option>Wei hour 13:00-15:00</option>
-                        <option>Shen hour 15:00-17:00</option>
-                        <option>You hour 17:00-19:00</option>
-                        <option>Xu hour 19:00-21:00</option>
-                        <option>Hai hour 21:00-23:00</option>
-                    </datalist>
+                <div class="sample-switcher" id="homeSampleSwitcher" aria-label="Preview examples">
+                    <button class="sample-dot active" type="button" onclick="setHomepagePreviewSample(0, true)" aria-label="Preview example 1"></button>
+                    <button class="sample-dot" type="button" onclick="setHomepagePreviewSample(1, true)" aria-label="Preview example 2"></button>
+                    <button class="sample-dot" type="button" onclick="setHomepagePreviewSample(2, true)" aria-label="Preview example 3"></button>
+                    <button class="sample-dot" type="button" onclick="setHomepagePreviewSample(3, true)" aria-label="Preview example 4"></button>
+                    <button class="sample-next" type="button" onclick="advanceHomepagePreview(true)">Next</button>
                 </div>
             </div>
+            <div class="outcome-cards">
+                <button class="outcome-card" type="button" onclick="previewHomepageFeature('script_styles')">
+                    <h3>Six Script Styles</h3>
+                    <p>From ancient seal style to flowing calligraphy, choose the visual mood of your name.</p>
+                    <div class="mini-script-row"><span class="mini-script">Seal</span><span class="mini-script">Clerical</span><span class="mini-script">Running</span></div>
+                </button>
+                <button class="outcome-card" type="button" onclick="previewHomepageFeature('certificate')">
+                    <h3>Name Certificate</h3>
+                    <p>A formal keepsake that explains your Chinese name, persona, and cultural source.</p>
+                    <div class="mini-cert">Certificate Preview<strong id="homeCertName">林清瑶</strong><span id="homeCertPersona">Jade-like Grace</span></div>
+                </button>
+                <button class="outcome-card" type="button" onclick="previewHomepageFeature('tattoo')">
+                    <h3>Tattoo Preview</h3>
+                    <p>Check vertical layout, readability, and meaning safety before using Chinese characters.</p>
+                    <div class="mini-tattoo"><div class="mini-tattoo-name" id="homeTattooName">林清瑶</div><div>Meaning safe<br>Readable layout<br>Minimal ink style</div></div>
+                </button>
+                <button class="outcome-card" type="button" onclick="previewHomepageFeature('social_cards')">
+                    <h3>Social Profile Cards</h3>
+                    <p>Share your name as a cultural identity card on X, Instagram, LinkedIn, and more.</p>
+                    <div class="mini-social" id="homeSocialBio">My Chinese name is Lin Qingyao: Jade-like Grace.</div>
+                </button>
+            </div>
         </div>
-
-        <div class="form-item full">
-            <label>Meaning Preference</label>
-            <input type="text" id="meaning" placeholder="wisdom, grace, peace, success, confidence...">
+        <div class="outcome-plan">
+            <div class="outcome-plan-box">
+                <h3>Free Result</h3>
+                <ul><li>Chinese name, pinyin, and meaning</li><li>One oriental persona tag</li><li>Basic shareable name card</li></ul>
+            </div>
+            <div class="outcome-plan-box premium">
+                <h3>Identity Pack Upgrade</h3>
+                <ul><li>HD certificate, six script styles, tattoo preview</li><li>Social cards, no-watermark downloads, more name options</li></ul>
+            </div>
         </div>
-        <div class="loading" id="loading">Generating your meaningful Chinese name, please wait...</div>
-        <button id="generateBtn">Generate My Chinese Name</button>
-        <div class="quota-hint" id="quotaHint">Free attempts remaining: <span id="quotaCount">2</span></div>
+    </section>
+    <div class="form-box form-intake" id="generator">
+        <div class="form-intake-grid">
+            <aside class="intake-story">
+                <div class="intake-kicker">Create Yours</div>
+                <h2>Tell us the identity your name should carry.</h2>
+                <p>Your English name is only the starting point. Birth context, surname rhythm, and personal direction help shape a Chinese name with cultural weight.</p>
+                <div class="intake-signals">
+                    <div class="intake-signal"><mark>姓</mark><div><strong>Surname matching</strong><span>English surname becomes a natural Chinese family-name direction.</span></div></div>
+                    <div class="intake-signal"><mark>时</mark><div><strong>I Ching + Five Elements</strong><span>Birth date and hour guide balance, imagery, and character choice.</span></div></div>
+                    <div class="intake-signal"><mark>诗</mark><div><strong>Classical source</strong><span>Book of Songs, Chu Ci, and traditional aesthetics shape the final story.</span></div></div>
+                </div>
+            </aside>
+            <div class="form-panel">
+                <div class="form-title">Create Your Chinese Identity</div>
+                <div class="form-title-en">Receive Chinese characters, pinyin, meaning, pronunciation, Five Elements context, and classical source.</div>
+                <div class="form-section">
+                    <div class="form-section-title">Who You Are</div>
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label>English Given Name</label>
+                            <input type="text" id="englishName" autocomplete="given-name" placeholder="e.g. Emily">
+                        </div>
+                        <div class="form-item">
+                            <label>English Surname</label>
+                            <input type="text" id="englishSurname" autocomplete="family-name" placeholder="e.g. Johnson">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label>Gender</label>
+                            <select id="gender">
+                                <option value="" selected>Select gender</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Neutral</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label>Name Mood</label>
+                            <select id="style">
+                                <option>Gentle & Poetic</option>
+                                <option>Grand & Confident</option>
+                                <option>Elegant & Scholarly</option>
+                                <option>Calm & Minimal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Birth Context</div>
+                    <div class="form-item full">
+                        <label>Birth Date & Chinese Hour <span class="en">for I Ching and Five Elements context</span></label>
+                        <div class="birth-row">
+                            <div class="birth-col">
+                                <input list="yearList" id="birthYear" placeholder="Year">
+                                <datalist id="yearList"></datalist>
+                            </div>
+                            <div class="birth-col">
+                                <input list="monthList" id="birthMonth" placeholder="Month">
+                                <datalist id="monthList">
+                                    <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+                                    <option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+                                </datalist>
+                            </div>
+                            <div class="birth-col">
+                                <input list="dayList" id="birthDay" placeholder="Day">
+                                <datalist id="dayList"></datalist>
+                            </div>
+                            <div class="birth-col">
+                                <input list="timeList" id="birthTime" placeholder="Chinese hour">
+                                <datalist id="timeList">
+                                    <option>Zi hour 23:00-01:00</option>
+                                    <option>Chou hour 01:00-03:00</option>
+                                    <option>Yin hour 03:00-05:00</option>
+                                    <option>Mao hour 05:00-07:00</option>
+                                    <option>Chen hour 07:00-09:00</option>
+                                    <option>Si hour 09:00-11:00</option>
+                                    <option>Wu hour 11:00-13:00</option>
+                                    <option>Wei hour 13:00-15:00</option>
+                                    <option>Shen hour 15:00-17:00</option>
+                                    <option>You hour 17:00-19:00</option>
+                                    <option>Xu hour 19:00-21:00</option>
+                                    <option>Hai hour 21:00-23:00</option>
+                                </datalist>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Identity Direction</div>
+                    <div class="form-item full">
+                        <label>Meaning Preference</label>
+                        <input type="text" id="meaning" placeholder="e.g. ocean, wisdom, calm strength, artistic grace">
+                    </div>
+                </div>
+                <div class="loading" id="loading">Creating your Chinese identity, please wait...</div>
+                <button id="generateBtn">Generate My Chinese Identity</button>
+                <div class="quota-hint" id="quotaHint">Free attempts remaining: <span id="quotaCount">2</span></div>
+            </div>
+        </div>
     </div>
     <div id="result"></div>
+    <section class="blog-preview">
+        <div class="blog-head">
+            <div>
+                <div class="blog-kicker">Cultural Naming Journal</div>
+                <h2>Guides that make the identity feel real.</h2>
+                <p>Short articles explain Chinese surnames, I Ching and Five Elements context, classical sources, and how to use the name with confidence.</p>
+            </div>
+            <a class="blog-link" href="/blog">Read Blog</a>
+        </div>
+        <div class="blog-grid">
+            <a class="blog-card" href="/blog/why-your-chinese-name-should-not-sound-like-your-english-name"><small>Identity</small><h3>Why your Chinese name should not simply sound like your English name</h3><span>Sound can help, but meaning, surname, and cultural memory make the name feel usable.</span></a>
+            <a class="blog-card" href="/blog/i-ching-five-elements-chinese-name"><small>Tradition</small><h3>How I Ching and Five Elements guide a Chinese name</h3><span>Birth context becomes naming imagery instead of a rigid fortune-telling claim.</span></a>
+            <a class="blog-card" href="/blog/book-of-songs-chu-ci-name-sources"><small>Classics</small><h3>Book of Songs and Chu Ci as naming sources</h3><span>Classical lines give the result a source, a mood, and a story people can remember.</span></a>
+        </div>
+    </section>
     <div class="culture-desc">
         <strong>Trust & safety:</strong> Secure PayPal checkout, privacy-conscious form data, sample-style bilingual report, and support for payment or generation issues.
         <div class="en">We do not sell a random translation. We provide a personal naming interpretation with characters, pinyin, meaning, and cultural source.</div>
     </div>
-    <div class="extra-box">
-        <div class="extra-card">
-            <h3>Popular Name Examples</h3>
-            <div class="scroll-wrapper"><div class="scroll-content">
-                <div class="scroll-item"><div class="item-title">Su Qingyan</div><div class="item-en">Water-Wood Element</div><div class="item-desc">Gentle and peaceful like a breeze</div></div>
-                <div class="scroll-item"><div class="item-title">Jing Anjin</div><div class="item-en">Wood-Metal Element</div><div class="item-desc">Mild as jade, modest and serene</div></div>
-                <div class="scroll-item"><div class="item-title">Zhi Yao</div><div class="item-en">Fire-Fire Element</div><div class="item-desc">Free-spirited and open-minded</div></div>
-                <div class="scroll-item"><div class="item-title">Mu Chen</div><div class="item-en">Water-Wood Element</div><div class="item-desc">Morning light with lively energy</div></div>
-                <div class="scroll-item"><div class="item-title">Ruo Shuang</div><div class="item-en">Metal-Water Element</div><div class="item-desc">Pure and elegant as frost</div></div>
-            </div></div>
-        </div>
-        <div class="extra-card">
-            <h3>Chinese Naming Culture Tips</h3>
-            <div class="scroll-wrapper"><div class="scroll-content">
-                <div class="scroll-item"><div class="item-title">Eight Characters & Five Elements</div><div class="item-en">Birth-time balance</div><div class="item-desc">Match lucky elements by birth time and balance life energy</div></div>
-                <div class="scroll-item"><div class="item-title">Book of Songs Names</div><div class="item-en">Classical poetry</div><div class="item-desc">Derived from ancient elegant poems with literary heritage</div></div>
-                <div class="scroll-item"><div class="item-title">Chu Ci Romance</div><div class="item-en">Poetic aspiration</div><div class="item-desc">Inherit the romantic flair of Chu Ci poetry</div></div>
-                <div class="scroll-item"><div class="item-title">I Ching Balance</div><div class="item-en">Harmony and timing</div><div class="item-desc">Draw auspicious meanings for balance and protection</div></div>
-                <div class="scroll-item"><div class="item-title">Surname Origin</div><div class="item-en">Hundred Family Surnames</div><div class="item-desc">Trace surname sound, image, and cultural heritage</div></div>
-            </div></div>
-        </div>
-    </div>
     <div class="price-box">
-        <div class="price-title">Upgrade Paid Packages</div>
+        <div class="price-title">Unlock Your Chinese Cultural Identity Kit</div>
         <div class="price-row">
             <div class="price-card">
-                <h3>Basic</h3>
+                <h3>Name Explorer</h3>
                 <div class="price">$9.9</div>
                 <ul>
-                    <li>3 custom Chinese names</li>
-                    <li>Basic five-element analysis</li>
+                    <li>3 custom Chinese name generations</li>
+                    <li>Meaning, pinyin, and pronunciation guide</li>
                     <li>1 regeneration</li>
-                    <li>Chinese characters, pinyin, and English meaning</li>
+                    <li>Basic social name card</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="basic" data-price="9.9">Buy Now</button>
             </div>
             <div class="price-card hot">
-                <h3>Premium</h3>
+                <h3>Cultural Identity Pack</h3>
                 <div class="price">$19.9</div>
                 <ul>
-                    <li>5 exclusive Chinese names</li>
+                    <li>5 exclusive Chinese name options</li>
                     <li>Full birth-time and five-elements analysis</li>
-                    <li>Book of Songs and Chu Ci source trace</li>
-                    <li>Downloadable naming certificate</li>
+                    <li>Certificate, script styles, and social cards</li>
+                    <li>Tattoo readiness preview</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="premium" data-price="19.9">Buy Now</button>
             </div>
             <div class="price-card">
-                <h3>Ultimate</h3>
+                <h3>Full Naming Report</h3>
                 <div class="price">$29.9</div>
                 <ul>
                     <li>Unlimited name generations for your project</li>
                     <li>In-depth cultural customization</li>
-                    <li>Lifetime name record storage</li>
+                    <li>Full report and lifetime name record storage</li>
                     <li>Priority support for payment or generation issues</li>
                 </ul>
                 <button class="buy-btn paypal-btn" data-package="ultimate" data-price="29.9">Buy Now</button>
@@ -564,7 +885,7 @@ input:focus,select:focus{
             <div class="footer-col"><h4>About Us</h4><a href="/brand-intro">Brand Intro</a><a href="/contact-us">Contact Us</a></div>
             <div class="footer-col"><h4>Terms</h4><a href="/terms">Terms of Use</a><a href="/privacy">Privacy Policy</a></div>
             <div class="footer-col"><h4>Help</h4><a href="/faq">FAQ</a><a href="/payment-guide">Payment Guide</a></div>
-            <div class="footer-col"><h4>Guides</h4><a href="/chinese-name-examples">Chinese Name Examples</a><a href="/english-to-chinese-name-examples">English to Chinese Examples</a><a href="/how-to-choose-a-chinese-name">How to Choose a Chinese Name</a><a href="/chinese-name-by-birthday">Chinese Name by Birthday</a><a href="/chinese-surname-matching">Chinese Surname Matching</a></div>
+            <div class="footer-col"><h4>Guides</h4><a href="/blog">Blog</a><a href="/chinese-name-examples">Chinese Name Examples</a><a href="/english-to-chinese-name-examples">English to Chinese Examples</a><a href="/how-to-choose-a-chinese-name">How to Choose a Chinese Name</a><a href="/chinese-name-by-birthday">Chinese Name by Birthday</a><a href="/chinese-surname-matching">Chinese Surname Matching</a></div>
             <div class="footer-col"><h4>Follow Us</h4><a href="https://facebook.com" target="_blank">Facebook</a><a href="https://instagram.com" target="_blank">Instagram</a><a href="https://tiktok.com" target="_blank">TikTok</a></div>
         </div>
         <div class="copyright">漏 2026 My Chinese Name | Creator Studio 路 All Rights Reserved 路 mychinesename.co</div>
@@ -588,25 +909,38 @@ input:focus,select:focus{
     </a>
 </div>
 
+<div class="asset-modal" id="identityAssetModal">
+    <div class="asset-dialog">
+        <div class="asset-head">
+            <h3 id="identityAssetTitle">Identity Asset Preview</h3>
+            <button class="asset-close" type="button" onclick="closeIdentityAssetModal()">Close</button>
+        </div>
+        <div class="asset-preview" id="identityAssetPreview"></div>
+        <div class="asset-actions">
+            <button class="asset-btn" type="button" onclick="downloadCurrentIdentityAssetPng()">Save PNG</button>
+            <button class="asset-btn secondary" type="button" onclick="unlockIdentityPack('identity_asset_modal', currentShareName || '')">Unlock Full Identity Pack</button>
+        </div>
+    </div>
+</div>
 <!-- Payment modal -->
 <div class="paywall-modal" id="paywallModal">
     <div class="paywall-content">
         <button class="paywall-close" onclick="closePaywall()">x</button>
-        <div class="paywall-title">Upgrade Paid Packages</div>
+        <div class="paywall-title">Unlock Your Chinese Cultural Identity Kit</div>
         <div class="paywall-row">
             <div class="paywall-card">
-                <h3>Basic</h3><div class="price-wrap"><span class="price-original">$19.9</span><span class="price-current">$9.9</span><span class="price-badge">Starter</span></div>
-                <ul><li>3 custom Chinese name options</li><li>Basic five-element analysis</li><li>1 regeneration if the direction feels wrong</li><li>Chinese characters, pinyin, and English meaning</li></ul>
+                <h3>Name Explorer</h3><div class="price-wrap"><span class="price-original">$19.9</span><span class="price-current">$9.9</span><span class="price-badge">Starter</span></div>
+                <ul><li>3 custom Chinese name generations</li><li>Meaning, pinyin, and pronunciation guide</li><li>1 regeneration if the direction feels wrong</li><li>Basic social name card</li></ul>
                 <button class="buy-btn paypal-btn" data-package="basic" data-price="9.9">Buy Now</button>
             </div>
             <div class="paywall-card hot">
-                <h3>Premium</h3><div class="price-wrap"><span class="price-original">$39.9</span><span class="price-current">$19.9</span><span class="price-badge">Most Popular</span></div>
-                <ul><li>5 exclusive Chinese name options</li><li>Full birth-time and five-elements analysis</li><li>Book of Songs / Chu Ci source explanation</li><li>Downloadable naming certificate</li><li>1 calligraphy-style name card</li></ul>
+                <h3>Cultural Identity Pack</h3><div class="price-wrap"><span class="price-original">$39.9</span><span class="price-current">$19.9</span><span class="price-badge">Most Popular</span></div>
+                <ul><li>5 exclusive Chinese name options</li><li>Full birth-time and five-elements analysis</li><li>Book of Songs / Chu Ci source explanation</li><li>Certificate, script styles, and social cards</li><li>Tattoo readiness preview</li></ul>
                 <button class="buy-btn paypal-btn" data-package="premium" data-price="19.9">Buy Now</button>
             </div>
             <div class="paywall-card">
-                <h3>Ultimate</h3><div class="price-wrap"><span class="price-original">$59.9</span><span class="price-current">$29.9</span><span class="price-badge">Full Service</span></div>
-                <ul><li>Unlimited name generations for your project</li><li>In-depth cultural customization</li><li>Lifetime name record storage</li><li>Priority support for payment or generation issues</li></ul>
+                <h3>Full Naming Report</h3><div class="price-wrap"><span class="price-original">$59.9</span><span class="price-current">$29.9</span><span class="price-badge">Full Service</span></div>
+                <ul><li>Unlimited name generations for your project</li><li>In-depth cultural customization</li><li>Full report and lifetime name record storage</li><li>Priority support for payment or generation issues</li></ul>
                 <button class="buy-btn paypal-btn" data-package="ultimate" data-price="29.9">Buy Now</button>
             </div>
         </div>
@@ -621,7 +955,7 @@ input:focus,select:focus{
 const API_BASE = window.API_BASE || (
     ['localhost', '127.0.0.1'].includes(window.location.hostname)
         ? ''
-        : 'https://mychinesename-api.onrender.com'
+        : ''
 );
 const USER_ID_KEY = 'MY_CHINESE_NAME_USER_ID';
 function getBrowserUserId(){
@@ -712,6 +1046,8 @@ let currentShareSquareImageUrl = '';
 let currentSharePublishPromise = null;
 let currentShareName = '';
 let currentShareResult = null;
+let currentCalligraphyCard = null;
+let currentCalligraphyStyleIndex = 0;
 let currentPackage = 'free';
 let shareRewardClaimed = false;
 
@@ -815,7 +1151,54 @@ function svgTextToImage(svgText){
     });
 }
 
-async function svgTextToSquarePngDataUrl(svgText){
+const CALLIGRAPHY_FONT_FILES = {
+    regular: ['/assets/fonts/calligraphy/MaShanZheng-Regular.ttf', 'MCN-MaShan'],
+    running: ['/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf', 'MCN-ZhiMang'],
+    cursive: ['/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf', 'MCN-MaoCao'],
+    seal: ['/assets/fonts/calligraphy/LongCang-Regular.ttf', 'MCN-LongCang']
+};
+let calligraphyFontsReadyPromise = null;
+
+function ensureCalligraphyFontsReady(){
+    if(calligraphyFontsReadyPromise) return calligraphyFontsReadyPromise;
+    calligraphyFontsReadyPromise = Promise.all(Object.values(CALLIGRAPHY_FONT_FILES).map(([url, family]) => {
+        if(!('FontFace' in window) || !document.fonts) return Promise.resolve();
+        const face = new FontFace(family, `url(${url})`);
+        return face.load().then(loaded => {
+            document.fonts.add(loaded);
+        }).catch(() => null);
+    })).then(() => document.fonts?.ready || null).catch(() => null);
+    return calligraphyFontsReadyPromise;
+}
+
+function drawCanvasCalligraphyName(ctx, name, x, y, size, style = 'running', fill = '#050403'){
+    if(!name) return;
+    const familyMap = {
+        regular: 'MCN-MaShan',
+        running: 'MCN-MaShan',
+        cursive: 'MCN-MaoCao',
+        seal: 'MCN-LongCang'
+    };
+    const family = familyMap[style] || familyMap.running;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${size}px "${family}", "SimKai", "KaiTi", serif`;
+    ctx.shadowColor = 'rgba(0,0,0,.22)';
+    ctx.shadowBlur = Math.max(4, size * .035);
+    ctx.shadowOffsetX = Math.max(2, size * .025);
+    ctx.shadowOffsetY = Math.max(3, size * .035);
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(0,0,0,.22)';
+    ctx.lineWidth = Math.max(1.2, size * .018);
+    ctx.strokeText(name, x, y);
+    ctx.fillStyle = fill;
+    ctx.fillText(name, x, y);
+    ctx.restore();
+}
+
+async function svgTextToSquarePngDataUrl(svgText, name){
+    await ensureCalligraphyFontsReady();
     const img = await svgTextToImage(svgText);
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
@@ -824,10 +1207,12 @@ async function svgTextToSquarePngDataUrl(svgText){
     ctx.fillStyle = '#f7f2e9';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawImageContain(ctx, img, 36, 36, 1008, 1008);
+    drawCanvasCalligraphyName(ctx, name || currentShareName, 540, 508, 142, 'running');
     return canvas.toDataURL('image/png');
 }
 
 async function svgTextToPreviewPngDataUrl(svgText, name, result){
+    await ensureCalligraphyFontsReady();
     const img = await svgTextToImage(svgText);
     const canvas = document.createElement('canvas');
     canvas.width = 1200;
@@ -850,6 +1235,7 @@ async function svgTextToPreviewPngDataUrl(svgText, name, result){
     ctx.fill();
     ctx.stroke();
     drawImageContain(ctx, img, 86, 90, 458, 458);
+    drawCanvasCalligraphyName(ctx, name, 315, 330, 92, 'running');
 
     const pinyin = result?.pinyin || '';
     const summary = buildShareSummary(result);
@@ -872,7 +1258,7 @@ async function svgTextToPreviewPngDataUrl(svgText, name, result){
 }
 
 async function svgTextToPngFile(svgText, fileName){
-    const dataUrl = await svgTextToSquarePngDataUrl(svgText);
+    const dataUrl = await svgTextToSquarePngDataUrl(svgText, currentShareName);
     const bytes = atob(dataUrl.split(',')[1] || '');
     const arr = new Uint8Array(bytes.length);
     for(let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
@@ -881,6 +1267,7 @@ async function svgTextToPngFile(svgText, fileName){
 
 function legacySvgTextToPngFile(svgText, fileName){
     return new Promise((resolve, reject) => {
+        ensureCalligraphyFontsReady().finally(() => {
         const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const img = new Image();
@@ -909,11 +1296,13 @@ function legacySvgTextToPngFile(svgText, fileName){
             reject(new Error('image_load_failed'));
         };
         img.src = url;
+        });
     });
 }
 
 function svgTextToPngDataUrl(svgText){
     return new Promise((resolve) => {
+        ensureCalligraphyFontsReady().finally(() => {
         const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const img = new Image();
@@ -936,6 +1325,7 @@ function svgTextToPngDataUrl(svgText){
             resolve('');
         };
         img.src = url;
+        });
     });
 }
 
@@ -962,6 +1352,70 @@ function buildShareSummary(result){
     return summary.slice(0, 260) || 'A meaningful Chinese name inspired by the I Ching, Book of Songs, and classical Chinese culture.';
 }
 
+function renderCalligraphyLoading(name){
+    return `<div class="calligraphy-loading">
+        <div class="result-name">${escapeHtml(name || '')}</div>
+        <div class="avatar-subtitle">Preparing real brush-calligraphy image...</div>
+    </div>`;
+}
+
+async function prepareCalligraphyCard(name, result, style){
+    currentSharePageUrl = '';
+    currentShareImageUrl = '';
+    currentShareSquareImageUrl = '';
+    currentShareName = name || '';
+    currentShareResult = result || null;
+    currentCalligraphyCard = null;
+    const status = document.getElementById('shareRewardStatus');
+    const wrap = document.getElementById('avatarSvgWrap');
+    if(status) status.textContent = 'Preparing real calligraphy card...';
+    if(wrap) wrap.innerHTML = renderCalligraphyLoading(name);
+    currentSharePublishPromise = fetch(apiUrl('/api/calligraphy-card'), {
+        method: 'POST',
+        headers: apiHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+            name,
+            style: style || 'running',
+            pinyin: result?.pinyin || '',
+            summary: buildShareSummary(result),
+            meaning: result?.meaning || ''
+        })
+    }).then(async res => {
+        const data = await res.json().catch(() => null);
+        if(!res.ok || !data?.success) throw new Error(data?.error || 'Calligraphy card failed');
+        return data;
+    }).then(data => {
+        currentCalligraphyCard = data;
+        currentSharePageUrl = data.url || '';
+        currentShareImageUrl = data.imageUrl || '';
+        currentShareSquareImageUrl = data.squareImageUrl || data.imageUrl || '';
+        const linkEl = document.getElementById('sharePageLink');
+        if(linkEl && currentSharePageUrl) {
+            linkEl.href = currentSharePageUrl;
+            linkEl.textContent = currentSharePageUrl;
+        }
+        if(wrap && currentShareImageUrl) {
+            wrap.innerHTML = `<img class="avatar-img calligraphy-card-img" src="${currentShareImageUrl}" alt="${escapeHtml(name)} calligraphy name card">`;
+        }
+        const status = document.getElementById('shareRewardStatus');
+        if(status) status.textContent = 'Real calligraphy card is ready.';
+        return data;
+    }).catch(err => {
+        const status = document.getElementById('shareRewardStatus');
+        if(status) status.textContent = 'Real calligraphy card could not be generated. Please try again after image provider is configured.';
+        if(wrap) wrap.innerHTML = `<div class="avatar-subtitle">Real brush-calligraphy provider is not ready. The site will not pretend this is calligraphy with a web font.</div>`;
+        console.error('calligraphy card failed:', err);
+        return null;
+    });
+    return currentSharePublishPromise;
+}
+
+function regenerateCalligraphyCard(name){
+    const styles = ['running', 'regular', 'seal'];
+    currentCalligraphyStyleIndex = (currentCalligraphyStyleIndex + 1) % styles.length;
+    return prepareCalligraphyCard(name, currentShareResult, styles[currentCalligraphyStyleIndex]);
+}
+
 function publishShareCard(name, svgText, result){
     currentSharePageUrl = '';
     currentShareImageUrl = '';
@@ -972,7 +1426,7 @@ function publishShareCard(name, svgText, result){
     if(status) status.textContent = 'Preparing share images...';
     currentSharePublishPromise = Promise.all([
         svgTextToPreviewPngDataUrl(svgText, name, result).catch(() => ''),
-        svgTextToSquarePngDataUrl(svgText).catch(() => '')
+        svgTextToSquarePngDataUrl(svgText, name).catch(() => '')
     ]).then(([previewPng, squarePng]) => fetch(apiUrl('/api/share-card'), {
         method: 'POST',
         headers: apiHeaders({ 'Content-Type': 'application/json' }),
@@ -1011,6 +1465,11 @@ function publishShareCard(name, svgText, result){
 }
 
 async function retryShareCardPublish(){
+    if(currentSharePageUrl) return currentSharePageUrl;
+    if(currentShareName && currentShareResult) {
+        const data = await prepareCalligraphyCard(currentShareName, currentShareResult, 'running');
+        return data?.url || currentSharePageUrl || '';
+    }
     const svgText = getCurrentAvatarSvgText();
     if(!svgText || !currentShareName) return '';
     await publishShareCard(currentShareName, svgText, currentShareResult);
@@ -1040,7 +1499,28 @@ function downloadCurrentAvatarCopy(name){
     return true;
 }
 
+async function downloadImageUrl(url, fileName){
+    const res = await fetch(url, { cache: 'no-store' });
+    if(!res.ok) throw new Error('Image download failed');
+    const blob = await res.blob();
+    const dlUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = dlUrl;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(dlUrl);
+}
+
 async function downloadCurrentAvatarPng(name){
+    if(currentShareSquareImageUrl || currentShareImageUrl) {
+        try {
+            await downloadImageUrl(currentShareSquareImageUrl || currentShareImageUrl, (name || 'chinese_name') + '_calligraphy_card.png');
+            trackEvent('save_image', { name, type: 'real_calligraphy_png', hasShareUrl: !!currentSharePageUrl });
+            return true;
+        } catch(e) {
+            console.error('real calligraphy download failed:', e);
+        }
+    }
     const svgText = getCurrentAvatarSvgText();
     if(!svgText) return false;
     try {
@@ -1078,7 +1558,7 @@ async function claimShareReward(platform){
         if(status) status.textContent = 'Share reward already claimed.';
         return;
     }
-    const hasCard = !!getCurrentAvatarSvgText() && !!currentSharePageUrl;
+    const hasCard = (!!getCurrentAvatarSvgText() || !!currentShareImageUrl) && !!currentSharePageUrl;
     if(!hasCard) return;
     trackEvent('share_click', { platform });
     try {
@@ -1115,8 +1595,42 @@ async function openPlatformShare(platform, name){
 
 async function shareImageWithSystem(platform, name){
     const text = getPlainShareText();
-    const svgText = getCurrentAvatarSvgText();
     const readyPromise = ensureSharePageReady();
+    if(currentShareSquareImageUrl || currentShareImageUrl) {
+        try {
+            const imageUrl = currentShareSquareImageUrl || currentShareImageUrl;
+            const res = await fetch(imageUrl, { cache: 'no-store' });
+            const blob = await res.blob();
+            const file = new File([blob], (name || 'chinese_name') + '_calligraphy_card.png', { type: blob.type || 'image/png' });
+            if(navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+                const readyUrl = await Promise.race([
+                    readyPromise,
+                    new Promise(resolve => setTimeout(() => resolve(currentSharePageUrl || OFFICIAL_SHARE_URL), 1200))
+                ]);
+                await navigator.share({
+                    title: 'My Chinese Name',
+                    text,
+                    url: readyUrl || currentSharePageUrl || OFFICIAL_SHARE_URL,
+                    files: [file]
+                });
+                await readyPromise;
+                trackEvent('share_image', { platform, name, method: 'real_calligraphy_png', urlReady: !!currentSharePageUrl });
+                claimShareReward(platform);
+                return;
+            }
+            await downloadCurrentAvatarPng(name);
+            await copyShareText(text);
+            trackEvent('share_image', { platform, name, method: 'real_calligraphy_download', urlReady: !!currentSharePageUrl });
+            alert('Calligraphy card image saved. Please upload the saved image in the social app.');
+            await readyPromise;
+            claimShareReward(platform);
+            return;
+        } catch(e) {
+            if(e && e.name === 'AbortError') return;
+            console.error('real calligraphy share failed:', e);
+        }
+    }
+    const svgText = getCurrentAvatarSvgText();
 
     if(svgText && navigator.share) {
         try {
@@ -1155,7 +1669,7 @@ async function shareImageWithSystem(platform, name){
 // \u5206\u4eab\u51fd\u6570
 async function doShare(platform){
     const readyUrl = await ensureSharePageReady();
-    if(!readyUrl && !getCurrentAvatarSvgText()) {
+    if(!readyUrl && !getCurrentAvatarSvgText() && !currentShareImageUrl) {
         alert('Generate a name card first, then share it.');
         return;
     }
@@ -1177,6 +1691,131 @@ function submitResultFeedback(value, name){
         hasShareUrl: !!currentSharePageUrl
     });
     if(status) status.textContent = value === 'love' ? 'Thanks. Glad this name feels right.' : 'Thanks. We will use this to improve the naming result.';
+}
+
+function scrollToGenerator(source){
+    trackEvent('homepage_preview_click', { source: source || 'homepage_cta', action: 'scroll_to_generator' });
+    const target = document.querySelector('.form-box');
+    if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function previewHomepageFeature(feature){
+    trackEvent('homepage_preview_click', { feature, action: 'preview_feature' });
+    advanceHomepagePreview(true);
+    const messages = {
+        script_styles: 'After generation, you can choose script styles such as Ancient Seal, Han Clerical, Classic Regular, and Flowing Running.',
+        certificate: 'After generation, the certificate preview explains the Chinese name, pinyin, persona tag, and cultural source.',
+        tattoo: 'After generation, tattoo preview shows vertical layout, readability, and meaning-safety guidance.',
+        social_cards: 'After generation, social cards help turn the name into a profile story and shareable identity.'
+    };
+    alert(messages[feature] || 'Generate a name to preview this feature with your own result.');
+}
+
+const homepagePreviewSamples = [
+    {
+        name: '林清瑶',
+        pinyin: 'Lin Qingyao · lin ching-yow',
+        persona: 'Jade-like Grace',
+        tags: ['Refined', 'Gentle', 'Poetic', 'Calm Power'],
+        meaning: 'Name meaning: clear jade, graceful light, and a calm presence.',
+        source: 'Cultural source: inspired by classical imagery, five-elements balance, and Chinese naming aesthetics.',
+        use: 'Use it as a social story, profile identity, keepsake certificate, or tattoo reference.',
+        bio: 'My Chinese name is Lin Qingyao: Jade-like Grace.'
+    },
+    {
+        name: '苏静言',
+        pinyin: 'Su Jingyan · soo jing-yen',
+        persona: 'Quiet Scholar',
+        tags: ['Wise', 'Calm', 'Literary', 'Soft Focus'],
+        meaning: 'Name meaning: quiet thought, graceful speech, and composed intelligence.',
+        source: 'Cultural source: inspired by Book of Songs restraint, scholarly elegance, and balanced water-wood imagery.',
+        use: 'Use it as a thoughtful profile name, reading-club story, certificate, or professional identity card.',
+        bio: 'My Chinese name is Su Jingyan: Quiet Scholar.'
+    },
+    {
+        name: '沈和铃',
+        pinyin: 'Shen Heling · shen huh-ling',
+        persona: 'Gentle Strategist',
+        tags: ['Balanced', 'Warm', 'Strategic', 'Harmonious'],
+        meaning: 'Name meaning: harmony, resonance, and a gentle but steady inner rhythm.',
+        source: 'Cultural source: inspired by I Ching balance, peaceful sound imagery, and elegant surname matching.',
+        use: 'Use it as a calm leadership identity, social story, keepsake certificate, or tattoo reference.',
+        bio: 'My Chinese name is Shen Heling: Gentle Strategist.'
+    },
+    {
+        name: '云若兰',
+        pinyin: 'Yun Ruolan · yoon rwo-lan',
+        persona: 'Spring Orchid Energy',
+        tags: ['Fresh', 'Elegant', 'Artistic', 'Soft Power'],
+        meaning: 'Name meaning: orchid-like grace, light clouds, and a naturally refined presence.',
+        source: 'Cultural source: inspired by orchid symbolism, Chu Ci elegance, and spring-growth imagery.',
+        use: 'Use it as an artistic social identity, profile card, certificate, or graceful tattoo inspiration.',
+        bio: 'My Chinese name is Yun Ruolan: Spring Orchid Energy.'
+    }
+];
+let homepagePreviewIndex = 0;
+let homepagePreviewTimer = null;
+
+function setHomepagePreviewSample(index, manual){
+    homepagePreviewIndex = ((index % homepagePreviewSamples.length) + homepagePreviewSamples.length) % homepagePreviewSamples.length;
+    const sample = homepagePreviewSamples[homepagePreviewIndex];
+    const samplePanel = document.querySelector('.sample-result');
+    const outcomeCards = document.querySelector('.outcome-cards');
+    if(samplePanel) {
+        samplePanel.classList.remove('is-changing');
+        void samplePanel.offsetWidth;
+        samplePanel.classList.add('is-changing');
+    }
+    if(outcomeCards) {
+        outcomeCards.classList.remove('is-changing');
+        void outcomeCards.offsetWidth;
+        outcomeCards.classList.add('is-changing');
+    }
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = value;
+    };
+    setText('homeSampleName', sample.name);
+    setText('homeSamplePinyin', sample.pinyin);
+    setText('homeSamplePersona', sample.persona);
+    setText('homeCertName', sample.name);
+    setText('homeCertPersona', sample.persona);
+    setText('homeTattooName', sample.name);
+    setText('homeSocialBio', sample.bio);
+    const tags = document.getElementById('homeSampleTags');
+    if(tags) tags.innerHTML = sample.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+    const lines = document.querySelectorAll('.sample-lines .sample-line');
+    [sample.meaning, sample.source, sample.use].forEach((text, lineIndex) => {
+        if(lines[lineIndex]) lines[lineIndex].textContent = text;
+    });
+    document.querySelectorAll('.sample-dot').forEach((dot, dotIndex) => {
+        dot.classList.toggle('active', dotIndex === homepagePreviewIndex);
+    });
+    trackEvent('homepage_preview_view', {
+        variant: 'identity_kit_preview_v2',
+        sampleIndex: homepagePreviewIndex,
+        sampleName: sample.name,
+        persona: sample.persona,
+        mode: manual ? 'manual' : 'auto'
+    });
+}
+
+function advanceHomepagePreview(manual){
+    setHomepagePreviewSample(homepagePreviewIndex + 1, manual);
+    if(manual) startHomepagePreviewRotation();
+}
+
+function startHomepagePreviewRotation(){
+    if(homepagePreviewTimer) clearInterval(homepagePreviewTimer);
+    homepagePreviewTimer = setInterval(() => {
+        if(document.hidden) return;
+        advanceHomepagePreview(false);
+    }, 5200);
+}
+
+function applyHomepagePreviewSample(){
+    setHomepagePreviewSample(Math.floor(Math.random() * homepagePreviewSamples.length), false);
+    startHomepagePreviewRotation();
 }
 
 // \u4ed8\u8d39\u5f39\u7a97
@@ -1330,6 +1969,7 @@ document.addEventListener('DOMContentLoaded', function(){
         document.body.appendChild(badge);
     }
     trackPageView();
+    applyHomepagePreviewSample();
     loadPricing().catch(function(e){ console.error('loadPricing failed:', e); });
     syncQuota().catch(function(e){ console.error('syncQuota failed:', e); });
 });
@@ -1462,6 +2102,288 @@ function renderMeaningSections(result){
     return lines.map(line => `<div class="bi-line"><span class="bi-cn">${escapeHtml(line)}</span></div>`).join('');
 }
 
+function derivePersona(result){
+    const text = [
+        result?.fullName || '',
+        result?.meaning || '',
+        ...(Array.isArray(result?.sections) ? result.sections.map(s => `${s.titleCn || ''} ${s.titleEn || ''} ${s.cn || ''} ${s.en || ''}`) : [])
+    ].join(' ').toLowerCase();
+    const options = [
+        { name: 'Jade-like Grace', cn: '玉质清雅', tags: ['Refined', 'Gentle', 'Elegant'], match: ['jade','grace','elegant','clear','pure','玉','雅','清'] },
+        { name: 'Quiet Scholar', cn: '静雅书生', tags: ['Calm', 'Wise', 'Poetic'], match: ['book','scholar','wisdom','poem','quiet','文','书','诗','静'] },
+        { name: 'Mountain Spirit', cn: '山岚灵气', tags: ['Grounded', 'Free', 'Resilient'], match: ['mountain','spirit','forest','stone','山','林','岚','石'] },
+        { name: 'Gentle Strategist', cn: '温润谋者', tags: ['Balanced', 'Strategic', 'Warm'], match: ['strategy','balance','steady','gentle','衡','安','和','睿'] },
+        { name: 'Spring Orchid Energy', cn: '兰气春生', tags: ['Fresh', 'Artistic', 'Soft Power'], match: ['spring','orchid','flower','bright','春','兰','芳','华'] }
+    ];
+    return options.find(item => item.match.some(key => text.includes(key))) || options[Math.abs(String(result?.fullName || '').charCodeAt(0) || 0) % options.length];
+}
+
+function getPrimaryMeaning(result){
+    if(Array.isArray(result?.sections) && result.sections.length) {
+        const section = result.sections.find(s => s.en || s.cn) || result.sections[0];
+        return (section.en || section.cn || '').slice(0, 180);
+    }
+    return (result?.meaning || 'A culturally grounded Chinese name with pinyin, meaning, and classical source.').replace(/\s+/g, ' ').slice(0, 180);
+}
+
+function renderIdentityKit(result){
+    const name = result.fullName || '';
+    const safeName = escapeHtml(name);
+    const persona = derivePersona(result);
+    const meaning = escapeHtml(getPrimaryMeaning(result));
+    const pinyin = escapeHtml(result.pinyin || '');
+    const bio = `My Chinese name is ${name}${result.pinyin ? ` (${result.pinyin})` : ''}: ${persona.name}.`;
+    const scriptOptions = [
+        ['seal','Ancient Seal','Mysterious old-script feeling'],
+        ['clerical','Han Clerical','Historical and ceremonial'],
+        ['regular','Classic Regular','Clear, formal, readable'],
+        ['running','Flowing Running','Elegant social-card style'],
+        ['cursive','Wild Cursive','Expressive premium art'],
+        ['oracle','Oracle Symbol','Ancient mark inspiration']
+    ].map((item, idx) => `<button class="script-option${idx === 0 ? ' active' : ''}" type="button" data-script="${item[0]}" onclick="selectScriptStyle('${item[0]}','${safeName}',this)"><strong>${item[1]}</strong><span>${item[2]}</span></button>`).join('');
+    setTimeout(() => trackEvent('identity_pack_view', { name, persona: persona.name }), 0);
+    return `<div class="identity-kit">
+    <div class="identity-hero">
+        <section class="identity-panel dark">
+            <div class="identity-eyebrow">Oriental Persona</div>
+            <div class="persona-name">${escapeHtml(persona.name)}</div>
+            <div class="identity-copy">${escapeHtml(persona.cn)} · This gives the name a social identity, not just a translation.</div>
+            <div class="persona-tags">${persona.tags.map(tag => `<span class="persona-tag">${escapeHtml(tag)}</span>`).join('')}</div>
+        </section>
+        <section class="identity-panel">
+            <div class="identity-eyebrow">Meaning Snapshot</div>
+            <div class="identity-title">${safeName}${pinyin ? ` · ${pinyin}` : ''}</div>
+            <div class="identity-copy">${meaning}</div>
+            <div class="bio-line">${escapeHtml(bio)}</div>
+            <button class="preview-btn" type="button" onclick="previewSocialBio('${safeName}')">Preview Social Bio</button>
+        </section>
+    </div>
+    <div class="kit-grid">
+        <section class="kit-card">
+            <h3>Choose Your Chinese Script</h3>
+            <p>Turn the same name into different cultural moods for sharing, saving, or upgrading.</p>
+            <div class="script-options">${scriptOptions}</div>
+        </section>
+        <section class="kit-card">
+            <h3>Chinese Name Certificate</h3>
+            <div class="certificate-mini">
+                <div>Certificate of Chinese Cultural Name</div>
+                <div class="cert-name">${safeName}</div>
+                <div>${pinyin || 'Pinyin included after generation'}</div>
+            </div>
+            <button class="preview-btn" type="button" onclick="previewCertificate('${safeName}')">View Certificate Preview</button>
+        </section>
+        <section class="kit-card">
+            <h3>Tattoo Readiness</h3>
+            <div class="tattoo-mini">
+                <div class="tattoo-vertical">${safeName}</div>
+                <div><strong>Meaning safe</strong><br>Readable vertically<br>Best for minimal black ink<br>Needs premium final check</div>
+            </div>
+            <button class="preview-btn" type="button" onclick="previewTattoo('${safeName}')">View Tattoo Preview</button>
+        </section>
+    </div>
+    <section class="unlock-panel">
+        <div>
+            <h3>Unlock Cultural Identity Pack</h3>
+            <div class="unlock-list">
+                <span>HD name certificate</span><span>Six script styles</span>
+                <span>Tattoo-ready layout</span><span>Social profile card</span>
+                <span>No-watermark images</span><span>More name options</span>
+            </div>
+        </div>
+        <div class="unlock-price">
+            <span>Best for sharing and keeping</span>
+            <strong>From $9.90</strong>
+            <button class="unlock-btn" type="button" onclick="unlockIdentityPack('identity_pack','${safeName}')">Unlock Identity Pack</button>
+        </div>
+    </section>
+</div>`;
+}
+
+function getScriptConfig(scriptKey){
+    const configs = {
+        seal: { font: getCalligraphyFontStack('seal'), theme: 'paper' },
+        clerical: { font: getCalligraphyFontStack('clerical'), theme: 'mountain' },
+        regular: { font: getCalligraphyFontStack('regular'), theme: 'cloud' },
+        running: { font: getCalligraphyFontStack('running'), theme: 'ink' },
+        cursive: { font: getCalligraphyFontStack('cursive'), theme: 'ink' },
+        oracle: { font: getCalligraphyFontStack('oracle'), theme: 'mountain' }
+    };
+    return configs[scriptKey] || configs.regular;
+}
+
+function selectScriptStyle(scriptKey, name, button){
+    document.querySelectorAll('.script-option').forEach(btn => btn.classList.toggle('active', btn === button));
+    const wrap = document.getElementById('avatarSvgWrap');
+    if(!wrap || !name) return;
+    const config = getScriptConfig(scriptKey);
+    const svg = createChineseStyleAvatarSvg(name, { size: 400, font: config.font, theme: config.theme });
+    wrap.innerHTML = svg;
+    trackEvent('script_style_select', { script: scriptKey, name });
+    publishShareCard(name, svg, currentShareResult);
+}
+
+let currentIdentityAsset = null;
+
+function getPersonaForCurrent(name){
+    return derivePersona(currentShareResult || { fullName: name });
+}
+
+function getAssetSummary(){
+    return getPrimaryMeaning(currentShareResult || {}).replace(/[<>]/g, '').slice(0, 180) || 'A meaningful Chinese name with cultural source, pinyin, and an oriental persona.';
+}
+
+function getCalligraphyFontStack(style = 'regular'){
+    const stacks = {
+        seal: "'MCN-LongCang', 'MCN-MaShan', 'SimKai', 'KaiTi', '\u6977\u4f53', serif",
+        clerical: "'MCN-MaShan', 'MCN-LongCang', 'SimKai', 'KaiTi', '\u6977\u4f53', serif",
+        running: "'MCN-MaShan', 'MCN-ZhiMang', 'SimKai', 'KaiTi', '\u6977\u4f53', cursive",
+        cursive: "'MCN-MaoCao', 'MCN-ZhiMang', 'MCN-MaShan', cursive",
+        oracle: "'MCN-LongCang', 'MCN-MaShan', 'SimKai', 'KaiTi', '\u6977\u4f53', serif",
+        regular: "'MCN-MaShan', 'SimKai', 'KaiTi', '\u6977\u4f53', serif"
+    };
+    return stacks[style] || stacks.regular;
+}
+
+function getCalligraphyFontFaceCss(){
+    return `<style>
+      @font-face{font-family:MCN-MaShan;src:url('/assets/fonts/calligraphy/MaShanZheng-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-ZhiMang;src:url('/assets/fonts/calligraphy/ZhiMangXing-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-MaoCao;src:url('/assets/fonts/calligraphy/LiuJianMaoCao-Regular.ttf') format('truetype');}
+      @font-face{font-family:MCN-LongCang;src:url('/assets/fonts/calligraphy/LongCang-Regular.ttf') format('truetype');}
+    </style>`;
+}
+
+function getCalligraphyDefs(idPrefix){
+    return `${getCalligraphyFontFaceCss()}<filter id="${idPrefix}Soft"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="${idPrefix}Ink">
+      <feTurbulence type="fractalNoise" baseFrequency="0.032" numOctaves="3" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation=".18"/>
+    </filter>`;
+}
+
+function getCalligraphyTextMarkup(text, x, y, size, options = {}){
+    const safeText = escapeHtml(text);
+    const family = options.family || getCalligraphyFontStack(options.style || 'regular');
+    const anchor = options.anchor || 'middle';
+    const letterSpacing = options.letterSpacing || 12;
+    const fill = options.fill || '#070504';
+    const filterId = options.filterId || 'assetInk';
+    const softId = options.softId || 'assetSoft';
+    const writingMode = options.writingMode ? ` writing-mode="${options.writingMode}"` : '';
+    return `<g font-family="${family}" text-anchor="${anchor}"${writingMode} letter-spacing="${letterSpacing}">
+    <text x="${x + 6}" y="${y + 8}" font-size="${size}" fill="#1b1712" opacity=".14" filter="url(#${softId})">${safeText}</text>
+    <text x="${x - 2}" y="${y - 2}" font-size="${size}" fill="${fill}" opacity=".24" stroke="${fill}" stroke-width="1.2">${safeText}</text>
+    <text x="${x}" y="${y}" font-size="${size}" fill="${fill}" stroke="${fill}" stroke-width=".55" filter="url(#${filterId})">${safeText}</text>
+  </g>`;
+}
+
+function buildCertificateSvg(name){
+    const persona = getPersonaForCurrent(name);
+    const pinyin = currentShareResult?.pinyin || '';
+    const summary = getAssetSummary();
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs><linearGradient id="certBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#e5c994"/></linearGradient>${getCalligraphyDefs('cert')}</defs>
+  <rect width="1200" height="800" fill="url(#certBg)"/>
+  <rect x="58" y="58" width="1084" height="684" rx="28" fill="none" stroke="#9d2419" stroke-width="4"/>
+  <rect x="92" y="92" width="1016" height="616" rx="16" fill="rgba(255,255,255,.34)" stroke="#c9a96e" stroke-width="2"/>
+  <text x="600" y="154" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#8c2318" letter-spacing="4">CHINESE NAME CERTIFICATE</text>
+  <text x="600" y="218" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#7a5a35">Certificate of Chinese Cultural Identity</text>
+  ${getCalligraphyTextMarkup(name, 600, 366, 118, { style: 'running', letterSpacing: 14, filterId: 'certInk', softId: 'certSoft' })}
+  <text x="600" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#7a4d2c">${escapeHtml(pinyin)}</text>
+  <text x="600" y="492" text-anchor="middle" font-family="Georgia, serif" font-size="38" fill="#8c2318">${escapeHtml(persona.name)}</text>
+  <text x="600" y="548" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#5c4631">${escapeHtml(summary)}</text>
+  <text x="168" y="660" font-family="Georgia, serif" font-size="20" fill="#8c2318">mychinesename.co</text>
+  <g transform="translate(980 602)"><rect width="86" height="86" rx="8" fill="#9d2419"/><text x="43" y="36" text-anchor="middle" font-family="${getCalligraphyFontStack('regular')}" font-size="25" fill="#f8ead2">雅</text><text x="43" y="66" text-anchor="middle" font-family="${getCalligraphyFontStack('regular')}" font-size="25" fill="#f8ead2">名</text></g>
+</svg>`;
+}
+
+function buildTattooSvg(name){
+    const persona = getPersonaForCurrent(name);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1200" viewBox="0 0 800 1200">
+  <defs>${getCalligraphyDefs('tattoo')}</defs>
+  <rect width="800" height="1200" fill="#f7f2e9"/>
+  <path d="M250 90c220 120 260 320 110 520-132 176-90 330 138 500" fill="none" stroke="#d8c6b0" stroke-width="2" opacity=".55"/>
+  ${getCalligraphyTextMarkup(name, 400, 610, 118, { style: 'cursive', letterSpacing: 20, filterId: 'tattooInk', softId: 'tattooSoft', writingMode: 'vertical-rl' })}
+  <text x="132" y="154" font-family="Georgia, serif" font-size="30" fill="#8c2318">Tattoo Readiness Preview</text>
+  <text x="132" y="206" font-family="Georgia, serif" font-size="22" fill="#5c4631">${escapeHtml(persona.name)} · vertical layout</text>
+  <g font-family="Georgia, serif" font-size="24" fill="#3f3428"><text x="132" y="930">Meaning safe</text><text x="132" y="970">Readable vertical layout</text><text x="132" y="1010">Minimal black ink style</text><text x="132" y="1050">Final tattoo check recommended</text></g>
+  <text x="132" y="1120" font-family="Georgia, serif" font-size="22" fill="#8c2318">mychinesename.co</text>
+</svg>`;
+}
+
+function buildSocialCardSvg(name){
+    const persona = getPersonaForCurrent(name);
+    const pinyin = currentShareResult?.pinyin || '';
+    const summary = getAssetSummary();
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs><linearGradient id="socialBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#ead5ac"/></linearGradient>${getCalligraphyDefs('social')}</defs>
+  <rect width="1080" height="1080" fill="url(#socialBg)"/>
+  <rect x="70" y="70" width="940" height="940" rx="34" fill="rgba(255,255,255,.45)" stroke="#c9a96e" stroke-width="2"/>
+  <text x="540" y="186" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#8c2318" letter-spacing="3">MY CHINESE NAME</text>
+  ${getCalligraphyTextMarkup(name, 540, 440, 132, { style: 'running', letterSpacing: 16, filterId: 'socialInk', softId: 'socialSoft' })}
+  <text x="540" y="510" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#6c4c32">${escapeHtml(pinyin)}</text>
+  <text x="540" y="610" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#8c2318">${escapeHtml(persona.name)}</text>
+  <text x="540" y="676" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#5c4631">${escapeHtml(summary)}</text>
+  <text x="540" y="900" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#8c2318">Create yours at mychinesename.co</text>
+</svg>`;
+}
+
+function openIdentityAsset(type, name){
+    const titles = { certificate: 'Chinese Name Certificate', tattoo: 'Tattoo Readiness Preview', social: 'Social Profile Card' };
+    const builders = { certificate: buildCertificateSvg, tattoo: buildTattooSvg, social: buildSocialCardSvg };
+    const svg = builders[type] ? builders[type](name) : buildSocialCardSvg(name);
+    currentIdentityAsset = { type, name, svg };
+    const modal = document.getElementById('identityAssetModal');
+    const title = document.getElementById('identityAssetTitle');
+    const preview = document.getElementById('identityAssetPreview');
+    if(title) title.textContent = titles[type] || 'Identity Asset Preview';
+    if(preview) preview.innerHTML = svg;
+    if(modal) modal.classList.add('show');
+    trackEvent('identity_asset_created', { type, name, hasAiResult: !!currentShareResult });
+}
+
+function closeIdentityAssetModal(){
+    const modal = document.getElementById('identityAssetModal');
+    if(modal) modal.classList.remove('show');
+}
+
+async function downloadCurrentIdentityAssetPng(){
+    if(!currentIdentityAsset?.svg) return;
+    try {
+        const file = await legacySvgTextToPngFile(currentIdentityAsset.svg, `${currentIdentityAsset.name || 'chinese_name'}_${currentIdentityAsset.type}.png`);
+        const url = URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(url);
+        trackEvent('identity_asset_download', { type: currentIdentityAsset.type, name: currentIdentityAsset.name });
+    } catch(e) {
+        alert('PNG export failed. Please try again after regenerating the asset.');
+    }
+}
+
+function previewCertificate(name){
+    trackEvent('certificate_preview', { name });
+    openIdentityAsset('certificate', name);
+}
+
+function previewTattoo(name){
+    trackEvent('tattoo_preview', { name });
+    openIdentityAsset('tattoo', name);
+}
+
+function previewSocialBio(name){
+    trackEvent('social_bio_preview', { name });
+    openIdentityAsset('social', name);
+}
+function unlockIdentityPack(pkg, name){
+    trackEvent('premium_unlock_click', { package: pkg, name });
+    showPaywall();
+}
+
 function buildResultLines(result){
     const lines = [];
     if(result.fullName) lines.push(`\u3010\u5b8c\u6574\u4e2d\u6587\u59d3\u540d\u3011\uff1a${result.fullName}`);
@@ -1478,10 +2400,19 @@ function buildResultLines(result){
 }
 
 document.getElementById('generateBtn').addEventListener('click', async () => {
+    const generateBtn = document.getElementById('generateBtn');
+    if(generateBtn.dataset.loading === '1') return;
+    generateBtn.dataset.loading = '1';
+    const originalGenerateText = generateBtn.textContent;
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Creating your Chinese identity...';
     trackEvent('generate_click', { devTest: DEV_TEST_MODE });
     if(!DEV_TEST_MODE){
-        await syncQuota();
+        try { await syncQuota(); } catch(e) { console.warn('quota sync failed:', e); }
         if(currentQuota <= 0){
+            generateBtn.dataset.loading = '0';
+            generateBtn.disabled = false;
+            generateBtn.textContent = originalGenerateText;
             showPaywall();
             return;
         }
@@ -1490,6 +2421,9 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     const englishName = document.getElementById('englishName').value.trim();
     const englishSurname = document.getElementById('englishSurname').value.trim();
     if(!englishName || !englishSurname){
+        generateBtn.dataset.loading = '0';
+        generateBtn.disabled = false;
+        generateBtn.textContent = originalGenerateText;
         trackEvent('generate_failed', { reason: 'missing_name' });
         document.getElementById('result').innerText = "\u8bf7\u8f93\u5165\u4f60\u7684\u82f1\u6587\u540d\u548c\u59d3\u6c0f\uff01| Please enter your given name and englishSurname!";
         return;
@@ -1531,6 +2465,9 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const text = await res.text();
         if(!res.ok){
             loading.style.display = 'none';
+            generateBtn.dataset.loading = '0';
+            generateBtn.disabled = false;
+            generateBtn.textContent = originalGenerateText;
             if(res.status === 402 && text.includes('quota')){
                 showPaywall();  // \u989d\u5ea6\u8017\u5c3d \u2192 \u5f39\u4ed8\u8d39\u5899
             } else {
@@ -1542,6 +2479,9 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         const result = parseGeneratedName(text);
         const fullName = result.fullName;
         if(!fullName){
+            generateBtn.dataset.loading = '0';
+            generateBtn.disabled = false;
+            generateBtn.textContent = originalGenerateText;
             trackEvent('generate_failed', { reason: 'invalid_result' });
             document.getElementById('result').innerText = '\u751f\u6210\u7ed3\u679c\u683c\u5f0f\u5f02\u5e38\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Invalid generation result, please try again';
             return;
@@ -1586,6 +2526,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
         }
         html += renderMeaningSections(result);
         html += `</div>`;
+        html += renderIdentityKit(result);
         html += `<div class="result-feedback">
     <div class="feedback-title">How does this name feel?</div>
     <button class="feedback-btn" onclick="submitResultFeedback('love','${safeFullName}')">Love it</button>
@@ -1593,22 +2534,12 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     <div class="feedback-status" id="resultFeedbackStatus"></div>
 </div>`;
 
-        const fontsIdx = Math.floor(Math.random() * avatarFonts.length);
-        const bgIdx = Math.floor(Math.random() * avatarThemes.length);
-        currentAvatarFontsIdx = fontsIdx;
-        currentAvatarBgIdx = bgIdx;
-        const avatarSvg = createChineseStyleAvatarSvg(fullName, {
-            size: 400,
-            font: avatarFonts[fontsIdx],
-            theme: avatarThemes[bgIdx],
-            subtitle: wuxingText
-        });
         html += `<div class="avatar-showcase">
     <div class="avatar-label">Shareable Chinese Name Card | \u4e13\u5c5e\u4e2d\u6587\u540d\u5361</div>
-    <div class="avatar-subtitle">Brush-calligraphy style, designed as a beautiful cultural keepsake for social sharing<br>\u6bdb\u7b14\u4e66\u6cd5\u540d\u5361\uff0c\u9002\u5408\u4fdd\u5b58\u5206\u4eab</div>
-    <div class="avatar-svg-wrap" id="avatarSvgWrap">${avatarSvg}</div>
+    <div class="avatar-subtitle">Real brush-calligraphy image, generated from your Chinese name after the naming result is created.<br>\u6839\u636e\u672c\u6b21\u751f\u6210\u7684\u4e2d\u6587\u540d\u52a8\u6001\u751f\u6210\u771f\u5b9e\u6bdb\u7b14\u4e66\u6cd5\u56fe\u5361</div>
+    <div class="avatar-svg-wrap" id="avatarSvgWrap">${renderCalligraphyLoading(safeFullName)}</div>
     <div class="avatar-actions">
-        <button class="avatar-btn" onclick="regenerateAvatar('${safeFullName}')">New Style</button>
+        <button class="avatar-btn" onclick="regenerateCalligraphyCard('${safeFullName}')">New Brush Style</button>
         <button class="avatar-btn" onclick="downloadCurrentAvatarPng('${safeFullName}')">Save Image</button>
         <button class="avatar-btn" onclick="shareImageWithSystem('system','${safeFullName}')">Share Image</button>
     </div>
@@ -1632,10 +2563,16 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     <a id="sharePageLink" href="${OFFICIAL_SHARE_URL}" target="_blank" rel="noopener" style="display:block;margin-top:10px;font-size:12px;color:#886655;word-break:break-all">${OFFICIAL_SHARE_URL}</a>
 </div>`;
         document.getElementById('result').innerHTML = html;
-        document.getElementById('generateBtn').textContent = 'Generate Another Name';
-        publishShareCard(fullName, avatarSvg, result);
+        generateBtn.dataset.loading = '0';
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate Another Name';
+        currentCalligraphyStyleIndex = 0;
+        prepareCalligraphyCard(fullName, result, 'running');
     }catch(err){
         loading.style.display = 'none';
+        generateBtn.dataset.loading = '0';
+        generateBtn.disabled = false;
+        generateBtn.textContent = originalGenerateText;
         trackEvent('generate_failed', { reason: 'frontend_exception' });
         document.getElementById('result').innerText = "\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5 | Generation failed, please try again later";
         console.error("\u9519\u8bef\u8be6\u60c5\uff1a",err);
@@ -1644,10 +2581,10 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
 // \u524d\u7aef\u751f\u6210\u4e66\u6cd5\u5934\u50cf\uff08\u591a\u5b57\u4f53\u591a\u80cc\u666f\u5207\u6362\uff0c\u65e0\u9700\u540e\u7aef\uff09
 const avatarFonts = [
-    "'Zhi Mang Xing', 'Ma Shan Zheng', STXingkai, FZShuTi, KaiTi, cursive",
-    "'Ma Shan Zheng', 'Zhi Mang Xing', STXingkai, FZShuTi, KaiTi, cursive",
-    "STXingkai, 'Zhi Mang Xing', 'Ma Shan Zheng', FZShuTi, KaiTi, cursive",
-    "FZShuTi, 'Zhi Mang Xing', 'Ma Shan Zheng', KaiTi, cursive"
+    getCalligraphyFontStack('regular'),
+    getCalligraphyFontStack('running'),
+    getCalligraphyFontStack('cursive'),
+    getCalligraphyFontStack('seal')
 ];
 const avatarThemes = ['cloud','ink','paper','mountain'];
 let currentAvatarFontsIdx = 0;
@@ -1697,6 +2634,7 @@ function createChineseStyleAvatarSvg(name, options){
 
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    ${getCalligraphyFontFaceCss()}
     <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#fffaf0"/>
       <stop offset="48%" stop-color="#f5ead6"/>
