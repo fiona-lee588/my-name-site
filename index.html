@@ -1781,36 +1781,29 @@
     }
 
     function readChinese(text) {
-      if (!text || !window.speechSynthesis) return;
+      if (!text) return;
+      if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+        toast("Pronunciation is not supported on this browser.");
+        return;
+      }
       const synth = window.speechSynthesis;
-      synth.cancel();
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = "zh-CN";
-      utter.rate = 0.9;
+      utter.rate = 0.88;
       utter.pitch = 1;
       utter.volume = 1;
-      const speakWithVoice = () => {
-        const voices = synth.getVoices();
-        const zhVoice = voices.find(voice => voice.lang === "zh-CN" && /female|mei|女/i.test(voice.name))
-          || voices.find(voice => voice.lang === "zh-CN")
-          || voices.find(voice => voice.lang && voice.lang.startsWith("zh"));
-        if (zhVoice) utter.voice = zhVoice;
-        synth.speak(utter);
-      };
-      if (synth.getVoices().length) {
-        speakWithVoice();
-      } else {
-        synth.onvoiceschanged = () => {
-          synth.onvoiceschanged = null;
-          speakWithVoice();
-        };
-        setTimeout(() => {
-          if (!synth.speaking) {
-            synth.onvoiceschanged = null;
-            speakWithVoice();
-          }
-        }, 1000);
-      }
+      const voices = synth.getVoices();
+      const zhVoice = voices.find(voice => voice.lang === "zh-CN" && /female|mei|女/i.test(voice.name))
+        || voices.find(voice => voice.lang === "zh-CN")
+        || voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("zh"));
+      if (zhVoice) utter.voice = zhVoice;
+      utter.onerror = () => toast("Please turn on phone sound and try again.");
+      synth.cancel();
+      if (synth.paused) synth.resume();
+      synth.speak(utter);
+      setTimeout(() => {
+        if (synth.paused) synth.resume();
+      }, 180);
     }
 
     if (window.speechSynthesis) {
