@@ -22,18 +22,6 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || (IS_PROD ? 'https://mychinesename
 const LOG_LEVEL   = process.env.LOG_LEVEL || (IS_PROD ? 'error' : 'debug');
 const OFFICIAL_DOMAIN = (process.env.PUBLIC_SITE_URL || process.env.DOMAIN || DOMAIN).replace(/\/+$/, '');
 const SHARE_DOMAIN = (process.env.SHARE_DOMAIN || OFFICIAL_DOMAIN).replace(/\/+$/, '');
-
-// Google Analytics 4 跟踪代码（衡量 ID：G-FM0BKB6V4N）
-const GA_SNIPPET = `
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FM0BKB6V4N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-FM0BKB6V4N');
-</script>
-`;
 const DEFAULT_SOCIAL_IMAGE_URL = `${OFFICIAL_DOMAIN}/assets/social-preview.png`;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const ADMIN_PATH = '/admin-dashboard-2026';
@@ -399,6 +387,9 @@ const SEO_LANDING_PAGES = {
         ]
     }
 };
+
+// Batch-generated name pages (405 entries), data file so server.js stays readable.
+Object.assign(SEO_LANDING_PAGES, require('./seo-name-pages'));
 
 // Startup logging.
 const log = (...args) => { console.log(...args); };
@@ -940,7 +931,6 @@ function renderSharePage(id, card){
 <html lang="en">
 <head>
 <meta charset="utf-8">
-${GA_SNIPPET}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${htmlEscape(title)}</title>
 <meta name="description" content="${htmlEscape(desc)}">
@@ -1418,8 +1408,7 @@ function renderBlogIndex(){
         description:'Cultural naming guides for Chinese names, I Ching, Five Elements, and classical sources.'
     };
     return `<!doctype html><html lang="en"><head>
-<meta charset="utf-8">${GA_SNIPPET}
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chinese Naming Blog | My Chinese Name</title>
 <meta name="description" content="Cultural naming guides for Chinese names, I Ching, Five Elements, Book of Songs, Chu Ci, surname matching, and identity cards.">
 <link rel="canonical" href="${canonical}">
@@ -1468,8 +1457,7 @@ function renderBlogPost(slug, post){
         articleBody
     };
     return `<!doctype html><html lang="en"><head>
-<meta charset="utf-8">${GA_SNIPPET}
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${htmlEscape(post.title)} | My Chinese Name</title>
 <meta name="description" content="${htmlEscape(post.description)}">
 <link rel="canonical" href="${canonical}">
@@ -1532,7 +1520,6 @@ function renderSeoLandingPage(pathname, page){
 <html lang="en">
 <head>
 <meta charset="utf-8">
-${GA_SNIPPET}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${htmlEscape(page.title)} | My Chinese Name</title>
 <meta name="description" content="${htmlEscape(page.intro)}">
