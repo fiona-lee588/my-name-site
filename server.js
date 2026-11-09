@@ -561,6 +561,47 @@ const SHARE_CARD_FILE = path.join(DATA_DIR, 'share-cards.json');
 const PAYPAL_ORDER_FILE = path.join(DATA_DIR, 'paypal-orders.json');
 const CONTACT_MESSAGES_FILE = path.join(DATA_DIR, 'contact-messages.json');
 const BLOG_POSTS_FILE = path.join(DATA_DIR, 'blog-posts.json');
+const VISIT_STATS_FILE = path.join(DATA_DIR, 'visit-stats.json');
+
+// Lightweight self-hosted visit stats (daily counts + top pages, no personal data)
+function readVisitStats(){
+    try {
+        if(!fs.existsSync(VISIT_STATS_FILE)) return { total: 0, days: {} };
+        return JSON.parse(fs.readFileSync(VISIT_STATS_FILE, 'utf8'));
+    } catch { return { total: 0, days: {} }; }
+}
+function recordVisit(pathname){
+    try {
+        const stats = readVisitStats();
+        const day = new Date().toISOString().slice(0, 10);
+        if(!stats.days[day]) stats.days[day] = { count: 0, pages: {} };
+        stats.days[day].count += 1;
+        stats.days[day].pages[pathname] = (stats.days[day].pages[pathname] || 0) + 1;
+        stats.total += 1;
+        fs.writeFileSync(VISIT_STATS_FILE, JSON.stringify(stats));
+    } catch { /* never break requests on stats */ }
+}
+const VISIT_SKIP = /^\/(assets|api|admin-dashboard|favicon|robots|sitemap|track-pixel)/;
+function shouldCountVisit(pathname){
+    if(VISIT_SKIP.test(pathname)) return false;
+    if(pathname.includes('.')) return false;
+    return true;
+}
+app.use((req, res, next) => {
+    if(req.method === 'GET' && shouldCountVisit(req.path)) recordVisit(req.path);
+    next();
+});
+
+// Public aggregated visit stats for the weekly report (no personal data)
+app.get('/site-stats.json', (req, res) => {
+    const stats = readVisitStats();
+    const days = Object.keys(stats.days || {}).sort().slice(-14).map(d => ({
+        date: d,
+        visits: stats.days[d].count,
+        topPages: Object.entries(stats.days[d].pages || {}).sort((a, b) => b[1] - a[1]).slice(0, 8)
+    }));
+    res.json({ ok: true, total: stats.total || 0, days });
+});
 const CALLIGRAPHY_PROVIDER = (process.env.CALLIGRAPHY_PROVIDER || (process.env.OPENAI_API_KEY ? 'openai' : '')).toLowerCase();
 const OPENAI_API_KEY = normalizeSecret(process.env.OPENAI_API_KEY || process.env.OPENAI_IMAGE_API_KEY || '');
 const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
