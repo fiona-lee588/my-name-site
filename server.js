@@ -401,6 +401,20 @@ log("PayPal client id configured:", !!process.env.PAYPAL_CLIENT_ID);
 log("PayPal client secret configured:", !!process.env.PAYPAL_CLIENT_SECRET);
 log("Site domain:", DOMAIN);
 
+// ---- 诊断：捕获崩溃并记录，供 /api/paypal-diag 读取 ----
+const CRASH_FILE = require('path').join(require('os').tmpdir(), 'vm-crash-log.json');
+function recordCrash(kind, err){
+    try {
+        require('fs').writeFileSync(CRASH_FILE, JSON.stringify({
+            kind, message: err && err.message,
+            stack: err && String(err.stack || '').slice(0, 800),
+            at: new Date().toISOString()
+        }));
+    } catch(_) {}
+}
+process.on('uncaughtException', (err) => { recordCrash('uncaughtException', err); logError('uncaughtException:', err && err.message); });
+process.on('unhandledRejection', (reason) => { recordCrash('unhandledRejection', reason instanceof Error ? reason : new Error(String(reason))); logError('unhandledRejection:', reason); });
+
 // ============================================================
 // CORS \u914d\u7f6e
 // ============================================================
@@ -2174,6 +2188,7 @@ app.post('/api/share-reward', (req, res) => {
 // PayPal \u652f\u4ed8\u8bf7\u6c42\uff08REST API \u6b63\u5f0f\u7248\uff09
 // --------------------------------------------------------
 app.post('/api/paypal-order', (req, res) => {
+    try {
     const pkg = cleanStr(req.body.package) || cleanStr(req.body.pkg);
     if(!pkg || !PACKAGE_ENTITLEMENTS[pkg]) return res.status(400).json({ error: 'Unknown package' });
 
@@ -2208,6 +2223,27 @@ app.post('/api/paypal-order', (req, res) => {
         savePayPalOrder(result.id, { pkg, userId, amount, currency: 'USD', status: 'created' });
         appendPaymentLog({ status: 'created', txn: result.id, userId, pkg });
         res.json({ paypalUrl: approvalUrl.href, paymentId: result.id });
+    });
+    } catch (e) {
+        recordCrash('paypal-order-sync', e);
+        logError('paypal-order crash:', e && e.message);
+        res.status(500).json({ error: 'Payment creation crashed', detail: e && e.message });
+    }
+});
+
+// 诊断端点：报告 PayPal 环境配置与最近崩溃（不泄露密钥本体）
+app.get('/api/paypal-diag', (req, res) => {
+    let crash = null;
+    try { crash = JSON.parse(require('fs').readFileSync(CRASH_FILE, 'utf-8')); } catch(_) {}
+    res.json({
+        diag_version: 'diag-1',
+        mode: process.env.PAYPAL_MODE || 'sandbox',
+        client_id_configured: !!process.env.PAYPAL_CLIENT_ID,
+        client_secret_configured: !!process.env.PAYPAL_CLIENT_SECRET,
+        client_id_prefix: (process.env.PAYPAL_CLIENT_ID || '').slice(0, 8),
+        domain: process.env.DOMAIN || null,
+        node: process.version,
+        last_crash: crash
     });
 });
 
