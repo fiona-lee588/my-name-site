@@ -647,7 +647,14 @@ function readPaymentLog(){
         return JSON.parse(fs.readFileSync(PAYMENT_LOG_FILE, 'utf8'));
     } catch { return []; }
 }
-function writePaymentLog(logs){ fs.writeFileSync(PAYMENT_LOG_FILE, JSON.stringify(logs, null, 2)); }
+function writePaymentLog(logs){
+    try {
+        fs.mkdirSync(path.dirname(PAYMENT_LOG_FILE), { recursive: true });
+        fs.writeFileSync(PAYMENT_LOG_FILE, JSON.stringify(logs));
+    } catch(err) {
+        logError('[payment-log] 本地记账失败（不影响收款）:', err.message);
+    }
+}
 
 function readPayPalOrders(){
     try {
@@ -657,7 +664,13 @@ function readPayPalOrders(){
 }
 
 function writePayPalOrders(orders){
-    fs.writeFileSync(PAYPAL_ORDER_FILE, JSON.stringify(orders, null, 2));
+    try {
+        fs.mkdirSync(path.dirname(PAYPAL_ORDER_FILE), { recursive: true });
+        fs.writeFileSync(PAYPAL_ORDER_FILE, JSON.stringify(orders, null, 2));
+    } catch(err) {
+        // 免费版无持久磁盘时 /var/data 不可写；订单已在 PayPal 创建成功，本地记录失败不阻塞收款
+        logError('[paypal-orders] 本地记账失败（不影响收款）:', err.message);
+    }
 }
 
 function savePayPalOrder(paymentId, order){
@@ -694,7 +707,12 @@ function readAnalyticsLog(){
 }
 
 function writeAnalyticsLog(logs){
-    fs.writeFileSync(ANALYTICS_LOG_FILE, JSON.stringify(logs, null, 2));
+    try {
+        fs.mkdirSync(path.dirname(ANALYTICS_LOG_FILE), { recursive: true });
+        fs.writeFileSync(ANALYTICS_LOG_FILE, JSON.stringify(logs, null, 2));
+    } catch(err) {
+        logError('[analytics] 写入失败:', err.message);
+    }
 }
 
 function readContactMessages(){
