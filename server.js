@@ -2268,6 +2268,29 @@ app.get('/api/paypal-diag', (req, res) => {
 // --------------------------------------------------------
 // PayPal IPN\uff08\u5b98\u65b9\u5f02\u6b65\u901a\u77e5 + \u4e09\u5c42\u5b89\u5168\u6821\u9a8c\uff09
 // --------------------------------------------------------
+// Pinterest OAuth 接应页：浏览器授权后跳回这里，服务器端换取长期钥匙
+// 用法：/api/pinterest-callback?cid=应用ID&sec=应用密钥&code=授权码
+app.get('/api/pinterest-callback', async (req, res) => {
+    const { cid, sec, code } = req.query;
+    const page = (title, body) => res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>body{font-family:sans-serif;max-width:700px;margin:60px auto;padding:0 20px;line-height:1.8}pre{background:#f7f5ef;padding:16px;border-radius:8px;white-space:pre-wrap;word-break:break-all}</style></head><body>${body}</body></html>`);
+    if(!code) return page('Pinterest 授权', '<h2>地址里没有授权码</h2><p>请从 Pinterest 授权页面跳转回来。</p>');
+    if(!cid || !sec) return page('Pinterest 授权', '<h2>缺少应用参数</h2><p>需要在网址里带上 cid（应用ID）和 sec（应用密钥）。</p>');
+    try {
+        const r = await fetch('https://api.pinterest.com/v5/oauth/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: 'Basic ' + Buffer.from(cid + ':' + sec).toString('base64') },
+            body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: 'https://mychinesename.co/api/pinterest-callback' })
+        });
+        const data = await r.json();
+        if(data.access_token){
+            return page('授权成功', `<h2>Pinterest 长期钥匙已拿到</h2><p>把本页内容完整发给你的助手即可（含刷新钥匙）：</p><pre>${JSON.stringify(data, null, 2)}</pre>`);
+        }
+        return page('换钥匙失败', `<h2>Pinterest 返回错误</h2><pre>${JSON.stringify(data, null, 2)}</pre><p>常见原因：授权码只能用一次、或应用密钥不对。</p>`);
+    } catch(err) {
+        return page('网络错误', `<h2>请求 Pinterest 失败</h2><p>${htmlEscape(err.message)}</p>`);
+    }
+});
+
 app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
     const ipn = req.body;
     log('[app] request processed');
