@@ -1,0 +1,75 @@
+{
+  "note": "Pinterest auto-post queue. post.py posts the first entry with posted=null, then commits this file.",
+  "pins": [
+    {
+      "slug": "qingyang",
+      "image": "card_11.png",
+      "title": "Qīngyáng 清扬 — the oldest compliment to a beautiful person",
+      "description": "Bright eyes, clear brow. This is the exact phrase the Book of Songs — China's oldest poetry, 3,000 years old — used to describe a beautiful person. A name that has meant graceful beauty since before Rome was founded. See the full meaning and origin: https://mychinesename.co/name/qingyang",
+      "posted": null
+    },
+    {
+      "slug": "wanxi",
+      "image": "card_12.png",
+      "title": "Wǎnxī 婉兮 — grace itself, from the oldest Chinese poetry",
+      "description": "Soft, graceful, unforgettable. 'Wǎnxī' comes from the Book of Songs, where a traveler falls in love at first sight on a morning of wild grass and dew. One of the most poetic two characters ever written for a girl. Full story: https://mychinesename.co/name/wanxi",
+      "posted": null
+    },
+    {
+      "slug": "jiashu",
+      "image": "card_13.png",
+      "title": "Jiāshù 嘉树 — the noble tree Qu Yuan praised",
+      "description": "Qu Yuan, China's first great poet, praised one tree above all: the orange tree — 'the noblest of all fine trees'. A name for someone you hope will stand tall and stay fragrant through every season. Full story: https://mychinesename.co/name/jiashu",
+      "posted": null
+    },
+    {
+      "slug": "youlan",
+      "image": "card_14.png",
+      "title": "Yōulán 幽兰 — the orchid hidden in the deep valley",
+      "description": "Confucius said the orchid is 'the king of fragrances', yet it blooms quietly in empty valleys, asking no one's praise. 'Yōulán' is for quiet strength and hidden talent. Full story: https://mychinesename.co/name/youlan",
+      "posted": null
+    },
+    {
+      "slug": "jingjie",
+      "image": "card_15.png",
+      "title": "Jìngjiē 静姝 — 'a quiet, beautiful girl', straight from the Book of Songs",
+      "description": "Three thousand years ago, the Book of Songs described an ideal woman with exactly these two characters: still as still water, lovely beyond compare. The most timeless compliment in Chinese. Full story: https://mychinesename.co/name/jingjie",
+      "posted": null
+    },
+    {
+      "slug": "zhanlu",
+      "image": "card_16.png",
+      "title": "Zhānlù 湛露 — heavy morning dew, fresh and radiant",
+      "description": "From the Book of Songs: 'the heavy dew of dawn'. Pure, luminous, full of morning promise. A rare name that sounds like first light on leaves. Full story: https://mychinesename.co/name/zhanlu",
+      "posted": null
+    },
+    {
+      "slug": "suqing",
+      "image": "card_17.png",
+      "title": "Sùqīng 素卿 — pure, elegant, like white silk",
+      "description": "'Sù' is un-dyed silk — purity without decoration. 'Qīng' is an intimate classical term of endearment. Together: understated elegance that needs no ornament. Full story: https://mychinesename.co/name/suqing",
+      "posted": null
+    },
+    {
+      "slug": "yaoyao",
+      "image": "card_18.png",
+      "title": "Yáoyáo 夭夭 — 'peaches heavy on the branch', the Book of Songs' happiest name",
+      "description": "The most joyful line in the Book of Songs: 'peach tree young and tender, its blossoms bright'. 'Yáoyáo' means blooming, thriving, radiant with life. Full story: https://mychinesename.co/name/yaoyao",
+      "posted": null
+    },
+    {
+      "slug": "zhilan",
+      "image": "card_19.png",
+      "title": "Zhǐlán 芷兰 — angelica and orchid, the scholar's fragrance",
+      "description": "'Zhǐ' is the fragrant angelica plant of the Chu ci; 'lán' the orchid Confucius loved. The classic pairing for a person of virtue and learning. Full story: https://mychinesename.co/name/zhilan",
+      "posted": null
+    },
+    {
+      "slug": "weiying",
+      "image": "card_20.png",
+      "title": "Wēiyíng 微萦 — faintly lingering, like a melody you can't forget",
+      "description": "'Wēi' — subtle, gentle. 'Yíng' — to linger, to curl around the heart. A modern-classical name for something beautiful that stays with you. Full story: https://mychinesename.co/name/weiying",
+      "posted": null
+    }
+  ]
+}
