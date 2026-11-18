@@ -1,0 +1,33 @@
+name: Pinterest Poster
+
+on:
+  schedule:
+    - cron: '23 3 * * *'
+    - cron: '47 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Post one queued pin
+        env:
+          PINTEREST_TOKEN: ${{ secrets.PINTEREST_TOKEN }}
+        run: python pinterest/post.py
+
+      - name: Save queue state
+        run: |
+          git config user.name "vm-poster"
+          git config user.email "vm-poster@users.noreply.github.com"
+          git add pinterest/queue.json
+          git diff --cached --quiet || git commit -m "poster: mark pin posted"
+          git push
