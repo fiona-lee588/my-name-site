@@ -1463,6 +1463,21 @@ const BLOG_POSTS = {
             ['The source should explain the feeling', 'A good source note tells the user why the name fits, what it evokes, and how to introduce it in English.'],
             ['Poetic does not mean obscure', 'For overseas users, the best classical name is elegant, readable, and easy enough to remember.']
         ]
+    },
+    'beautiful-chinese-names-with-stories': {
+        title: 'Beautiful Chinese Names with Stories: What a Name Carries Before You Say It',
+        category: 'Names',
+        date: '2026-11-18',
+        description: 'A good Chinese name is a three-character story. Here is how meaning, tone, and classical imagery turn a name into an identity.',
+        intro: 'In Chinese, a name is spoken before it is written, but it is remembered for what it means. Two or three characters can carry an image of jade, a line of poetry, or a wish from a classic text.',
+        content: `<section><h2>Meaning Comes First, Sound Second</h2>
+<p>Many naming tools start by imitating the sound of an English name. That gives you a nickname, not an identity. A real Chinese name starts with the idea behind your name: grace, peace, strength, clarity. Then characters are chosen that express that idea naturally. See how this works in practice with <a href="/chinese-name-for-emma">a Chinese name for Emma</a> or <a href="/chinese-name-for-liam">a Chinese name for Liam</a>, where meaning leads the design rather than pronunciation.</p></section>
+<section><h2>Characters Are Chosen Like Words in a Poem</h2>
+<p>Each character adds a layer. One character may carry the imagery — orchid, river, dawn light — while another keeps the name balanced, modern, and easy to say. Tone matters too: a name should rise and fall like a short phrase, not clash like two drum beats. Gender feel, surname pairing, and how the name looks on paper are all checked before a name is offered.</p></section>
+<section><h2>Classical Sources Give a Name Its Story</h2>
+<p>The strongest Chinese names borrow atmosphere from the Book of Songs, Chu Ci, and Tang poetry. A name that echoes a line about orchids or a quiet boat carries a story you can tell in one sentence — and that sentence is often what makes the name stick. Explore more examples such as <a href="/chinese-name-for-ava">a Chinese name for Ava</a>, <a href="/chinese-name-for-evelyn">a Chinese name for Evelyn</a>, or <a href="/chinese-name-for-ethan">a Chinese name for Ethan</a>, each built with the same method: meaning, characters, tone, and a shareable card.</p></section>
+<section><h2>A Name Should Be Easy to Carry</h2>
+<p>A name you cannot use is only a decoration. Every finished name should come with pinyin, a one-line persona tag, and a shareable card you can put on a social profile, a class roster, or a business introduction. That is when a translated name becomes a real identity.</p></section>`
     }
 };
 
