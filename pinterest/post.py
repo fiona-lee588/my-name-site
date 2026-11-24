@@ -3,18 +3,43 @@
 
 Run by GitHub Actions (runs overseas, can reach api.pinterest.com).
 Token comes from repo secret PINTEREST_TOKEN (never commit it).
+
+On API error: write the exact error to pinterest/last_error.txt and push it,
+so the failure is readable without logging into GitHub.
 """
 import datetime
 import json
 import os
+import subprocess
 import sys
 import urllib.request
+from pathlib import Path
 
 API = "https://api.pinterest.com/v5"
 TOKEN = os.environ["PINTEREST_TOKEN"]
 BOARD_NAME = os.environ.get("PINTEREST_BOARD", "Chinese Names")
 SITE = os.environ.get("SITE_URL", "https://mychinesename.co").rstrip("/")
 DRY = os.environ.get("DRY_RUN") == "1"
+
+
+def report_api_error(status: int, body: str) -> None:
+    """把 API 错误详情写进仓库并推送（actions/checkout 默认保留凭据）。"""
+    try:
+        detail = (
+            "time: " + datetime.datetime.now(datetime.timezone.utc).isoformat() + "\n"
+            + "HTTP " + str(status) + "\n" + body[:1500] + "\n"
+        )
+        Path("pinterest/last_error.txt").write_text(detail, encoding="utf-8")
+        subprocess.run(["git", "config", "user.name", "vm-poster"], check=False)
+        subprocess.run(
+            ["git", "config", "user.email", "vm-poster@users.noreply.github.com"],
+            check=False,
+        )
+        subprocess.run(["git", "add", "pinterest/last_error.txt"], check=False)
+        subprocess.run(["git", "commit", "-m", "poster: record API error"], check=False)
+        subprocess.run(["git", "push"], check=False)
+    except Exception:
+        pass
 
 
 def req(method, path, body=None):
@@ -29,7 +54,9 @@ def req(method, path, body=None):
             raw = resp.read()
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
-        print("HTTP", e.code, e.read().decode()[:500])
+        text = e.read().decode("utf-8", "ignore")
+        print("HTTP", e.code, text[:500])
+        report_api_error(e.code, text)
         sys.exit(2)
 
 
