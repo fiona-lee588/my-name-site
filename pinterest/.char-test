@@ -1,0 +1,6 @@
+placeholders: ${{ secrets.TEST }} and $(date +%F)
+backtick block:
+```
+echo hi
+```
+done
