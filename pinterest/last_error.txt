@@ -1,0 +1,3 @@
+time: 2026-11-24T13:59:11.364539+00:00
+HTTP 401
+{"code":3,"message":"Your token does not have sufficient permissions to perform this operation. Please ensure your token is authorized with the correct set of scopes. Missing: ['boards:write']"}
